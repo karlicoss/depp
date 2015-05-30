@@ -1,12 +1,13 @@
 package types
 
+import util.PrettyPrintable
+
 /**
  * Created by karlicos on 29.05.15.
  */
 
-sealed abstract class Type {
+sealed abstract class Type extends PrettyPrintable{
   def to(other: Type): Arrow = Arrow(this, other)
-  def pretty(): String
 }
 
 //final case class Sum(types: Array[Type]) extends Type
@@ -14,7 +15,7 @@ final case class Prod(types: Array[Type]) extends Type {
   override def pretty(): String = "(" + types.mkString(",") + ")"
 }
 final case class Arrow(from: Type, to: Type) extends Type {
-  override def pretty(): String = s"($from) => $to"
+  override def pretty(): String = s"(${from.pretty()}) => ${to.pretty()}"
 }
 
 object Types {

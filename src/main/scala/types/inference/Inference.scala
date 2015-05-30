@@ -32,7 +32,7 @@ package object Inference {
         case Lam(name, tp, body) => {
           val vid = next_id()
           val bid = next_id()
-          printEquation(name, vid)
+          printEquation(name.pretty(), vid)
           printEquation(body.pretty(), bid)
           printEquation(term.pretty(), getArrow(vid, bid))
           helper(body)
