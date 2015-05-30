@@ -4,20 +4,17 @@ package typecheck
  * Created by karlicos on 30.05.15.
  */
 
-import org.scalatest._
-import terms.Terms
+import terms.Terms.{App, Var}
+import typecheck.Substitution.subst
 import types.Types.unitT
-import types.inference.Inference.alala
+import util.UnitSpec
+import terms.Variables.{Variable, Simple, vv}
 
-import scala.collection.mutable.Stack
-
-abstract class UnitSpec extends FlatSpec
-  with Matchers with OptionValues with Inside with Inspectors
 
 class TypecheckTest extends UnitSpec {
   "fsdf" should "fefewfwe" in {
     val tp = unitT.to(unitT)
-    alala(Terms.ololo)
+//    alala(Terms.ololo)
   }
 //  "A Stack" should "pop values in last-in-first-out order" in {
 //    val stack = new Stack[Int]
@@ -33,4 +30,14 @@ class TypecheckTest extends UnitSpec {
 //      emptyStack.pop()
 //    }
 //  }
+}
+
+class SubstitutionTest extends UnitSpec {
+  "fsfs" should "fsdfsf" in {
+    val varx: Variable = vv("x'")
+    val vary: Variable = vv("y'")
+    val term = Var(varx)
+    val mapto = App(Var(vary), Var(vary))
+    subst(Map((varx, mapto)), term) should be (App(Var(vary), Var(vary)))// TODO alpha equivalent
+  }
 }

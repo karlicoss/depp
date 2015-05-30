@@ -29,13 +29,13 @@ package object Inference {
           val id = next_id()
           printEquation(term.pretty(), id)
         }
-        case Lam(name, tp, body) => {
+        case Lam(abs) => {
           val vid = next_id()
           val bid = next_id()
-          printEquation(name.pretty(), vid)
-          printEquation(body.pretty(), bid)
-          printEquation(term.pretty(), getArrow(vid, bid))
-          helper(body)
+          printEquation(abs.name.pretty(), vid)
+          printEquation(abs.body.pretty(), bid)
+          printEquation(abs.tp.pretty(), getArrow(vid, bid))
+          helper(abs.body)
         }
         case App(a, b) => {
           val appid = next_id()
@@ -46,9 +46,9 @@ package object Inference {
           helper(a)
           helper(b)
         }
-        case Prod(terms) => {
-          println("TODO")
-        }
+//        case Prod(terms) => {
+//          println("TODO")
+//        }
       }
     }
     helper(term)
