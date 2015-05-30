@@ -1,40 +1,11 @@
 package typecheck
 
-import org.scalatest.matchers.{MatchResult, Matcher}
 import terms.Abstraction.Abs
 import terms.Terms._
 import terms.Variables.vv
-import typecheck.Alpha.equivalent
 import util.UnitSpec
 
-/**
- * Created by karlicos on 30.05.15.
- */
 
-
-trait CustomMatchers {
-  class AlphaEquivalenceMatcher(right: Term) extends Matcher[Term] {
-    override def apply(left: Term) = MatchResult(
-      equivalent(left, right),
-      "Should be alpha-equivalent",
-      "Should not be alpha-equivalent")
-  }
-
-  class VarMatcher extends Matcher[Term] {
-    override def apply(left: Term): MatchResult = {
-      MatchResult(left.isInstanceOf[Var], "NOT INSTANCE!", "INSTANCE!")
-    }
-  }
-
-  /**
-   * TODO how to implement be matcher?
-   */
-  def beAequivalentTo(right: Term): Matcher[Term] = {
-    new AlphaEquivalenceMatcher(right)
-  }
-
-  val isVar = new VarMatcher
-}
 
 class AlphaEquivalenceTest extends UnitSpec with CustomMatchers {
 
