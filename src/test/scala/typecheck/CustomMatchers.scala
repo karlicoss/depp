@@ -28,11 +28,14 @@ trait CustomMatchers {
   }
 
   class HasTypeInContextMatcher(env: Environment, tp: Term) extends Matcher[Term] {
-    override def apply(left: Term) = MatchResult(
-      Inference.infer(env, left) == tp, // TODO structural equivalence?
-      "Should have the type",
-      "Should not have the type"
-    )
+    override def apply(left: Term) = {
+      val inferred = Inference.infer(env, left)
+      MatchResult(
+        inferred == tp, // TODO structural equivalence?
+        s"Expected type ${tp.pretty()}, got ${inferred.pretty()} instead",
+        "Should not have the type"
+      )
+    }
   }
 
   class VarMatcher extends Matcher[Term] {

@@ -1,9 +1,9 @@
 package typecheck.inference
 
-import terms.Terms.{Level, Var}
+import terms.Terms.{App, Level, Var}
 import terms.Variables.vv
 import typecheck.CustomMatchers
-import util.Terms.booleanContext
+import util.Terms.{intContext, booleanContext}
 import util.UnitSpec
 
 /**
@@ -16,8 +16,12 @@ class InferenceTest extends UnitSpec with CustomMatchers {
       Map(vv("x") -> Level(0)), Var(vv("x")))
   }
 
-  it should "infer type" in {
+  it should "infer false :: Bool" in {
     Var(vv("false")) should haveTypeInContext(booleanContext, Var(vv("Bool")))
+  }
+
+  it should "infer succ zero :: Int" in {
+    App(Var(vv("succ")), Var(vv("zero"))) should haveTypeInContext(intContext, Var(vv("Int")))
   }
 
 
