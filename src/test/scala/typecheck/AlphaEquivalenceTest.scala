@@ -1,21 +1,11 @@
 package typecheck
 
-import terms.Abstraction.Abs
-import terms.Terms._
+import terms.Terms.{Level, Var, App, Term}
 import terms.Variables.vv
 import util.UnitSpec
-
-
+import util.Terms._
 
 class AlphaEquivalenceTest extends UnitSpec with CustomMatchers {
-
-  def simpleLambda(name: String, term: Term): Term = {
-    Lam(Abs(vv(name), Level(0), term))
-  }
-
-  def makeId(name: String): Term = {
-    simpleLambda(name, Var(vv(name)))
-  }
 
   it should "treat as equivalent" in {
     val one = makeId("x")

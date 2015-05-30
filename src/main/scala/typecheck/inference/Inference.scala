@@ -1,4 +1,4 @@
-package types.inference
+package typecheck.inference
 
 import java.lang.Math.max
 

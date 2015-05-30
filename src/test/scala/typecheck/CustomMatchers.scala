@@ -2,7 +2,9 @@ package typecheck
 
 import org.scalatest.matchers.{MatchResult, Matcher}
 import terms.Terms.{Var, Term}
+import terms.Variables.Variable
 import typecheck.Alpha.equivalent
+import inference.Inference
 
 /**
  * Created by karlicos on 30.05.15.
@@ -17,6 +19,13 @@ trait CustomMatchers {
       "Should not be alpha-equivalent")
   }
 
+  class EqualInContextMatcher(env: Map[Variable, Term], right: Term) extends Matcher[Term] {
+    override def apply(left: Term) = MatchResult(
+      Inference.equal(env, left, right),
+      "Should be beta-equivalent",
+      "Should not be beta-equivalent")
+  }
+
   class VarMatcher extends Matcher[Term] {
     override def apply(left: Term): MatchResult = {
       MatchResult(left.isInstanceOf[Var], "NOT INSTANCE!", "INSTANCE!")
@@ -28,6 +37,10 @@ trait CustomMatchers {
    */
   def beAequivalentTo(right: Term): Matcher[Term] = {
     new AlphaEquivalenceMatcher(right)
+  }
+
+  def beBequivalentTo(env: Map[Variable, Term], right: Term): Matcher[Term] = {
+    new EqualInContextMatcher(env, right)
   }
 
   val isVar = new VarMatcher

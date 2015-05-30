@@ -1,4 +1,4 @@
-package types.inference
+package typecheck.inference
 
 /**
  * Created by karlicos on 30.05.15.

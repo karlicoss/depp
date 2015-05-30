@@ -4,6 +4,7 @@ import terms.Abstraction.Abs
 import terms.Terms.Term
 import terms.Variables.Variable
 import typecheck.Substitution
+import typecheck.inference.Inference
 import util.PrettyPrintable
 
 /**
@@ -27,6 +28,9 @@ package object Terms {
   sealed abstract class Term extends PrettyPrintable {
     def subst(map: Map[Variable, Term]): Term = {
       Substitution.subst(map, this)
+    }
+    def equal(other: Term): Boolean = {
+      Inference.equal(Map(), this, other)
     }
   }
 
