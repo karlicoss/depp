@@ -14,7 +14,7 @@ final case class Prod(types: Array[Type]) extends Type {
   override def pretty(): String = "(" + types.mkString(",") + ")"
 }
 final case class Arrow(from: Type, to: Type) extends Type {
-  override def pretty(): String = s"($from => $to)"
+  override def pretty(): String = s"($from) => $to"
 }
 
 object Types {
