@@ -1,7 +1,11 @@
 package types.inference
 
+import java.lang.Math.max
+
+import terms.Abstraction.Abs
 import terms.Terms._
-import types.Type
+import terms.Variables.Variable
+import typecheck.Substitution.subst
 
 /**
  * Created by karlicos on 30.05.15.
@@ -52,5 +56,60 @@ package object Inference {
       }
     }
     helper(term)
+  }
+
+  def evaluate(map: Map[Variable, Term], term: Term): Term = ???
+
+  /**
+   * TODO: mutable context?
+   */
+  def infer(env: Map[Variable, Term], term: Term): Term = {
+    term match {
+      case Var(name) => env.get(name) match {
+        case Some(x) => x
+        case None => ??? // TODO raise error
+      }
+      case Level(level) => Level(level + 1)
+      case Lam(abs) => {
+        val level = inferLevel(env, abs.tp)
+        val tp = infer(env + (abs.name -> abs.tp), abs.body)
+        Pi(Abs(abs.name, abs.tp, tp))
+      }
+      case Pi(abs) => {
+        val level1 = inferLevel(env, abs.tp)
+        val level2 = inferLevel(env + (abs.name -> abs.tp), abs.body)
+        Level(max(level1, level2))
+      }
+      case App(a, b) => {
+        val abs = inferPi(env, a)
+        val argType = infer(env, b)
+        // TODO check argType and abs.tp for equality
+        subst(Map(abs.name -> b), abs.body)
+      }
+    }
+  }
+
+  def inferPi(env: Map[Variable, Term], term: Term): Abs = {
+    val funType = infer(env, term)
+    val ev = evaluate(env, funType)
+    ev match {
+      case Pi(abs) => abs
+      case _ => {
+        val message = s"Expected ${funType.pretty()} to be evaluated in Pi type, got ${ev.pretty()} instead"
+        throw TypeInferenceException(message)
+      }
+    }
+  }
+
+  def inferLevel(env: Map[Variable, Term], term: Term): Integer = {
+    val tp = infer(env, term)
+    val ev = evaluate(env, tp)
+    ev match {
+      case Level(kind) => kind
+      case _ => {
+        val message = s"Expected ${tp.pretty()} to be evaluated in Level, got ${ev.pretty()} instead"
+        throw TypeInferenceException(message)
+      }
+    }
   }
 }

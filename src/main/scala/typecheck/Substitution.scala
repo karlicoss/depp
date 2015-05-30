@@ -18,7 +18,7 @@ package object Substitution {
         }
       case Lam(abs) => Lam(substAbs(l, abs))
       case Pi(abs) => Pi(substAbs(l, abs))
-      case Universe(kind) => Universe(kind)
+      case Level(kind) => Level(kind)
       case App(a, b) => App(subst(l, a), subst(l, b))
     }
   }

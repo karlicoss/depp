@@ -10,7 +10,7 @@ import util.UnitSpec
 class AlphaEquivalenceTest extends UnitSpec with CustomMatchers {
 
   def simpleLambda(name: String, term: Term): Term = {
-    Lam(Abs(vv(name), Universe(0), term))
+    Lam(Abs(vv(name), Level(0), term))
   }
 
   def makeId(name: String): Term = {
@@ -48,10 +48,10 @@ class AlphaEquivalenceTest extends UnitSpec with CustomMatchers {
   }
 
   it should "treat universes with same indices as eqivalent" in {
-    Universe(11) should beAequivalentTo(Universe(11))
+    Level(11) should beAequivalentTo(Level(11))
   }
 
   it should "treat universes with different indices as not equivalent" in {
-    Universe(1) should not (beAequivalentTo(Universe(2)))
+    Level(1) should not (beAequivalentTo(Level(2)))
   }
 }

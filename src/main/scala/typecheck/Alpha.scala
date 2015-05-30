@@ -40,9 +40,9 @@ package object Alpha {
             case Pi(babs) => absHelper(ctx, aabs, babs)
             case _ => false
           }
-        case Universe(akind) =>
+        case Level(akind) =>
           b match {
-            case Universe(bkind) => akind == bkind
+            case Level(bkind) => akind == bkind
             case _ => false
           }
       }

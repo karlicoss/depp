@@ -34,7 +34,7 @@ package object Terms {
   final case class Pi(abs: Abs) extends Term {
     override def pretty(): String = abs.pretty()
   }
-  final case class Universe(kind: Integer) extends Term {
+  final case class Level(kind: Integer) extends Term {
     override def pretty(): String = s"Type$kind"
   }
 
