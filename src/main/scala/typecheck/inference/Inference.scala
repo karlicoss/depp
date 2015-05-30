@@ -66,7 +66,7 @@ package object Inference {
 
     term match {
       case Var(name) => env.get(name) match {
-        case Some(x) => evaluate(env, x)
+        case Some(x) => Var(name)
         case None => throw TypeInferenceException(s"Unknown variable ${name.pretty()}") // TODO EvaluationException
       }
       case Level(kind) => Level(kind)

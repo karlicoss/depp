@@ -20,15 +20,22 @@ package object Terms {
     simpleLambda(name, Var(vv(name)))
   }
 
+  def makeNumeral(n: Int): Term = {
+    n match {
+      case 0 => Var(vv("zero"))
+      case x => App(Var(vv("succ")), makeNumeral(x - 1))
+    }
+  }
+
   val booleanContext = Map(
     vv("Bool") -> Level(0),
     vv("true") -> Var(vv("Bool")),
     vv("false") -> Var(vv("Bool"))
   )
 
-  val intContext : Environment = Map(
-    vv("Int") -> Level(0),
-    vv("zero") -> Var(vv("Int")),
-    vv("succ") -> Pi(Abs(vv("."), Var(vv("Int")), Var(vv("Int"))))
+  val natContext : Environment = Map(
+    vv("Nat") -> Level(0),
+    vv("zero") -> Var(vv("Nat")),
+    vv("succ") -> Pi(Abs(vv("."), Var(vv("Nat")), Var(vv("Nat"))))
   )
 }
