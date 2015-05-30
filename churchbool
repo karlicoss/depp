@@ -1,0 +1,14 @@
+Parameter Nat: Type 0. Parameter zero: Nat. Parameter succ: Nat -> Nat. Check (succ zero).
+
+
+
+Parameter Bool : Type 0. Parameter true : Bool. Parameter false : Bool.
+Definition boolean := forall A: Type 0, forall x:A, forall y:A, A.
+Definition tt  := fun A: Type 0 => fun x: A => fun y:A => x.
+Definition ff  := fun A: Type 0 => fun x: A => fun y:A => y.
+Definition not := fun x : boolean => fun A : Type 0 => fun t: A => fun f: A => x A f t.
+
+Eval (not tt Bool true false). 
+    = false
+    : Bool
+
