@@ -5,6 +5,7 @@ import terms.Terms.{Var, Term}
 import terms.Variables.Variable
 import typecheck.Alpha.equivalent
 import inference.Inference
+import typecheck.Environment.Environment
 
 /**
  * Created by karlicos on 30.05.15.
@@ -26,6 +27,14 @@ trait CustomMatchers {
       "Should not be beta-equivalent")
   }
 
+  class HasTypeInContextMatcher(env: Environment, tp: Term) extends Matcher[Term] {
+    override def apply(left: Term) = MatchResult(
+      Inference.infer(env, left) == tp, // TODO structural equivalence?
+      "Should have the type",
+      "Should not have the type"
+    )
+  }
+
   class VarMatcher extends Matcher[Term] {
     override def apply(left: Term): MatchResult = {
       MatchResult(left.isInstanceOf[Var], "NOT INSTANCE!", "INSTANCE!")
@@ -39,8 +48,12 @@ trait CustomMatchers {
     new AlphaEquivalenceMatcher(right)
   }
 
-  def beBequivalentTo(env: Map[Variable, Term], right: Term): Matcher[Term] = {
+  def beBequivalentTo(env: Environment, right: Term): Matcher[Term] = {
     new EqualInContextMatcher(env, right)
+  }
+
+  def haveTypeInContext(env: Environment, tp: Term): Matcher[Term] = {
+    new HasTypeInContextMatcher(env, tp)
   }
 
   val isVar = new VarMatcher

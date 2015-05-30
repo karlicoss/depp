@@ -3,13 +3,14 @@ package typecheck
 import terms.Abstraction.Abs
 import terms.Terms._
 import terms.Variables.Variable
+import typecheck.Environment.Environment
 
 /**
  * Created by karlicos on 30.05.15.
  */
 package object Substitution {
   // TOOD trait?
-  def subst(l: Map[Variable, Term], term: Term): Term = {
+  def subst(l: Environment, term: Term): Term = {
     term match {
       case Var(name) =>
         l get name match {
@@ -25,7 +26,7 @@ package object Substitution {
 
   def fresh(name: Variable): Variable = ??? // TODO
 
-  def substAbs(l: Map[Variable, Term], abs: Abs): Abs = {
+  def substAbs(l: Environment, abs: Abs): Abs = {
     val fv = fresh(abs.v)
     Abs(fv, subst(l, abs.tp), subst(l + (abs.v -> Var(fv)), abs.body))
   }

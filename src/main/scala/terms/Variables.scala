@@ -23,5 +23,7 @@ package object Variables {
     override def pretty(): String = s"$name$id"
   }
 
+  // final case class Whatever? for forall _:A. B
+
   def vv(name: String): Variable = Simple(name)
 }

@@ -58,6 +58,12 @@ package object Inference {
   }
 
   def evaluate(env: Map[Variable, Term], term: Term): Term = {
+    def evaluateAbs(env: Map[Variable, Term], abs: Abs): Abs = {
+      val etp = evaluate(env, abs.tp)
+      val ebody = evaluate(env + (abs.v -> etp), abs.body)
+      Abs(abs.v, etp, ebody)
+    }
+
     term match {
       case Var(name) => env.get(name) match {
         case Some(x) => evaluate(env, x)
@@ -77,16 +83,37 @@ package object Inference {
     }
   }
 
-  def evaluateAbs(env: Map[Variable, Term], abs: Abs): Abs = {
-    val etp = evaluate(env, abs.tp)
-    val ebody = evaluate(env + (abs.v -> etp), abs.body)
-    Abs(abs.v, etp, ebody)
-  }
-
-  /**
-   * TODO: mutable context?
-   */
   def infer(env: Map[Variable, Term], term: Term): Term = {
+    def assumeEqual(env: Map[Variable, Term], t1: Term, t2: Term): Unit = {
+      if (!equal(env, t1, t2)) {
+        throw TypeInferenceException("TODO")
+      }
+    }
+
+    def inferPi(env: Map[Variable, Term], term: Term): Abs = {
+      val funType = infer(env, term)
+      val ev = evaluate(env, funType)
+      ev match {
+        case Pi(abs) => abs
+        case _ => {
+          val message = s"Expected ${funType.pretty()} to be evaluated in Pi type, got ${ev.pretty()} instead"
+          throw TypeInferenceException(message)
+        }
+      }
+    }
+
+    def inferLevel(env: Map[Variable, Term], term: Term): Integer = {
+      val tp = infer(env, term)
+      val ev = evaluate(env, tp)
+      ev match {
+        case Level(kind) => kind
+        case _ => {
+          val message = s"Expected ${tp.pretty()} to be evaluated in Level, got ${ev.pretty()} instead"
+          throw TypeInferenceException(message)
+        }
+      }
+    }
+
     term match {
       case Var(name) => env.get(name) match {
         case Some(x) => x
@@ -112,6 +139,9 @@ package object Inference {
     }
   }
 
+  /**
+   * Beta equivalence in context
+   */
   def equal(env: Map[Variable, Term], t1: Term, t2: Term): Boolean = {
     def helper(t1: Term, t2: Term): Boolean = {
       (t1, t2) match {
@@ -128,35 +158,5 @@ package object Inference {
     }
 
     helper(evaluate(env, t1), evaluate(env, t2))
-  }
-
-  def assumeEqual(env: Map[Variable, Term], t1: Term, t2: Term): Unit = {
-    if (!equal(env, t1, t2)) {
-      throw TypeInferenceException("TODO")
-    }
-  }
-
-  def inferPi(env: Map[Variable, Term], term: Term): Abs = {
-    val funType = infer(env, term)
-    val ev = evaluate(env, funType)
-    ev match {
-      case Pi(abs) => abs
-      case _ => {
-        val message = s"Expected ${funType.pretty()} to be evaluated in Pi type, got ${ev.pretty()} instead"
-        throw TypeInferenceException(message)
-      }
-    }
-  }
-
-  def inferLevel(env: Map[Variable, Term], term: Term): Integer = {
-    val tp = infer(env, term)
-    val ev = evaluate(env, tp)
-    ev match {
-      case Level(kind) => kind
-      case _ => {
-        val message = s"Expected ${tp.pretty()} to be evaluated in Level, got ${ev.pretty()} instead"
-        throw TypeInferenceException(message)
-      }
-    }
   }
 }

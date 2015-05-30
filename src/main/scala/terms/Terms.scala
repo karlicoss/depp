@@ -3,6 +3,7 @@ package terms
 import terms.Abstraction.Abs
 import terms.Terms.Term
 import terms.Variables.Variable
+import typecheck.Environment.Environment
 import typecheck.Substitution
 import typecheck.inference.Inference
 import util.PrettyPrintable
@@ -26,11 +27,16 @@ package object Abstraction {
 package object Terms {
 
   sealed abstract class Term extends PrettyPrintable {
-    def subst(map: Map[Variable, Term]): Term = {
+    def subst(map: Environment): Term = {
       Substitution.subst(map, this)
     }
+
     def equal(other: Term): Boolean = {
       Inference.equal(Map(), this, other)
+    }
+
+    def inferType(): Term = {
+      Inference.infer(Map(), this)
     }
   }
 
