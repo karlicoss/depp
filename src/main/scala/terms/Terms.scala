@@ -3,6 +3,7 @@ package terms
 import terms.Abstraction.Abs
 import terms.Terms.Term
 import terms.Variables.Variable
+import typecheck.Substitution
 import util.PrettyPrintable
 
 /**
@@ -12,14 +13,21 @@ import util.PrettyPrintable
 
 
 package object Abstraction {
-  final case class Abs(name: Variable, tp: Term, body: Term) extends PrettyPrintable {
-    override def pretty(): String = s"\\${name.pretty()}:${tp.pretty()}.${body.pretty()}" // TODO
+
+  /**
+   * lambda v : tp.body
+   */
+  final case class Abs(v: Variable, tp: Term, body: Term) extends PrettyPrintable {
+    override def pretty(): String = s"\\${v.pretty()}:${tp.pretty()}.${body.pretty()}" // TODO
   }
 }
 
 package object Terms {
 
   sealed abstract class Term extends PrettyPrintable {
+    def subst(map: Map[Variable, Term]): Term = {
+      Substitution.subst(map, this)
+    }
   }
 
   final case class Var(name: Variable) extends Term {

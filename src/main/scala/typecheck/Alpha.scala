@@ -13,7 +13,7 @@ package object Alpha {
   def equivalent(a: Term, b: Term): Boolean = {
     def absHelper(ctx: Map[Variable, Variable], a: Abs, b: Abs): Boolean = {
       val typeEquiv = helper(ctx, a.tp, b.tp)
-      val bodyEquiv = helper(ctx + (a.name -> b.name), a.body, b.body)
+      val bodyEquiv = helper(ctx + (a.v -> b.v), a.body, b.body)
       typeEquiv && bodyEquiv
     }
 

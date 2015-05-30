@@ -26,7 +26,7 @@ package object Substitution {
   def fresh(name: Variable): Variable = ??? // TODO
 
   def substAbs(l: Map[Variable, Term], abs: Abs): Abs = {
-    val fv = fresh(abs.name)
-    Abs(fv, subst(l, abs.tp), subst(l + (abs.name -> Var(fv)), abs.body))
+    val fv = fresh(abs.v)
+    Abs(fv, subst(l, abs.tp), subst(l + (abs.v -> Var(fv)), abs.body))
   }
 }
