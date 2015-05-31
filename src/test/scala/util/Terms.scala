@@ -44,8 +44,8 @@ package object Terms {
   val churchBooleanContext: Environment = Map(
     vv("Boolean") -> ChurchBoolean.Boolean,
     vv("tt") -> ChurchBoolean.tt,
-    vv("ff") -> ChurchBoolean.ff,
-    vv("not") -> ChurchBoolean.not
+    vv("ff") -> ChurchBoolean.ff
+//    vv("not") -> ChurchBoolean.not
   )
 
   val natContext : Environment = Map(

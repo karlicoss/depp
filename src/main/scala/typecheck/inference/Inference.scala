@@ -150,6 +150,7 @@ package object Inference {
         case (Lam(aabs), Lam(babs)) => absHelper(aabs, babs)
         case (Pi(aabs), Pi(babs)) => absHelper(aabs, babs)
         case (App(a, b), App(c, d)) => helper(a, c) && helper(b, d)
+        case _ => false
       }
     }
 

@@ -5,7 +5,7 @@ import terms.Variables.vv
 import typecheck.CustomMatchers
 import typecheck.Environment.Environment
 import util.Implicits._
-import util.Terms.{booleanContext, makeNumeral, natContext, churchBooleanContext}
+import util.Terms._
 import util.UnitSpec
 
 /**
@@ -46,7 +46,24 @@ class InferenceTest extends UnitSpec with CustomMatchers {
     "X".pi(Level(0), "x".pi("X", "X")) should haveTypeInContext(Map(), Level(1))
   }
 
-  it should "fafsdf" in {
-    "not".app("tt") should haveTypeInContext(churchBooleanContext, "Boolean")
+  /*
+    TODO: this context actually contains definitions, that is the reason for failing tests
+  */
+  val alalaContext: Environment = Map(
+    vv("Type") -> "A".pi(Level(0), "x".pi("A", "A")),
+    vv("term") -> "A".lam(Level(0), "x".lam("A", "x"))
+  )
+
+  it should "infer simple dependent types" in {
+    Var("term") should haveTypeInContext(alalaContext, "Type")
   }
+
+  it should "infer type of Church booleans" in {
+    ChurchBoolean.tt should haveTypeInContext(churchBooleanContext, "Boolean")
+//    ChurchBoolean.ff should haveTypeInContext(churchBooleanContext, "Boolean")
+  }
+
+//  it should "fafsdf" in {
+//    "not".app("tt") should haveTypeInContext(churchBooleanContext, "Boolean")
+//  }
 }
