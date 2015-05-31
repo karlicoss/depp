@@ -35,7 +35,15 @@ class InferenceTest extends UnitSpec with CustomMatchers {
   )
 
   it should "infer type of identity function" in {
-    "x".lam("X", "x") should haveTypeInContext(simpleContext, ".".pi("X", "X")) // TODO alpha conversion
+    "x".lam("X", "x") should haveTypeInContext(simpleContext, ".".pi("X", "X"))
+  }
+
+  it should "infer type of type of identity" in {
+    ".".pi("X", "X") should haveTypeInContext(simpleContext, Level(0))
+  }
+
+  it should "infer type of type of polymorphic identity function" in {
+    "X".pi(Level(0), "x".pi("X", "X")) should haveTypeInContext(Map(), Level(1))
   }
 
   it should "fafsdf" in {
