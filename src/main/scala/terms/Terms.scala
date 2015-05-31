@@ -78,8 +78,14 @@ package object Terms {
     override def pretty(): String = s"Type$kind"
   }
 
-//  val unit = Prod(Array())
-//  val ololo = Lam(vv("x"), unitT, App(Var(vv("x")), Var(vv("y"))))
+  /**
+   * let x = y in whatever is equivalent to (\x.whatever) y
+   *
+   * TODO type should be inferred?
+   */
+  final case class Let(v: Variable, tp: Term, what: Term) {
+    def in(body: Term): Term = v.lam(tp, body).app(what)
+  }
 }
 
 

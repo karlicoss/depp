@@ -1,7 +1,7 @@
 package terms
 
 import terms.Abstraction.Abs
-import terms.Terms.{Pi, Lam, Term}
+import terms.Terms.{Let, Pi, Lam, Term}
 import util.PrettyPrintable
 
 /**
@@ -9,13 +9,11 @@ import util.PrettyPrintable
  */
 package object Variables {
   sealed abstract class Variable extends PrettyPrintable {
-    def lam(tp: Term, body: Term): Lam = {
-      Lam(Abs(this, tp, body))
-    }
+    def lam(tp: Term, body: Term): Lam = Lam(Abs(this, tp, body))
 
-    def pi(tp: Term, body: Term): Pi = {
-      Pi(Abs(this, tp, body))
-    }
+    def pi(tp: Term, body: Term): Pi = Pi(Abs(this, tp, body))
+
+    def let(tp: Term, what: Term): Let = Let(this, tp, what)
   }
 
   /**

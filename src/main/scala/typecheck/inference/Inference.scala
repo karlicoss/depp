@@ -86,7 +86,8 @@ package object Inference {
   def infer(env: Map[Variable, Term], term: Term): Term = {
     def assumeEqual(env: Map[Variable, Term], t1: Term, t2: Term): Unit = {
       if (!equal(env, t1, t2)) {
-        throw TypeInferenceException("TODO")
+        throw TypeInferenceException(
+          s"Expected ${t1.pretty()} to be equal to ${t2.pretty()}")
       }
     }
 

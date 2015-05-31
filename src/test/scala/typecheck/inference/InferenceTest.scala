@@ -46,6 +46,24 @@ class InferenceTest extends UnitSpec with CustomMatchers {
     "X".pi(Level(0), "x".pi("X", "X")) should haveTypeInContext(Map(), Level(1))
   }
 
+  val simpleContext2: Environment = Map(
+    vv("A") -> Level(0),
+    vv("a") -> "A"
+  )
+
+  it should "infer type in let expressions" in {
+    "b".let("A", "a").in("b") should haveTypeInContext(simpleContext2, "A")
+  }
+
+  /**
+   * The context of identity function
+   */
+  val letId = "id".let(".".pi("A", "A"), "x".lam("A", "x"))
+
+  it should "infer type in more complex let expressions" in {
+    letId.in("id".app("a")) should haveTypeInContext(simpleContext2, "A")
+  }
+
   /*
     TODO: this context actually contains definitions, that is the reason for failing tests
   */
