@@ -8,33 +8,44 @@ import typecheck.Environment.Environment
  * Created by karlicos on 30.05.15.
  */
 package object Terms {
+
+  implicit def str2Var(name: String): Var = Var.simple(name)
+
+  implicit def str2Variable(name: String): Variable = Simple(name)
+
   /**
    * Returns lambda
    */
-  def simpleLambda(v: String, term: Term): Term = vv(v).lam(Level(0), term)
+  def simpleLambda(v: String, term: Term): Term = v.lam(Level(0), term)
 
-  def makeId(name: String): Term = simpleLambda(name, Var.simple(name))
+  def makeId(name: String): Term = simpleLambda(name, name)
 
   def makeNumeral(n: Int): Term = {
     n match {
-      case 0 => Var.simple("zero")
-      case x => Var.simple("succ") app makeNumeral(x - 1)
+      case 0 => "zero"
+      case x => "succ" app makeNumeral(x - 1)
     }
   }
 
-  val booleanContext = Map(
+  val booleanContext: Environment = Map(
     vv("Bool") -> Level(0),
-    vv("true") -> Var.simple("Bool"),
-    vv("false") -> Var.simple("Bool")
+    vv("true") -> "Bool",
+    vv("false") -> "Bool"
   )
 
-  val booleanExtendedContext = Map(
-//    vv("Boolean") -> Pi(Abs)
-  )
+  val booleanExtendedContext: Environment = Map(
+    vv("Boolean") -> "A".pi(Level(0), "t".pi("A", "f".pi("A", "A"))),
+    vv("tt") -> "A".lam(Level(0), "t".lam("A", "f".lam("A", "t"))),
+    vv("ff") -> "A".lam(Level(0), "t".lam("A", "f".lam("A", "f"))),
+    vv("not") -> "b".lam("Boolean",
+      "A".lam(Level(0),
+        "t".lam("A",
+          "f".lam("A",
+            "x".app("A").app("f").app("t"))))))
 
   val natContext : Environment = Map(
     vv("Nat") -> Level(0),
-    vv("zero") -> Var.simple("Nat"),
-    vv("succ") -> vv(".").pi(Var.simple("Nat"), Var.simple("Nat"))
+    vv("zero") -> "Nat",
+    vv("succ") -> ".".pi("Nat", "Nat")
   )
 }
