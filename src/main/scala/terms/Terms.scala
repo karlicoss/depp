@@ -20,7 +20,7 @@ package object Abstraction {
    * lambda v : tp.body
    */
   final case class Abs(v: Variable, tp: Term, body: Term) extends PrettyPrintable {
-    override def pretty(): String = s"\\${v.pretty()}:${tp.pretty()}.${body.pretty()}" // TODO
+    override def pretty(): String = s"${v.pretty()}:${tp.pretty()}.${body.pretty()}" // TODO
   }
 }
 
@@ -54,18 +54,24 @@ package object Terms {
     def create(name: String, tp: Term, body: Term): Lam = Lam(Abs(Simple(name), tp, body))
   }
   final case class Lam(abs: Abs) extends Term {
-    override def pretty(): String = abs.pretty()
+    override def pretty(): String = "λ" + abs.pretty()
   }
 
   final case class App(a: Term, b: Term) extends Term {
-    override def pretty(): String = s"(${a.pretty()} ${b.pretty()})"
+    override def pretty(): String = {
+      (a, b) match {
+        case (Lam(abs), _) => s"(${a.pretty()}) ${b.pretty()}"
+        case (_, Var(v))   => s"${a.pretty()} ${b.pretty()}"
+        case _             => s"${a.pretty()} (${b.pretty()})"
+      }
+    }
   }
 
   object Pi {
     def create(name: String, tp: Term, body: Term): Pi = Pi(Abs(Simple(name), tp, body))
   }
   final case class Pi(abs: Abs) extends Term {
-    override def pretty(): String = abs.pretty()
+    override def pretty(): String = "Ɐ" + abs.pretty()
   }
 
   final case class Level(kind: Integer) extends Term {

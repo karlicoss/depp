@@ -38,7 +38,7 @@ package object Terms {
                 "A".lam(Level(0),
                   "t".lam("A",
                     "f".lam("A",
-                      "b".app("A").app("f").app("t")))))
+                      "b" app "A" app "f" app "t"))))
   }
 
   val churchBooleanContext: Environment = Map(
