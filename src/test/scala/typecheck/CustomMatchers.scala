@@ -31,7 +31,7 @@ trait CustomMatchers {
     override def apply(left: Term) = {
       val inferred = Inference.infer(env, left)
       MatchResult(
-        inferred == tp, // TODO structural equivalence?
+        Inference.equal(env, inferred, tp),
         s"Expected type ${tp.pretty()}, got ${inferred.pretty()} instead",
         "Should not have the type"
       )
