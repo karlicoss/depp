@@ -1,12 +1,22 @@
 package terms
 
+import terms.Abstraction.Abs
+import terms.Terms.{Pi, Lam, Term}
 import util.PrettyPrintable
 
 /**
  * Created by karlicos on 30.05.15.
  */
 package object Variables {
-  sealed abstract class Variable extends PrettyPrintable
+  sealed abstract class Variable extends PrettyPrintable {
+    def lam(tp: Term, body: Term): Lam = {
+      Lam(Abs(this, tp, body))
+    }
+
+    def pi(tp: Term, body: Term): Pi = {
+      Pi(Abs(this, tp, body))
+    }
+  }
 
   /**
    * The variable entered by the user

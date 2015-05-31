@@ -2,7 +2,7 @@ package terms
 
 import terms.Abstraction.Abs
 import terms.Terms.Term
-import terms.Variables.Variable
+import terms.Variables.{Simple, Variable}
 import typecheck.Environment.Environment
 import typecheck.Substitution
 import typecheck.inference.Inference
@@ -38,24 +38,39 @@ package object Terms {
     def inferType(): Term = {
       Inference.infer(Map(), this)
     }
+
+    def app(other: Term): Term = App(this, other)
+  }
+
+  object Var {
+    def simple(name: String): Var = Var(Simple(name))
   }
 
   final case class Var(name: Variable) extends Term {
     override def pretty(): String = name.pretty()
   }
+
+  object Lam {
+    def create(name: String, tp: Term, body: Term): Lam = Lam(Abs(Simple(name), tp, body))
+  }
   final case class Lam(abs: Abs) extends Term {
     override def pretty(): String = abs.pretty()
   }
+
   final case class App(a: Term, b: Term) extends Term {
     override def pretty(): String = s"(${a.pretty()} ${b.pretty()})"
+  }
+
+  object Pi {
+    def create(name: String, tp: Term, body: Term): Pi = Pi(Abs(Simple(name), tp, body))
   }
   final case class Pi(abs: Abs) extends Term {
     override def pretty(): String = abs.pretty()
   }
+
   final case class Level(kind: Integer) extends Term {
     override def pretty(): String = s"Type$kind"
   }
-
 
 //  val unit = Prod(Array())
 //  val ololo = Lam(vv("x"), unitT, App(Var(vv("x")), Var(vv("y"))))
