@@ -64,6 +64,10 @@ class InferenceTest extends UnitSpec with CustomMatchers {
     letId.in("id".app("a")) should haveTypeInContext(simpleContext2, "A")
   }
 
+//  var alalaContext = "Type".let(Level(1), "A".pi(Level(0), "x".pi("A", "A"))).in(
+//    "term".let()
+//  )
+
   /*
     TODO: this context actually contains definitions, that is the reason for failing tests
   */

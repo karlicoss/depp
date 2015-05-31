@@ -22,6 +22,18 @@ package object Abstraction {
   final case class Abs(v: Variable, tp: Term, body: Term) extends PrettyPrintable {
     override def pretty(): String = s"${v.pretty()}:${tp.pretty()}.${body.pretty()}" // TODO
   }
+
+  object Abs {
+    /**
+     * Constructs the abstraction; the argument type gets inferred from the type of the expression the abstraction is
+     * applied to
+     *
+     * TODO
+     */
+    def apply(v: Variable, body: Term): Abs = {
+
+    }
+  }
 }
 
 package object Terms {
