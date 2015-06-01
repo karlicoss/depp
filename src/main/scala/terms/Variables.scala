@@ -16,6 +16,8 @@ package object Variables {
     def pi(tp: Term, body: Term): Pi = Pi(Abs(this, tp, body))
 
     def let(tp: Term, what: Term): Let = Let(this, tp, what)
+
+    def let(what: Term): Let = Let(this, what)
   }
 
   /**
@@ -31,6 +33,10 @@ package object Variables {
    */
   final case class Generated(name: String, id: Integer) extends Variable {
     override def pretty(): String = s"$name$id"
+  }
+
+  final case class Dummy() extends Variable {
+    override def pretty(): String = "."
   }
 
   // final case class Whatever? for forall _:A. B

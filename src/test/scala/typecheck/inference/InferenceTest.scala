@@ -69,7 +69,7 @@ class InferenceTest extends UnitSpec with CustomMatchers {
 //  )
 
   "fwefwef" should "infer implicit type" in {
-    ("x".lam("x")).app("a") should haveTypeInContext(simpleContext2, "A")
+    ("x".lam("x")).app("a").undummy() should haveTypeInContext(simpleContext2, "A")
   }
 
   /*

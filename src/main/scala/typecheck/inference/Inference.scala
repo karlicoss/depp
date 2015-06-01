@@ -159,6 +159,9 @@ package object Inference {
     }
   }
 
+  /**
+   * Substitutes all the occurences of the type variable tvname with the type tp
+   */
   def substTv(tvname: Variable, tp: Term, term: Term): Term = {
     def substTvAbs(tvname: Variable, tp: Term, abs: Abs): Abs =
       Abs(abs.v, substTv(tvname, tp, abs.tp), substTv(tvname, tp, abs.body))
