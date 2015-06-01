@@ -64,10 +64,6 @@ class InferenceTest extends UnitSpec with CustomMatchers {
     letId.in("id".app("a")) should haveTypeInContext(simpleContext2, "A")
   }
 
-//  var alalaContext = "Type".let(Level(1), "A".pi(Level(0), "x".pi("A", "A"))).in(
-//    "term".let()
-//  )
-
   "fwefwef" should "infer implicit type" in {
     ("x".lam("x")).app("a").undummy() should haveTypeInContext(simpleContext2, "A")
   }
@@ -75,13 +71,38 @@ class InferenceTest extends UnitSpec with CustomMatchers {
   /*
     TODO: this context actually contains definitions, that is the reason for failing tests
   */
+  //  val alalaContext: Environment = Map(
+  //    vv("Type") -> "A".pi(Level(0), "x".pi("A", "A")),
+  //    vv("term") -> "A".lam(Level(0), "x".lam("A", "x"))
+  //  )
+
+  //  var alalaContext =
+  //    "Type".let("A".pi(Level(0), "x".pi("A", "A"))).in(
+  //    "term".let("A".lam(Level(0), "x".lam("A", "x"))).in(
+  //      "term"
+  //    )
+  //  )
+
   val alalaContext: Environment = Map(
-    vv("Type") -> "A".pi(Level(0), "x".pi("A", "A")),
-    vv("term") -> "A".lam(Level(0), "x".lam("A", "x"))
+    vv("A") -> Level(0)
   )
 
+  val alala =
+    "Id".let(".".pi("A", "A")).in(
+    "id".let("x".lam("A", "x")).in(
+        "id"
+      )
+    )
+
+//  val alala =
+//    "Type".let("A".pi(Level(0), "x".pi("A", "A"))).in(
+//    "term".let("A".lam(Level(0), "x".lam("A", "x"))).in(
+//      "term"
+//    )
+//  )
+
   it should "infer simple dependent types" in {
-    Var("term") should haveTypeInContext(alalaContext, "Type")
+    alalaContext.undummy() should haveTypeInContext(Map(), "Type")
   }
 
   it should "infer type of Church booleans" in {
