@@ -37,7 +37,7 @@ package object Inference {
           val bid = next_id()
           printEquation(abs.v.pretty(), vid)
           printEquation(abs.body.pretty(), bid)
-          printEquation(abs.tp.pretty(), getArrow(vid, bid))
+//          printEquation(abs.tp.pretty(), getArrow(vid, bid))
           helper(abs.body)
         }
         case App(a, b) => {
@@ -69,6 +69,7 @@ package object Inference {
         case Some(x) => Var(name)
         case None => throw TypeInferenceException(s"Unknown variable ${name.pretty()}") // TODO EvaluationException
       }
+      case TVar(name) => TVar(name) // TODO ???
       case Level(kind) => Level(kind)
       case Lam(abs) => Lam(evaluateAbs(env, abs))
       case Pi(abs) => Pi(evaluateAbs(env, abs))
@@ -120,9 +121,12 @@ package object Inference {
         case Some(x) => x
         case None => throw TypeInferenceException(s"Unbound variable ${name.pretty()}")
       }
+      case TVar(name) => {
+        throw TypeInferenceException("TODO: should this case even be possible?")
+      }
       case Level(level) => Level(level + 1)
       case Lam(abs) => {
-        val level = inferLevel(env, abs.tp)
+        // at this point, the type of abstraction should be inferred. Right?
         val tp = infer(env + (abs.v -> abs.tp), abs.body)
         Pi(Abs(abs.v, abs.tp, tp))
       }
@@ -132,11 +136,40 @@ package object Inference {
         Level(max(level1, level2))
       }
       case App(a, b) => {
-        val abs = inferPi(env, a)
         val argType = infer(env, b)
-        assumeEqual(env, abs.tp, argType)
-        abs.body.subst(Map(abs.v -> b))
+        val abs = inferPi(env, a)
+        /*
+            If the type of the bound variable is a type variable, we substitute the argument type for it, no checks
+
+            If the type of the bound is supplied, we should check it against the argument
+            // TODO check that it does not contain any type variables
+         */
+        val newabs = abs.tp match {
+          case TVar(name) =>
+            // TODO body substitution?
+            Abs(abs.v, argType, substTv(name, argType, abs.body))
+          case tp => {
+            assumeEqual(env, tp, argType)
+            abs
+          }
+        }
+
+        newabs.body.subst(Map(abs.v -> b))
       }
+    }
+  }
+
+  def substTv(tvname: Variable, tp: Term, term: Term): Term = {
+    def substTvAbs(tvname: Variable, tp: Term, abs: Abs): Abs =
+      Abs(abs.v, substTv(tvname, tp, abs.tp), substTv(tvname, tp, abs.body))
+
+    term match {
+      case Var(name) => Var(name)
+      case TVar(v) => if (v == tvname) tp else TVar(v)
+      case Level(kind) => Level(kind)
+      case Lam(abs) => Lam(substTvAbs(tvname, tp, abs))
+      case Pi(abs) => Pi(substTvAbs(tvname, tp, abs))
+      case App(a, b) => App(substTv(tvname, tp, a), substTv(tvname, tp, b))
     }
   }
 
@@ -151,7 +184,7 @@ package object Inference {
         case (Lam(aabs), Lam(babs)) => absHelper(aabs, babs)
         case (Pi(aabs), Pi(babs)) => absHelper(aabs, babs)
         case (App(a, b), App(c, d)) => helper(a, c) && helper(b, d)
-        case _ => false
+        case _ => false // TODO handle type variables?
       }
     }
 

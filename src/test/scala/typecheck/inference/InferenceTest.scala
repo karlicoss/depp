@@ -68,6 +68,10 @@ class InferenceTest extends UnitSpec with CustomMatchers {
 //    "term".let()
 //  )
 
+  "fwefwef" should "infer implicit type" in {
+    ("x".lam("x")).app("a") should haveTypeInContext(simpleContext2, "A")
+  }
+
   /*
     TODO: this context actually contains definitions, that is the reason for failing tests
   */

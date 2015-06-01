@@ -11,6 +11,8 @@ package object Variables {
   sealed abstract class Variable extends PrettyPrintable {
     def lam(tp: Term, body: Term): Lam = Lam(Abs(this, tp, body))
 
+    def lam(body: Term): Lam = Lam(Abs(this, body))
+
     def pi(tp: Term, body: Term): Pi = Pi(Abs(this, tp, body))
 
     def let(tp: Term, what: Term): Let = Let(this, tp, what)
