@@ -1,5 +1,6 @@
 package util
 
+import terms.{Level, Term}
 import terms.Terms._
 import terms.Variables._
 import typecheck.Environment.Environment

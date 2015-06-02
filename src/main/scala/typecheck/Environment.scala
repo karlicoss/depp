@@ -1,6 +1,6 @@
 package typecheck
 
-import terms.Terms.Term
+import terms.Term
 import terms.Variables.Variable
 
 /**

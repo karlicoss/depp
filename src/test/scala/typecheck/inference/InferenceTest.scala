@@ -1,6 +1,6 @@
 package typecheck.inference
 
-import terms.Terms.{Level, Var}
+import terms.{Level, Var}
 import terms.Variables.vv
 import typecheck.CustomMatchers
 import typecheck.Environment.Environment

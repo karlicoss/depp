@@ -1,7 +1,7 @@
 package typecheck
 
 import org.scalatest.matchers.{MatchResult, Matcher}
-import terms.Terms.{Term, Var}
+import terms.{Var, Term}
 import terms.Variables.Variable
 import typecheck.Alpha.equivalent
 import typecheck.Environment.Environment

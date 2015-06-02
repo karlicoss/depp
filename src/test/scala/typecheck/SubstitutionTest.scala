@@ -1,7 +1,7 @@
 package typecheck
 
-import terms.Terms.{App, Var}
 import terms.Variables.{Variable, vv}
+import terms.{App, Var}
 import util.UnitSpec
 
 /**

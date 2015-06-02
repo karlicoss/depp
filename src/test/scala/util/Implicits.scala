@@ -1,6 +1,6 @@
 package util
 
-import terms.Terms.Var
+import terms.Var
 import terms.Variables.{Simple, Variable}
 
 /**

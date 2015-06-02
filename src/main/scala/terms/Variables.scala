@@ -1,7 +1,7 @@
 package terms
 
 import terms.Abstraction.Abs
-import terms.Terms.{Let, Pi, Lam, Term}
+import terms.Terms.Let
 import util.PrettyPrintable
 
 /**

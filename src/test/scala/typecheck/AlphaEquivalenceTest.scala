@@ -1,9 +1,11 @@
 package typecheck
 
-import terms.Terms.{Level, Var, App, Term}
+import terms.{Level, Var, App, Term}
 import terms.Variables.vv
 import util.UnitSpec
 import util.Terms._
+
+import scala.App
 
 class AlphaEquivalenceTest extends UnitSpec with CustomMatchers {
 

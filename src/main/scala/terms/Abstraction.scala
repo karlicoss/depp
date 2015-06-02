@@ -1,6 +1,5 @@
 package terms
 
-import terms.Terms.{TVar, Var, Term}
 import terms.Variables.{Simple, Variable}
 import typecheck.Environment.Environment
 import typecheck.inference.{HasSubst, HasEvaluate}
