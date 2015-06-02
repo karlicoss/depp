@@ -10,33 +10,6 @@ import terms.Variables.Variable
  * Created by karlicos on 30.05.15.
  */
 package object Inference {
-  
-  def evaluate(env: Map[Variable, Term], term: Term): Term = {
-    def evaluateAbs(env: Map[Variable, Term], abs: Abs): Abs = {
-      val etp = evaluate(env, abs.tp)
-      val ebody = evaluate(env + (abs.v -> etp), abs.body)
-      Abs(abs.v, etp, ebody)
-    }
-
-    term match {
-      case Var(name) => env.get(name) match {
-        case Some(x) => Var(name)
-        case None => throw TypeInferenceException(s"Unknown variable ${name.pretty()}") // TODO EvaluationException
-      }
-      case TVar(name) => TVar(name) // TODO ???
-      case Level(kind) => Level(kind)
-      case Lam(abs) => Lam(evaluateAbs(env, abs))
-      case Pi(abs) => Pi(evaluateAbs(env, abs))
-      case App(a, b) => {
-        val arg = evaluate(env, b)
-        val fn = evaluate(env, a)
-        fn match {
-          case Lam(abs) => evaluate(env, abs.body.subst(Map(abs.v -> arg)))
-          case _ => App(arg, fn)
-        }
-      }
-    }
-  }
 
   def infer(env: Map[Variable, Term], term: Term): Term = {
     def assumeEqual(env: Map[Variable, Term], t1: Term, t2: Term): Unit = {
@@ -48,7 +21,7 @@ package object Inference {
 
     def inferPi(env: Map[Variable, Term], term: Term): Abs = {
       val funType = infer(env, term)
-      val ev = evaluate(env, funType)
+      val ev = funType.evaluate(env)
       ev match {
         case Pi(abs) => abs
         case _ => {
@@ -60,7 +33,7 @@ package object Inference {
 
     def inferLevel(env: Map[Variable, Term], term: Term): Integer = {
       val tp = infer(env, term)
-      val ev = evaluate(env, tp)
+      val ev = tp.evaluate(env)
       ev match {
         case Level(kind) => kind
         case _ => {
@@ -149,6 +122,6 @@ package object Inference {
       helper(a.tp, b.tp) && helper(a.body, b.body.subst(Map(b.v -> Var(a.v))))
     }
 
-    helper(evaluate(env, t1), evaluate(env, t2))
+    helper(t1.evaluate(env), t2.evaluate(env))
   }
 }
