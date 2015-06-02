@@ -8,8 +8,4 @@ import terms.Variables.Variable
  */
 package object Environment {
   type Environment = Map[Variable, Term]
-
-//  def apply(items: (Variable, Term)*): Environment = {
-//    ListBuffer(items: _*).toMap
-//  }
 }

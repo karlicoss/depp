@@ -1,7 +1,6 @@
 package terms
 
 import terms.Abstraction.Abs
-import terms.Terms.{TVar, Term, Var}
 import terms.Variables.{Dummy, Simple, Variable}
 import typecheck.Environment.Environment
 import typecheck.inference.{HasEvaluate, HasSubst, Inference, TypeInferenceException}
@@ -10,49 +9,6 @@ import util.PrettyPrintable
 /**
  * Created by karlicos on 30.05.15.
  */
-
-
-
-package object Abstraction {
-
-  /**
-   * lambda v : tp.body
-   */
-  /*
-    TODO: implicit dummy http://stackoverflow.com/a/5828982/706389
-   */
-  final case class Abs(v: Variable, tp: Term, body: Term, dummy: Unit)
-    extends PrettyPrintable with HasEvaluate[Abs] with HasSubst[Abs] {
-
-    override def pretty(): String = s"${v.pretty()}:${tp.pretty()}.${body.pretty()}"
-
-    override def evaluate(env: Environment): Abs = {
-      val etp = tp.evaluate(env)
-      val ebody = body.evaluate(env + (this.v -> etp))
-      Abs(v, etp, ebody)
-    }
-
-    override def substHelper(env: Environment, cnt: Int): (Abs, Int) = {
-      val fv = ??? // TODO fresh variable generator
-      val resType: (Term, Int) = tp.substHelper(env, cnt)
-      val resBody: (Term, Int) = body.substHelper(env + (v -> Var(fv)), resType._2)
-      (Abs(fv, resType._1, resBody._1), resBody._2)
-    }
-  }
-
-  object Abs {
-    /**
-     * Constructs the abstraction; the argument type gets inferred from the type of the expression the abstraction is
-     * applied to
-     */
-    def apply(v: Variable, tp: Term, body: Term): Abs = new Abs(v, tp, body, ())
-    /*
-      TODO: Should generate a fresh type variable?
-      We should probably traverse the term and assign the type variables before the evaluation
-     */
-    def apply(v: Variable, body: Term): Abs = new Abs(v, TVar.dummy, body, ())
-  }
-}
 
 package object Terms {
 
