@@ -1,10 +1,12 @@
 package terms
 
 import terms.Terms.{TVar, Var, Term}
-import terms.Variables.Variable
+import terms.Variables.{Simple, Variable}
 import typecheck.Environment.Environment
 import typecheck.inference.{HasSubst, HasEvaluate}
 import util.PrettyPrintable
+
+import scalaz.State
 
 /**
  * Created by karlicos on 02.06.15.
@@ -28,12 +30,12 @@ package object Abstraction {
       Abs(v, etp, ebody)
     }
 
-    override def substHelper(env: Environment, cnt: Int): (Abs, Int) = {
-      val fv = ??? // TODO fresh variable generator
-      val resType: (Term, Int) = tp.substHelper(env, cnt)
-      val resBody: (Term, Int) = body.substHelper(env + (v -> Var(fv)), resType._2)
-      (Abs(fv, resType._1, resBody._1), resBody._2)
-    }
+    override def substHelper(env: Environment) = for {
+      s <- State.get[Int] // TODO to string?
+      fv = Simple(s.toString) // TODO generated variable?
+      resType <- tp.substHelper(env)
+      resBody <- body.substHelper(env + (v -> Var(fv)))
+    } yield Abs(fv, resType, resBody)
   }
 
   object Abs {

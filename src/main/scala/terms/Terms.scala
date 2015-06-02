@@ -6,6 +6,8 @@ import typecheck.Environment.Environment
 import typecheck.inference.{HasEvaluate, HasSubst, Inference, TypeInferenceException}
 import util.PrettyPrintable
 
+import scalaz.State
+
 /**
  * Created by karlicos on 30.05.15.
  */
@@ -64,12 +66,11 @@ package object Terms {
       }
     }
 
-    override def substHelper(env: Environment, cnt: Int): (Term, Int) = {
-      val res = env get name match {
+    override def substHelper(env: Environment) = State.state {
+      env get name match {
         case Some(x) => x
         case None => Var(name)
       }
-      (res, cnt)
     }
   }
 
@@ -82,10 +83,9 @@ package object Terms {
 
     override def evaluate(env: Environment): Term = Lam(abs.evaluate(env))
 
-    override def substHelper(env: Environment, cnt: Int): (Term, Int) = {
-      val res = abs.substHelper(env, cnt)
-      (Lam(res._1), res._2)
-    }
+    override def substHelper(env: Environment) = for {
+      res <- abs.substHelper(env)
+    } yield Lam(res)
   }
 
   final case class App(a: Term, b: Term) extends Term {
@@ -106,11 +106,10 @@ package object Terms {
       }
     }
 
-    override def substHelper(env: Environment, cnt: Int): (Term, Int) = {
-      val res1 = a.substHelper(env, cnt)
-      val res2 = b.substHelper(env, res1._2)
-      (App(a, b), res2._2)
-    }
+    override def substHelper(env: Environment) = for {
+      resa <- a.substHelper(env)
+      resb <- b.substHelper(env)
+    } yield App(resa, resb)
   }
 
   object Pi {
@@ -121,10 +120,9 @@ package object Terms {
 
     override def evaluate(env: Environment): Term = Pi(abs.evaluate(env))
 
-    override def substHelper(env: Environment, cnt: Int): (Term, Int) = {
-      val res = abs.substHelper(env, cnt)
-      (Pi(res._1), res._2)
-    }
+    override def substHelper(env: Environment) = for {
+      res <- abs.substHelper(env)
+    } yield Pi(res)
   }
 
   final case class Level(kind: Integer) extends Term {
@@ -132,7 +130,7 @@ package object Terms {
 
     override def evaluate(env: Environment): Term = this
 
-    override def substHelper(env: Environment, cnt: Int): (Term, Int) = (this, cnt) // TODO
+    override def substHelper(env: Environment): State[Int, Term] = State.state(this)
   }
 
   /**
@@ -154,7 +152,7 @@ package object Terms {
 
     override def evaluate(env: Environment): Term = this // TODO??
 
-    override def substHelper(env: Environment, cnt: Int): (Term, Int) = (this, cnt) // TODO???
+    override def substHelper(env: Environment) = State.state(this) // TODO ???
   }
 
   object TVar {
