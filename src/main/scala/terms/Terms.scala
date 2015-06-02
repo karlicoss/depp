@@ -1,11 +1,10 @@
 package terms
 
 import terms.Abstraction.Abs
-import terms.Terms.{TVar, Term}
+import terms.Terms.{TVar, Term, Var}
 import terms.Variables.{Dummy, Simple, Variable}
 import typecheck.Environment.Environment
-import typecheck.Substitution
-import typecheck.inference.{TypeInferenceException, HasEvaluate, Inference}
+import typecheck.inference.{HasEvaluate, HasSubst, Inference, TypeInferenceException}
 import util.PrettyPrintable
 
 /**
@@ -22,7 +21,8 @@ package object Abstraction {
   /*
     TODO: implicit dummy http://stackoverflow.com/a/5828982/706389
    */
-  final case class Abs(v: Variable, tp: Term, body: Term, dummy: Unit) extends PrettyPrintable with HasEvaluate[Abs] {
+  final case class Abs(v: Variable, tp: Term, body: Term, dummy: Unit)
+    extends PrettyPrintable with HasEvaluate[Abs] with HasSubst[Abs] {
 
     override def pretty(): String = s"${v.pretty()}:${tp.pretty()}.${body.pretty()}"
 
@@ -30,6 +30,13 @@ package object Abstraction {
       val etp = tp.evaluate(env)
       val ebody = body.evaluate(env + (this.v -> etp))
       Abs(v, etp, ebody)
+    }
+
+    override def substHelper(env: Environment, cnt: Int): (Abs, Int) = {
+      val fv = ??? // TODO fresh variable generator
+      val resType: (Term, Int) = tp.substHelper(env, cnt)
+      val resBody: (Term, Int) = body.substHelper(env + (v -> Var(fv)), resType._2)
+      (Abs(fv, resType._1, resBody._1), resBody._2)
     }
   }
 
@@ -49,8 +56,8 @@ package object Abstraction {
 
 package object Terms {
 
-  sealed abstract class Term extends PrettyPrintable with HasEvaluate[Term] {
-    def subst(map: Environment): Term = Substitution.subst(map, this)
+  sealed abstract class Term
+    extends PrettyPrintable with HasEvaluate[Term] with HasSubst[Term] {
 
     def equal(other: Term): Boolean = Inference.equal(Map(), this, other)
 
@@ -100,6 +107,14 @@ package object Terms {
         case None => throw TypeInferenceException(s"Unknown variable ${name.pretty()}") // TODO EvaluationException
       }
     }
+
+    override def substHelper(env: Environment, cnt: Int): (Term, Int) = {
+      val res = env get name match {
+        case Some(x) => x
+        case None => Var(name)
+      }
+      (res, cnt)
+    }
   }
 
   object Lam {
@@ -110,6 +125,11 @@ package object Terms {
     override def pretty(): String = "λ" + abs.pretty()
 
     override def evaluate(env: Environment): Term = Lam(abs.evaluate(env))
+
+    override def substHelper(env: Environment, cnt: Int): (Term, Int) = {
+      val res = abs.substHelper(env, cnt)
+      (Lam(res._1), res._2)
+    }
   }
 
   final case class App(a: Term, b: Term) extends Term {
@@ -129,6 +149,12 @@ package object Terms {
         case _ => App(arg, fn)
       }
     }
+
+    override def substHelper(env: Environment, cnt: Int): (Term, Int) = {
+      val res1 = a.substHelper(env, cnt)
+      val res2 = b.substHelper(env, res1._2)
+      (App(a, b), res2._2)
+    }
   }
 
   object Pi {
@@ -138,12 +164,19 @@ package object Terms {
     override def pretty(): String = "Ɐ" + abs.pretty()
 
     override def evaluate(env: Environment): Term = Pi(abs.evaluate(env))
+
+    override def substHelper(env: Environment, cnt: Int): (Term, Int) = {
+      val res = abs.substHelper(env, cnt)
+      (Pi(res._1), res._2)
+    }
   }
 
   final case class Level(kind: Integer) extends Term {
     override def pretty(): String = s"Type$kind"
 
     override def evaluate(env: Environment): Term = this
+
+    override def substHelper(env: Environment, cnt: Int): (Term, Int) = (this, cnt) // TODO
   }
 
   /**
@@ -164,6 +197,8 @@ package object Terms {
     override def pretty(): String = s"Tv${v.pretty()}"
 
     override def evaluate(env: Environment): Term = this // TODO??
+
+    override def substHelper(env: Environment, cnt: Int): (Term, Int) = (this, cnt) // TODO???
   }
 
   object TVar {

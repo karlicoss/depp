@@ -2,7 +2,6 @@ package typecheck
 
 import terms.Terms.{App, Var}
 import terms.Variables.{Variable, vv}
-import typecheck.Substitution.subst
 import util.UnitSpec
 
 /**
@@ -14,6 +13,6 @@ class SubstitutionTest extends UnitSpec with CustomMatchers {
     val vary: Variable = vv("y'")
     val term = Var(varx)
     val mapto = App(Var(vary), Var(vary))
-    subst(Map(varx -> mapto), term) should be (App(Var(vary), Var(vary))) // TODO how to use alpha equivalence here?
+    term.subst(Map(varx -> mapto)) should be (App(Var(vary), Var(vary))) // TODO how to use alpha equivalence here?
   }
 }
