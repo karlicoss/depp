@@ -1,10 +1,9 @@
 package typecheck
 
 import org.scalatest.matchers.{MatchResult, Matcher}
-import terms.Terms.{Var, Term}
+import terms.Terms.{Term, Var}
 import terms.Variables.Variable
 import typecheck.Alpha.equivalent
-import inference.Inference
 import typecheck.Environment.Environment
 
 /**
@@ -22,16 +21,16 @@ trait CustomMatchers {
 
   class EqualInContextMatcher(env: Map[Variable, Term], right: Term) extends Matcher[Term] {
     override def apply(left: Term) = MatchResult(
-      Inference.equal(env, left, right),
+      Beta.equal(env, left, right),
       "Should be beta-equivalent",
       "Should not be beta-equivalent")
   }
 
   class HasTypeInContextMatcher(env: Environment, tp: Term) extends Matcher[Term] {
     override def apply(left: Term) = {
-      val inferred = Inference.infer(env, left)
+      val inferred = left.infer(env)
       MatchResult(
-        Inference.equal(env, inferred, tp),
+        Beta.equal(env, inferred, tp),
         s"Expected type ${tp.pretty()}, got ${inferred.pretty()} instead",
         "Should not have the type"
       )

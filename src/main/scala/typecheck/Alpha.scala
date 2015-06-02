@@ -9,7 +9,7 @@ import terms.Variables.Variable
  *
  * Created by karlicos on 30.05.15.
  */
-package object Alpha {
+object Alpha {
   def equivalent(a: Term, b: Term): Boolean = {
     def absHelper(ctx: Map[Variable, Variable], a: Abs, b: Abs): Boolean = {
       val typeEquiv = helper(ctx, a.tp, b.tp)
