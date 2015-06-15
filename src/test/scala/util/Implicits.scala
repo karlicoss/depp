@@ -1,13 +1,13 @@
 package util
 
-import terms.Var
+import terms.{Term, Var}
 import terms.Variables.{Simple, Variable}
+import typecheck.Environment.EnvValue
 
-/**
- * Created by karlicos on 31.05.15.
- */
 object Implicits {
   implicit def str2Var(name: String): Var = Var.simple(name)
 
   implicit def str2Variable(name: String): Variable = Simple(name)
+
+  implicit def type2EnvElem(tp: Term): EnvValue = EnvValue(tp)
 }

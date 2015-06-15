@@ -6,9 +6,6 @@ import typecheck.{Beta, HasInference}
 import typecheck.inference.{HasSubst, HasEvaluate}
 import util.PrettyPrintable
 
-/**
- * Created by karlicos on 03.06.15.
- */
 // TODO sealed
 abstract class Term
   extends PrettyPrintable with HasEvaluate[Term] with HasSubst[Term] with HasInference[Term] {

@@ -3,13 +3,11 @@ package terms
 import java.lang.Math._
 
 import terms.Abstraction.Abs
-import terms.Variables.{Variable, Simple}
+import terms.Variables.Simple
 import typecheck.Environment._
 import typecheck.inference.TypeInferenceException
+import util.Implicits.type2EnvElem
 
-/**
- * Created by karlicos on 03.06.15.
- */
 final case class Pi(abs: Abs) extends Term {
   override def pretty(): String = "Ɐ" + abs.pretty()
 
@@ -20,7 +18,7 @@ final case class Pi(abs: Abs) extends Term {
   } yield Pi(res)
 
   override def infer(env: Environment): Term = {
-    def inferLevel(env: Map[Variable, Term], term: Term): Integer = {
+    def inferLevel(env: Environment, term: Term): Integer = {
       val tp = term.infer(env)
       val ev = tp.evaluate(env)
       ev match {

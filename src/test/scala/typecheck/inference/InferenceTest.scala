@@ -45,7 +45,7 @@ class InferenceTest extends UnitSpec with CustomMatchers {
 
   val simpleContext2: Environment = Map(
     vv("A") -> Level(0),
-    vv("a") -> "A"
+    vv("a") -> Var("A")
   )
 
   it should "infer type in let expressions" in {

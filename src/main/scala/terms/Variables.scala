@@ -4,9 +4,6 @@ import terms.Abstraction.Abs
 import terms.Terms.Let
 import util.PrettyPrintable
 
-/**
- * Created by karlicos on 30.05.15.
- */
 package object Variables {
   sealed abstract class Variable extends PrettyPrintable {
     def lam(tp: Term, body: Term): Lam = Lam(Abs(this, tp, body))

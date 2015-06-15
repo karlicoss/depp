@@ -1,17 +1,15 @@
 package typecheck
 
 import terms.Abstraction.Abs
-import terms.Variables.Variable
 import terms._
+import typecheck.Environment.Environment
+import util.Implicits.type2EnvElem
 
-/**
- * Created by karlicos on 02.06.15.
- */
 object Beta {
   /**
    * Beta equivalence in context
    */
-  def equal(env: Map[Variable, Term], t1: Term, t2: Term): Boolean = {
+  def equal(env: Environment, t1: Term, t2: Term): Boolean = {
     def helper(t1: Term, t2: Term): Boolean = {
       (t1, t2) match {
         case (Var(a), Var(b)) => a == b

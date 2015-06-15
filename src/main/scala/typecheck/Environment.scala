@@ -3,11 +3,19 @@ package typecheck
 import terms.Term
 import terms.Variables.Variable
 
-/**
- * Created by karlicos on 30.05.15.
- *
- * TODO: why making it object rather that package object results in
- */
+import scalaz.Maybe
+import scalaz.Maybe.{Empty, Just}
+
 package object Environment {
-  type Environment = Map[Variable, Term]
+  case class EnvValue(tp: Term, dfn: Maybe[Term])
+
+  object EnvValue {
+    def apply(tp: Term, dfn: Term): EnvValue = EnvValue(tp, Just(dfn))
+    def apply(tp: Term): EnvValue = EnvValue(tp, Empty[Term]) // TODO wtf??
+  }
+
+  /**
+   * Map from variable name to the type and maybe a definition
+   */
+  type Environment = Map[Variable, EnvValue]
 }

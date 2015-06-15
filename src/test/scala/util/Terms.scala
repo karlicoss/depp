@@ -1,8 +1,7 @@
 package util
 
-import terms.{Level, Term}
-import terms.Terms._
 import terms.Variables._
+import terms.{Var, Level, Term}
 import typecheck.Environment.Environment
 import util.Implicits._
 
@@ -24,8 +23,8 @@ package object Terms {
 
   val booleanContext: Environment = Map(
     vv("Bool") -> Level(0),
-    vv("true") -> "Bool",
-    vv("false") -> "Bool"
+    vv("true") -> Var("Bool"),
+    vv("false") -> Var("Bool")
   )
 
   object ChurchBoolean {
@@ -48,7 +47,7 @@ package object Terms {
 
   val natContext : Environment = Map(
     vv("Nat") -> Level(0),
-    vv("zero") -> "Nat",
+    vv("zero") -> Var("Nat"),
     vv("succ") -> ".".pi("Nat", "Nat")
   )
 }

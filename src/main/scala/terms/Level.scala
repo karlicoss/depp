@@ -4,9 +4,6 @@ import typecheck.Environment._
 
 import scalaz._
 
-/**
- * Created by karlicos on 03.06.15.
- */
 final case class Level(kind: Integer) extends Term {
   override def pretty(): String = s"Type$kind"
 

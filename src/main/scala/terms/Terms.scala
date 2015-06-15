@@ -2,10 +2,6 @@ package terms
 
 import terms.Variables.Variable
 
-/**
- * Created by karlicos on 30.05.15.
- */
-
 object Terms {
 
   /**

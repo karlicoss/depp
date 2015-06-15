@@ -6,9 +6,6 @@ import typecheck.inference.TypeInferenceException
 
 import scalaz.State
 
-/**
- * Created by karlicos on 03.06.15.
- */
 final case class Var(name: Variable) extends Term {
   override def pretty(): String = name.pretty()
 
@@ -21,13 +18,13 @@ final case class Var(name: Variable) extends Term {
 
   override def substHelper(env: Environment) = State.state {
     env get name match {
-      case Some(x) => x
+      case Some(x) => x.tp // TODO ????
       case None => Var(name)
     }
   }
 
   override def infer(env: Environment): Term = env.get(name) match {
-    case Some(x) => x
+    case Some(x) => x.tp
     case None => throw TypeInferenceException(s"Unbound variable ${name.pretty()}")
   }
 }

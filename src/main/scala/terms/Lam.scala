@@ -3,10 +3,8 @@ package terms
 import terms.Abstraction.Abs
 import terms.Variables.Simple
 import typecheck.Environment._
+import util.Implicits.type2EnvElem
 
-/**
- * Created by karlicos on 03.06.15.
- */
 final case class Lam(abs: Abs) extends Term {
   override def pretty(): String = "λ" + abs.pretty()
 

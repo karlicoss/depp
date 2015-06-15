@@ -1,9 +1,5 @@
 package typecheck.inference
 
-/**
- * Created by karlicos on 30.05.15.
- */
-
 class TypeInferenceException private(message: String) extends RuntimeException(message)
 
 object TypeInferenceException {

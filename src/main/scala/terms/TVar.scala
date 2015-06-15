@@ -6,9 +6,6 @@ import typecheck.inference.TypeInferenceException
 
 import scalaz.State
 
-/**
- * Created by karlicos on 03.06.15.
- */
 final case class TVar(v: Variable) extends Term {
   override def pretty(): String = s"Tv${v.pretty()}"
 

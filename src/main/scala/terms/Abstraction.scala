@@ -6,10 +6,8 @@ import typecheck.inference.{HasSubst, HasEvaluate}
 import util.PrettyPrintable
 
 import scalaz.State
+import util.Implicits.type2EnvElem
 
-/**
- * Created by karlicos on 02.06.15.
- */
 package object Abstraction {
 
   /**

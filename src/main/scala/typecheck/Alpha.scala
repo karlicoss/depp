@@ -6,8 +6,6 @@ import terms._
 
 /**
  * Alpha equivalence
- *
- * Created by karlicos on 30.05.15.
  */
 object Alpha {
   def equivalent(a: Term, b: Term): Boolean = {

@@ -4,9 +4,6 @@ import terms.Abstraction.Abs
 import terms.Variables.Variable
 import terms._
 
-/**
- * Created by karlicos on 30.05.15.
- */
 object Inference {
 
   /**

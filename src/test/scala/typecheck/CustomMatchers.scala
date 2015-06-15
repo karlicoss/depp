@@ -1,8 +1,7 @@
 package typecheck
 
 import org.scalatest.matchers.{MatchResult, Matcher}
-import terms.{Var, Term}
-import terms.Variables.Variable
+import terms.{Term, Var}
 import typecheck.Alpha.equivalent
 import typecheck.Environment.Environment
 
@@ -15,7 +14,7 @@ trait CustomMatchers {
       "Should not be alpha-equivalent")
   }
 
-  class EqualInContextMatcher(env: Map[Variable, Term], right: Term) extends Matcher[Term] {
+  class EqualInContextMatcher(env: Environment, right: Term) extends Matcher[Term] {
     override def apply(left: Term) = MatchResult(
       Beta.equal(env, left, right),
       "Should be beta-equivalent",
