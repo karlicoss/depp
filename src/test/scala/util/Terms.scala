@@ -6,9 +6,6 @@ import terms.Variables._
 import typecheck.Environment.Environment
 import util.Implicits._
 
-/**
- * Created by karlicos on 30.05.15.
- */
 package object Terms {
 
   /**

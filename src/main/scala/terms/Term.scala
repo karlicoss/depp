@@ -13,8 +13,14 @@ import util.PrettyPrintable
 abstract class Term
   extends PrettyPrintable with HasEvaluate[Term] with HasSubst[Term] with HasInference[Term] {
 
+  /**
+   * Beta equality
+   */
   def equal(other: Term): Boolean = Beta.equal(Map(), this, other)
 
+  /**
+   * Constructs an application
+   */
   def app(other: Term): Term = App(this, other)
 
   /**

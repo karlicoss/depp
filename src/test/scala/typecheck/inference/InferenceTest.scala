@@ -8,9 +8,6 @@ import util.Implicits._
 import util.Terms._
 import util.UnitSpec
 
-/**
- * Created by karlicos on 30.05.15.
- */
 class InferenceTest extends UnitSpec with CustomMatchers {
 
   it should "fewfwef" in {
@@ -68,20 +65,6 @@ class InferenceTest extends UnitSpec with CustomMatchers {
     ("x".lam("x")).app("a").undummy() should haveTypeInContext(simpleContext2, "A")
   }
 
-  /*
-    TODO: this context actually contains definitions, that is the reason for failing tests
-  */
-  //  val alalaContext: Environment = Map(
-  //    vv("Type") -> "A".pi(Level(0), "x".pi("A", "A")),
-  //    vv("term") -> "A".lam(Level(0), "x".lam("A", "x"))
-  //  )
-
-  //  var alalaContext =
-  //    "Type".let("A".pi(Level(0), "x".pi("A", "A"))).in(
-  //    "term".let("A".lam(Level(0), "x".lam("A", "x"))).in(
-  //      "term"
-  //    )
-  //  )
 
   val alalaContext: Environment = Map(
     vv("A") -> Level(0)
@@ -94,12 +77,6 @@ class InferenceTest extends UnitSpec with CustomMatchers {
       )
     )
 
-//  val alala =
-//    "Type".let("A".pi(Level(0), "x".pi("A", "A"))).in(
-//    "term".let("A".lam(Level(0), "x".lam("A", "x"))).in(
-//      "term"
-//    )
-//  )
 
   it should "infer simple dependent types" in {
 //    alalaContext.undummy() should haveTypeInContext(Map(), "Type")

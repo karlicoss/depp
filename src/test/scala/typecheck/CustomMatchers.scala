@@ -6,10 +6,6 @@ import terms.Variables.Variable
 import typecheck.Alpha.equivalent
 import typecheck.Environment.Environment
 
-/**
- * Created by karlicos on 30.05.15.
- */
-
 
 trait CustomMatchers {
   class AlphaEquivalenceMatcher(right: Term) extends Matcher[Term] {

@@ -4,9 +4,6 @@ import terms.Variables.{Variable, vv}
 import terms.{App, Var}
 import util.UnitSpec
 
-/**
- * Created by karlicos on 30.05.15.
- */
 class SubstitutionTest extends UnitSpec with CustomMatchers {
   it should "fsf" in {
     val varx: Variable = vv("x'")
