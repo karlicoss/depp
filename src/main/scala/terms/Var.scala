@@ -1,8 +1,9 @@
 package terms
 
-import terms.Variables.{Variable, Simple}
-import typecheck.Environment._
+import terms.Variables.{Simple, Variable}
+import typecheck.Environment.{EnvValue, Environment}
 import typecheck.inference.TypeInferenceException
+import util.Utils.toInstance
 
 import scalaz.State
 
@@ -23,9 +24,21 @@ final case class Var(name: Variable) extends Term {
     }
   }
 
+  private def searchFinite(env: Environment): Option[Variable] = {
+    def aaa(v: Variable, e: EnvValue): Option[Variable] = for {
+      df <- e.dfn
+      finite <- toInstance[Finite](df)
+      if finite.elems.contains(this.name)
+    } yield v
+    env.toSeq.flatMap(p => aaa(p._1, p._2)).headOption
+  }
+
   override def infer(env: Environment): Term = env.get(name) match {
     case Some(x) => x.tp
-    case None => throw TypeInferenceException(s"Unbound variable ${name.pretty()}")
+    case None => searchFinite(env) match {
+      case Some(x) => Var(x)
+      case None => throw TypeInferenceException(s"Unbound variable ${name.pretty()}")
+    }
   }
 }
 
