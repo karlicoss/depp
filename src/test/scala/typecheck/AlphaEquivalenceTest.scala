@@ -59,12 +59,12 @@ class AlphaEquivalenceTest extends UnitSpec with CustomMatchers {
   it should "treat simple pi types as alpha equivalent" in {
     val tp1 = Pi(Abs(".", "Unit", "Unit"))
     val tp2 = Pi(Abs("x", "Unit", "Unit"))
-    tp1 should beAequivalentTo(tp2)
+    tp1 should beAequivalentTo(envWithUnit, tp2)
   }
 
   it should "treat simple sigma types as alpha equivalent" in {
     val tp1 = Sigma(Abs(".", "Unit", "Unit"))
     val tp2 = Sigma(Abs("x", "Unit", "Unit"))
-    tp1 should beAequivalentTo(tp2)
+    tp1 should beAequivalentTo(envWithUnit, tp2)
   }
 }

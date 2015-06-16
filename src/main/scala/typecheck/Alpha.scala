@@ -20,7 +20,15 @@ object Alpha {
       a match {
         case Var(aname) =>
           b match {
-            case Var(bname) => map(aname) == bname
+            case Var(bname) => {
+              if (env.contains(aname)) aname == bname
+              else map(aname) == bname
+            }
+            case _ => false
+          }
+        case Level(akind) =>
+          b match {
+            case Level(bkind) => akind == bkind
             case _ => false
           }
         case Lam(aabs) =>
@@ -28,20 +36,20 @@ object Alpha {
             case Lam(babs) => absHelper(env, map, aabs, babs)
             case _ => false
           }
-        case App(a1, a2) =>
-          b match {
-            case App(b1, b2) =>
-              helper(env, map, a1, b1) && helper(env, map, a2, b2)
-            case _ => false
-          }
         case Pi(aabs) =>
           b match {
             case Pi(babs) => absHelper(env, map, aabs, babs)
             case _ => false
           }
-        case Level(akind) =>
+        case Sigma(aabs) =>
           b match {
-            case Level(bkind) => akind == bkind
+            case Sigma(babs) => absHelper(env, map, aabs, babs)
+            case _ => false
+          }
+        case App(a1, a2) =>
+          b match {
+            case App(b1, b2) =>
+              helper(env, map, a1, b1) && helper(env, map, a2, b2)
             case _ => false
           }
       }
