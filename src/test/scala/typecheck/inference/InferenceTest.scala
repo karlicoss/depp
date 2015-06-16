@@ -11,8 +11,7 @@ import util.UnitSpec
 class InferenceTest extends UnitSpec with CustomMatchers {
 
   it should "fewfwef" in {
-    Var(vv("x")) should beBequivalentTo(
-      Map(vv("x") -> Level(0)), "x")
+    Var(vv("x")) should beBequivalentTo(Map(vv("x") -> Level(0)), "x")
   }
 
   it should "infer false :: Bool" in {

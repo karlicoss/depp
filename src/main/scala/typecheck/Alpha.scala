@@ -3,19 +3,20 @@ package typecheck
 import terms.Abstraction.Abs
 import terms.Variables.Variable
 import terms._
+import typecheck.Environment.Environment
 
 /**
  * Alpha equivalence
  */
 object Alpha {
-  def equivalent(a: Term, b: Term): Boolean = {
-    def absHelper(map: Map[Variable, Variable], a: Abs, b: Abs): Boolean = {
-      val typeEquiv = helper(map, a.tp, b.tp)
-      val bodyEquiv = helper(map + (a.v -> b.v), a.body, b.body)
+  def equivalent(env: Environment, a: Term, b: Term): Boolean = {
+    def absHelper(env: Environment, map: Map[Variable, Variable], a: Abs, b: Abs): Boolean = {
+      val typeEquiv = helper(env, map, a.tp, b.tp)
+      val bodyEquiv = helper(env, map + (a.v -> b.v), a.body, b.body)
       typeEquiv && bodyEquiv
     }
 
-    def helper(map: Map[Variable, Variable], a: Term, b: Term): Boolean = {
+    def helper(env: Environment, map: Map[Variable, Variable], a: Term, b: Term): Boolean = {
       a match {
         case Var(aname) =>
           b match {
@@ -24,18 +25,18 @@ object Alpha {
           }
         case Lam(aabs) =>
           b match {
-            case Lam(babs) => absHelper(map, aabs, babs)
+            case Lam(babs) => absHelper(env, map, aabs, babs)
             case _ => false
           }
         case App(a1, a2) =>
           b match {
             case App(b1, b2) =>
-              helper(map, a1, b1) && helper(map, a2, b2)
+              helper(env, map, a1, b1) && helper(env, map, a2, b2)
             case _ => false
           }
         case Pi(aabs) =>
           b match {
-            case Pi(babs) => absHelper(map, aabs, babs)
+            case Pi(babs) => absHelper(env, map, aabs, babs)
             case _ => false
           }
         case Level(akind) =>
@@ -45,6 +46,6 @@ object Alpha {
           }
       }
     }
-    helper(Map(), a, b)
+    helper(env, Map(), a, b)
   }
 }

@@ -1,22 +1,23 @@
 package typecheck
 
-import terms.{Level, Var, App, Term}
+import terms.Abstraction.Abs
 import terms.Variables.vv
-import util.UnitSpec
+import terms._
+import typecheck.Environment.{Environment, EnvValue}
+import util.Implicits._
 import util.Terms._
-
-import scala.App
+import util.UnitSpec
 
 class AlphaEquivalenceTest extends UnitSpec with CustomMatchers {
 
-  it should "treat as equivalent" in {
+  it should "treat identitiy functions as equivalent" in {
     val one = makeId("x")
     val two = makeId("y")
 
     one should beAequivalentTo(two)
   }
 
-  it should "fsdfsdf" in {
+  it should "treat some complex expressions as a-equivalent" in {
     def alala(a: String, b: String): Term = {
       simpleLambda(a, simpleLambda(b, App(Var(vv(a)), Var(vv(b)))))
     }
@@ -28,7 +29,7 @@ class AlphaEquivalenceTest extends UnitSpec with CustomMatchers {
     xy should beAequivalentTo(yz)
   }
 
-  it should "fefwef" in {
+  it should "treat some complex expressions as a-equivalent 2" in {
     val vx = vv("x")
     val vy = vv("y")
     val vz = vv("z")
@@ -45,5 +46,25 @@ class AlphaEquivalenceTest extends UnitSpec with CustomMatchers {
 
   it should "treat universes with different indices as not equivalent" in {
     Level(1) should not (beAequivalentTo(Level(2)))
+  }
+
+  it should "treat bound variables as equivalent" in {
+    val ctx: Environment = Map(vv("X") -> Level(0))
+    Var(vv("X")) should beAequivalentTo(ctx, Var(vv("X")))
+  }
+
+  val Unit = Finite(List("unit"))
+  val envWithUnit = Map(vv("Unit") -> EnvValue(Level(0), Unit))
+
+  it should "treat simple pi types as alpha equivalent" in {
+    val tp1 = Pi(Abs(".", "Unit", "Unit"))
+    val tp2 = Pi(Abs("x", "Unit", "Unit"))
+    tp1 should beAequivalentTo(tp2)
+  }
+
+  it should "treat simple sigma types as alpha equivalent" in {
+    val tp1 = Sigma(Abs(".", "Unit", "Unit"))
+    val tp2 = Sigma(Abs("x", "Unit", "Unit"))
+    tp1 should beAequivalentTo(tp2)
   }
 }

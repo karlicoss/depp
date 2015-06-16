@@ -12,6 +12,9 @@ package object Terms {
    */
   def simpleLambda(v: String, term: Term): Term = v.lam(Level(0), term)
 
+  /**
+   * Creates identity function: \x -> x
+   */
   def makeId(name: String): Term = simpleLambda(name, name)
 
   def makeNumeral(n: Int): Term = {

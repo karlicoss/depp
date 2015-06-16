@@ -2,14 +2,13 @@ package typecheck
 
 import org.scalatest.matchers.{MatchResult, Matcher}
 import terms.{Term, Var}
-import typecheck.Alpha.equivalent
 import typecheck.Environment.Environment
 
 
 trait CustomMatchers {
-  class AlphaEquivalenceMatcher(right: Term) extends Matcher[Term] {
+  class AlphaEquivalenceMatcher(env: Environment, right: Term) extends Matcher[Term] {
     override def apply(left: Term) = MatchResult(
-      equivalent(left, right),
+      Alpha.equivalent(env, left, right),
       "Should be alpha-equivalent",
       "Should not be alpha-equivalent")
   }
@@ -42,7 +41,11 @@ trait CustomMatchers {
    * TODO how to implement be matcher?
    */
   def beAequivalentTo(right: Term): Matcher[Term] = {
-    new AlphaEquivalenceMatcher(right)
+    new AlphaEquivalenceMatcher(Map(), right)
+  }
+
+  def beAequivalentTo(env: Environment, right: Term): Matcher[Term] = {
+    new AlphaEquivalenceMatcher(env, right)
   }
 
   def beBequivalentTo(env: Environment, right: Term): Matcher[Term] = {
