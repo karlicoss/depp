@@ -13,7 +13,7 @@ abstract class Term
   /**
    * Beta equality
    */
-  def equal(other: Term): Boolean = Beta.equal(Map(), this, other)
+  def equal(other: Term): Boolean = Beta.equivalent(Map(), this, other)
 
   /**
    * Constructs an application

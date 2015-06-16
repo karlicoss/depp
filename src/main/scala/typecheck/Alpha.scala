@@ -33,7 +33,7 @@ object Alpha {
           }
         case Lam(aabs) =>
           b match {
-            case Lam(babs) => absHelper(env, map, aabs, babs)
+            case Lam(babs) => absHelper(env, map, aabs, babs) // TODO variable name into context?
             case _ => false
           }
         case Pi(aabs) =>

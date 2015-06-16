@@ -15,7 +15,7 @@ trait CustomMatchers {
 
   class EqualInContextMatcher(env: Environment, right: Term) extends Matcher[Term] {
     override def apply(left: Term) = MatchResult(
-      Beta.equal(env, left, right),
+      Beta.equivalent(env, left, right),
       "Should be beta-equivalent",
       "Should not be beta-equivalent")
   }
@@ -24,7 +24,7 @@ trait CustomMatchers {
     override def apply(left: Term) = {
       val inferred = left.infer(env)
       MatchResult(
-        Beta.equal(env, inferred, tp),
+        Beta.equivalent(env, inferred, tp),
         s"Expected type ${tp.pretty()}, got ${inferred.pretty()} instead",
         "Should not have the type"
       )

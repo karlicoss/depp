@@ -45,7 +45,7 @@ final case class App(a: Term, b: Term) extends Term {
     }
 
     def assumeEqual(env: Environment, t1: Term, t2: Term): Unit = {
-      if (!Beta.equal(env, t1, t2)) {
+      if (!Beta.equivalent(env, t1, t2)) {
         throw TypeInferenceException(
           s"Expected ${t1.pretty()} to be equal to ${t2.pretty()}")
       }
