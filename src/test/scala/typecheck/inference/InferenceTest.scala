@@ -81,10 +81,10 @@ class InferenceTest extends UnitSpec with CustomMatchers {
 //    alalaContext.undummy() should haveTypeInContext(Map(), "Type")
   }
 
-  it should "infer type of Church booleans" in {
-    ChurchBoolean.tt should haveTypeInContext(churchBooleanContext, "Boolean")
-//    ChurchBoolean.ff should haveTypeInContext(churchBooleanContext, "Boolean")
-  }
+//  it should "infer type of Church booleans" in {
+//    ChurchBoolean.tt should haveTypeInContext(churchBooleanContext, "Boolean")
+////    ChurchBoolean.ff should haveTypeInContext(churchBooleanContext, "Boolean")
+//  }
 
 //  it should "fafsdf" in {
 //    "not".app("tt") should haveTypeInContext(churchBooleanContext, "Boolean")

@@ -3,6 +3,8 @@ package typecheck
 import terms.Term
 import terms.Variables.Variable
 
+import scala.collection.Map
+
 package object Environment {
   case class EnvValue(tp: Term, dfn: Option[Term])
 

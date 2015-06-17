@@ -5,10 +5,13 @@ import terms.Variables._
 import typecheck.Environment.EnvValue
 import util.Implicits._
 
+import scala.collection.Map
+import scala.collection.immutable.{Map => IMap}
+
 object BooleanContext {
   val BBoolean = Finite(Set("tt", "ff"))
 
-  val envWithBBoolean = Map(vv("Bool") -> EnvValue(Level(0), BBoolean))
+  val envWithBBoolean = IMap(vv("Bool") -> EnvValue(Level(0), BBoolean))
 
   /*
     if cond then th else el
