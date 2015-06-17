@@ -53,7 +53,7 @@ class AlphaEquivalenceTest extends UnitSpec with CustomMatchers {
     Var(vv("X")) should beAequivalentTo(ctx, Var(vv("X")))
   }
 
-  val Unit = Finite(List("unit"))
+  val Unit = Finite(Set("unit"))
   val envWithUnit = Map(vv("Unit") -> EnvValue(Level(0), Unit))
 
   it should "treat simple pi types as alpha equivalent" in {

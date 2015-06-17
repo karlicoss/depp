@@ -9,7 +9,7 @@ import scalaz.State
  * Simple finite type
  * @param elems the elements of the type
  */
-final case class Finite(elems: List[Variable]) extends Term {
+final case class Finite(elems: Set[Variable]) extends Term {
   /**
    * Infers the type of the expression under the given context
    * @param env the context

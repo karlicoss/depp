@@ -12,7 +12,7 @@ class FiniteTypesTest extends UnitSpec with CustomMatchers {
 
   def makefinite(n: Integer): Finite = {
     val names = (0 until n).map(i => Simple("f" + i))
-    Finite(names.toList)
+    Finite(names.toSet)
   }
 
   it should "infer type of empty finite type" in {

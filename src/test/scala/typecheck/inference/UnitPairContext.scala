@@ -7,7 +7,7 @@ import util.Implicits._
 import typecheck.Environment.EnvValue
 
 object UnitPairContext {
-  val Unit = Finite(List("unit"))
+  val Unit = Finite(Set("unit"))
 
   def PairType(a: Term, b: Term): Term = Sigma(Abs(".", a, b))
 
