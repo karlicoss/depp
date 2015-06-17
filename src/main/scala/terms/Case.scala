@@ -9,13 +9,19 @@ import typecheck.inference.TypeInferenceException
 import scala.collection.Map
 import scalaz.State
 
-case class Case(cond: Term, cases: Map[Variable, Term], dflt: Term) extends Term {
+case class Case(cond: Term, cases: Map[Variable, Term], dflt: Option[Term]) extends Term {
   /**
    * Evaluates the expression under the given context
    * @param env the context
    * @return
    */
-  override def evaluate(env: Environment): Term = ???
+  override def evaluate(env: Environment): Term = {
+    val Var(cs) = cond.evaluate(env)
+    cases.get(cs) match {
+      case Some(x) => x
+      case None => dflt.get // TODO exception?
+    }
+  }
 
   /*
     TODO is there a standard library equivalent?
@@ -31,13 +37,29 @@ case class Case(cond: Term, cases: Map[Variable, Term], dflt: Term) extends Term
     (curs, res)
   })
 
+  def liftOption[S, A](m: Option[State[S, A]]): State[S, Option[A]] = State(s => {
+    var curs = s
+    var res = null.asInstanceOf[Option[A]]
+    m match {
+      case Some(x) => {
+        val (s, a) = x.apply(curs)
+        curs = s
+        res = Some(a)
+      }
+      case None => {
+        res = None
+      }
+    }
+    (curs, res)
+  })
+
 //  promoteMap(cases.mapValues(_.substHelper(env)))
 
   override def substHelper(env: Environment): State[Int, Term] = for {
     scond <- cond.substHelper(env)
     scases <- promoteMap(cases.mapValues(_.substHelper(env))) // TODO Applicative.sequence
-    sdflt <- dflt.substHelper(env)
-  } yield Case(scond, scases, sdflt)
+    sdflt <- liftOption(dflt.map(_.substHelper(env)))
+  } yield new Case(scond, scases, sdflt)
 
   /**
    * Infers the type of the expression under the given context
@@ -46,8 +68,8 @@ case class Case(cond: Term, cases: Map[Variable, Term], dflt: Term) extends Term
    */
   override def infer(env: Environment): Term = {
     // 1. cond should be Finite
-    // 2. TODO check that switch is exhaustive
-    // 3. check for unknown patterns
+    // 2. check for unknown patterns
+    // 3. check that switch is exhaustive
     // 4. types of all the branches should be the same
 
     val tp = cond.infer(env) // tp should be the name of finite type
@@ -58,7 +80,11 @@ case class Case(cond: Term, cases: Map[Variable, Term], dflt: Term) extends Term
         if (!ccases.subsetOf(elems)) {
           throw TypeInferenceException(s"Unknown cases in $ccases, expected $elems")
         }
-        val btypes = (cases.values ++ Seq(dflt)).map(_.infer(env))
+        var clauses = cases.values
+        if (ccases.size < elems.size) {
+          clauses = clauses ++ Seq(dflt.get) // TODO should provide default, throw exception
+        }
+        val btypes = clauses.map(_.infer(env))
         val ftype = btypes.head
         for (tp <- btypes.tail) {
           if (!Beta.equivalent(env, ftype, tp)) {
@@ -73,4 +99,9 @@ case class Case(cond: Term, cases: Map[Variable, Term], dflt: Term) extends Term
   }
 
   override def pretty(): String = ???
+}
+
+object Case {
+  def apply(cond: Term, cases: Map[Variable, Term]): Case = Case(cond, cases, None)
+  def apply(cond: Term, cases: Map[Variable, Term], dflt: Term): Case = Case(cond, cases, Some(dflt))
 }

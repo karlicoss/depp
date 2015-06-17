@@ -18,6 +18,6 @@ object BooleanContext {
       vv("tt") -> th,
       vv("ff") -> el
     )
-    Case(cond, cc, th)
+    Case(cond, cc)
   }
 }

@@ -1,10 +1,13 @@
 package terms
 
 import terms.Abstraction.Abs
-import terms.Variables.{Simple, Dummy}
+import terms.Variables.{Variable, Simple, Dummy}
 import typecheck.{Beta, HasInference}
 import typecheck.inference.{HasSubst, HasEvaluate}
 import util.PrettyPrintable
+
+import scala.collection.Map
+import scala.collection.immutable.{Map => IMap}
 
 // TODO sealed
 abstract class Term
@@ -13,12 +16,14 @@ abstract class Term
   /**
    * Beta equality
    */
-  def equal(other: Term): Boolean = Beta.equivalent(Map(), this, other)
+  def equal(other: Term): Boolean = Beta.equivalent(IMap(), this, other)
 
   /**
    * Constructs an application
    */
   def app(other: Term): Term = App(this, other)
+
+  def ccase(cases: Map[Variable, Term], dflt: Term): Case = Case(this, cases, dflt)
 
   /**
    * Replaces all occurences of dummy type variables with named

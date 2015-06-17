@@ -15,7 +15,7 @@ final case class Var(name: Variable) extends Term {
       case Some(x) => this
       case None => searchFinite(env) match {
         case Some(x) =>
-          Var(x) // TODO ??
+          this // TODO ??
         case None =>
           throw TypeInferenceException(s"Unknown variable ${name.pretty()}") // TODO EvaluationException
       }

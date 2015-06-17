@@ -21,8 +21,8 @@ object Alpha {
         case Var(aname) =>
           b match {
             case Var(bname) => {
-              if (env.contains(aname)) aname == bname
-              else map(aname) == bname
+              aname == bname || map(aname) == bname
+              // TODO check env.contains(aname) ?
             }
             case _ => false
           }

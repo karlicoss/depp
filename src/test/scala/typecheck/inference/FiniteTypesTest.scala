@@ -39,4 +39,10 @@ class FiniteTypesTest extends UnitSpec with CustomMatchers {
     val env = Map(vv("Finite") -> EnvValue(Level(0), tp))
     Var("f0") should beBequivalentTo(env, "f0")
   }
+
+  it should "evaluate elements of finite types[2]" in {
+    val tp = makefinite(2) // f0, f1
+    val env = Map(vv("Finite") -> EnvValue(Level(0), tp))
+    Var("f1").evaluate(env) should beAequivalentTo(env, "f1")
+  }
 }
