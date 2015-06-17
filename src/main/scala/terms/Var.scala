@@ -13,7 +13,12 @@ final case class Var(name: Variable) extends Term {
   override def evaluate(env: Environment): Term = {
     env.get(name) match {
       case Some(x) => this
-      case None => throw TypeInferenceException(s"Unknown variable ${name.pretty()}") // TODO EvaluationException
+      case None => searchFinite(env) match {
+        case Some(x) =>
+          Var(x) // TODO ??
+        case None =>
+          throw TypeInferenceException(s"Unknown variable ${name.pretty()}") // TODO EvaluationException
+      }
     }
   }
 

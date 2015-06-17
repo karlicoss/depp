@@ -56,11 +56,11 @@ class InferenceTest extends UnitSpec with CustomMatchers {
    */
   val letId = "id".let(".".pi("A", "A"), "x".lam("A", "x"))
 
-  it should "infer type in more complex let expressions" in {
+  it should "infer type in let expressions [complex]" in {
     letId.in("id".app("a")) should haveTypeInContext(simpleContext2, "A")
   }
 
-  "fwefwef" should "infer implicit type" in {
+  it should "infer implicit type" in {
     ("x".lam("x")).app("a").undummy() should haveTypeInContext(simpleContext2, "A")
   }
 

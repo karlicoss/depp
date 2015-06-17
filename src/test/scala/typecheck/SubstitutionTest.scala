@@ -6,7 +6,7 @@ import util.UnitSpec
 import util.Implicits._
 
 class SubstitutionTest extends UnitSpec with CustomMatchers {
-  it should "fsf" in {
+  it should "perform simple substitution" in {
     val varx: Variable = vv("x'")
     val vary: Variable = vv("y'")
     val term = Var(varx)

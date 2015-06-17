@@ -8,7 +8,7 @@ import typecheck.Environment.EnvValue
 import util.Implicits._
 import util.UnitSpec
 
-class FiniteTypesTest extends UnitSpec with CustomMatchers{
+class FiniteTypesTest extends UnitSpec with CustomMatchers {
 
   def makefinite(n: Integer): Finite = {
     val names = (0 until n).map(i => Simple("f" + i))
@@ -32,5 +32,11 @@ class FiniteTypesTest extends UnitSpec with CustomMatchers{
     val env = Map(vv("Finite") -> EnvValue(Level(0), tp))
     Var("f0") should haveTypeInContext(env, "Finite")
     Var("f1") should haveTypeInContext(env, "Finite")
+  }
+
+  it should "evaluate elements of finite types" in {
+    val tp = makefinite(1) // f0
+    val env = Map(vv("Finite") -> EnvValue(Level(0), tp))
+    Var("f0") should beBequivalentTo(env, "f0")
   }
 }

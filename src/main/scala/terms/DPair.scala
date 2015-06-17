@@ -38,7 +38,11 @@ case class DPair(a: Term, b: Term, tp: Term) extends Term{
    * @param env the context
    * @return
    */
-  override def evaluate(env: Environment): Term = ??? // TODO??? how to evaluate?
+  override def evaluate(env: Environment): Term = {
+    val p1 = a.evaluate(env)
+    val p2 = b.evaluate(env)
+    DPair(p1, p2, tp)
+  }
 }
 
 object DPair {

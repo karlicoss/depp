@@ -25,4 +25,16 @@ object Common {
     val level2 = inferLevel(env + (abs.v -> abs.tp), abs.body)
     Level(max(level1, level2))
   }
+
+  def inferSigma(env: Environment, term: Term): Abs = {
+    val funType = term.infer(env)
+    val ev = funType.evaluate(env)
+    ev match {
+      case Sigma(abs) => abs
+      case _ => {
+        val message = s"Expected ${funType.pretty()} to be evaluated in Sigma type, got ${ev.pretty()} instead"
+        throw TypeInferenceException(message)
+      }
+    }
+  }
 }
