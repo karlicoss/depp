@@ -10,6 +10,9 @@ object BooleanContext {
 
   val envWithBBoolean = Map(vv("Bool") -> EnvValue(Level(0), BBoolean))
 
+  /*
+    if cond then th else el
+   */
   def bif(cond: Term, th: Term, el: Term): Term = {
     val cc = Map(
       vv("tt") -> th,

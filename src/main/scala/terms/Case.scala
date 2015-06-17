@@ -1,5 +1,6 @@
 package terms
 
+import terms.Finite
 import terms.Variables.Variable
 import typecheck.Beta
 import typecheck.Environment.Environment
@@ -49,9 +50,10 @@ case class Case(cond: Term, cases: Map[Variable, Term], dflt: Term) extends Term
     // 3. check for unknown patterns
     // 4. types of all the branches should be the same
 
-    val tp = cond.infer(env)
+    val tp = cond.infer(env) // tp should be the name of finite type
     tp match {
-      case Finite(elems) => {
+      case Var(name) => {
+        val Finite(elems) = env.get(name).get.dfn.get // TODO oh my...
         val ccases = cases.keySet
         if (!ccases.subsetOf(elems)) {
           throw TypeInferenceException(s"Unknown cases in $ccases, expected $elems")
