@@ -34,10 +34,8 @@ class CaseTest extends UnitSpec with CustomMatchers {
 
   it should "infer type of fsfsd" in {
     // Σ Unit (λ { unit → Bool })
-    val qq = Sigma(Abs(".", "Unit", Var(".").ccase(
-      IMap(
-        vv("unit") -> "Bool"),
-      "Bool")))
+    val qq = Sigma(Abs(".", "Unit", Var(".").ccase(IMap(vv("unit") -> "Bool"))))
     qq should haveTypeInContext(alalaEnv, Level(0))
+    DPair("unit", "tt", qq)
   }
 }

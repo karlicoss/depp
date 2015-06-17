@@ -23,6 +23,8 @@ abstract class Term
    */
   def app(other: Term): Term = App(this, other)
 
+  def ccase(cases: Map[Variable, Term]): Case = Case(this, cases)
+
   def ccase(cases: Map[Variable, Term], dflt: Term): Case = Case(this, cases, dflt)
 
   /**

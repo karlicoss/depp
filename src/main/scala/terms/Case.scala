@@ -58,7 +58,7 @@ case class Case(cond: Term, cases: Map[Variable, Term], dflt: Option[Term]) exte
   override def substHelper(env: Environment): State[Int, Term] = for {
     scond <- cond.substHelper(env)
     scases <- promoteMap(cases.mapValues(_.substHelper(env))) // TODO Applicative.sequence
-    sdflt <- liftOption(dflt.map(_.substHelper(env)))
+    sdflt <- liftOption(dflt.map(_.substHelper(env))) // TODO monadic lift?
   } yield new Case(scond, scases, sdflt)
 
   /**
