@@ -27,7 +27,7 @@ case class DPair(a: Term, b: Term, tp: Term) extends Term{
         val btp = b.infer(env)
         Sigma(Abs(dv, atp, btp)) // TODO variable name
       }
-      case _ => ??? // TODO raise exception
+      case _ => throw TypeInferenceException(s"Sigma type expected, got $tp instead")
     }
     val atp = a.infer(env)
     if (!Beta.equivalent(env, atp, t.tp)) {

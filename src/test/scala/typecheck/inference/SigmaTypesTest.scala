@@ -17,6 +17,6 @@ class SigmaTypesTest extends UnitSpec with CustomMatchers {
   }
 
   it should "infer type of dependent pair" in {
-    DPair("unit", "unit") should haveTypeInContext(envWithUnit, PairType("Unit", "Unit"))
+    DPair("uu", "uu") should haveTypeInContext(envWithUnit, PairType("Unit", "Unit"))
   }
 }

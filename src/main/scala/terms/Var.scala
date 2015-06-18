@@ -12,7 +12,12 @@ final case class Var(name: Variable) extends Term {
 
   override def evaluate(env: Environment): Term = {
     env.get(name) match {
-      case Some(x) => this
+      case Some(EnvValue(tp, dfn)) => {
+        dfn match {
+          case Some(x) => this // TODO FIXME x??
+          case None => this
+        }
+      }
       case None => searchFinite(env) match {
         case Some(x) =>
           this // TODO ??

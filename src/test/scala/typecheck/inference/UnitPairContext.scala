@@ -10,9 +10,9 @@ import scala.collection.Map
 import scala.collection.immutable.{Map => IMap}
 
 object UnitPairContext {
-  val Unit = Finite(Set("unit"))
+  val Unit = Finite(Set("uu"))
 
-  def PairType(a: Term, b: Term): Term = Sigma(Abs(".", a, b))
+  def PairType(A: Term, B: Term): Term = Sigma(Abs(".", A, B))
 
   val envWithUnit = IMap(vv("Unit") -> EnvValue(Level(0), Unit))
 

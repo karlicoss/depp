@@ -8,20 +8,24 @@ import UnitPairContext._
 
 class DPairInferenceTest extends UnitSpec with CustomMatchers {
 
+  it should "infer dependend pair type" in {
+    DPair("uu", "uu", null)
+  }
+
   it should "evaluate simple proj1" in {
-    Proj1(DPair("unit", "unit")) should beBequivalentTo(envWithUnit, "unit")
+    Proj1(DPair("uu", "uu")) should beBequivalentTo(envWithUnit, "uu")
   }
 
   it should "evaluate simple proj2" in {
-    Proj2(DPair("unit", "unit")) should beBequivalentTo(envWithUnit, "unit")
+    Proj2(DPair("uu", "uu")) should beBequivalentTo(envWithUnit, "uu")
   }
 
   it should "infer proj1 type [simple]" in {
-    Proj1(DPair("unit", "unit")) should haveTypeInContext(envWithUnit, "Unit")
+    Proj1(DPair("uu", "uu")) should haveTypeInContext(envWithUnit, "Unit")
   }
 
   it should "infer proj2 type [simple]" in {
-    Proj2(DPair("unit", "unit")) should haveTypeInContext(envWithUnit, "Unit")
+    Proj2(DPair("uu", "uu")) should haveTypeInContext(envWithUnit, "Unit")
   }
 
   it should "infer proj2 type [levels]" in {

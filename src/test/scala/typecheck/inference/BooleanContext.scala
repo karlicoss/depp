@@ -9,9 +9,9 @@ import scala.collection.Map
 import scala.collection.immutable.{Map => IMap}
 
 object BooleanContext {
-  val BBoolean = Finite(Set("tt", "ff"))
+  val BBool = Finite(Set("tt", "ff"))
 
-  val envWithBBoolean = IMap(vv("Bool") -> EnvValue(Level(0), BBoolean))
+  val envWithBBool = IMap(vv("Bool") -> EnvValue(Level(0), BBool))
 
   /*
     if cond then th else el
