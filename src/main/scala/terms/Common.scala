@@ -7,8 +7,10 @@ import typecheck.Environment._
 import typecheck.inference.TypeInferenceException
 import util.Implicits.type2EnvElem
 
+import scalaz.State
+
 object Common {
-  def inferPiSigma(abs: Abs, env: Environment): Term = {
+  def inferPiSigma(abs: Abs, env: Environment): State[Int, Term] = State.state {
     def inferLevel(env: Environment, term: Term): Integer = {
       val tp = term.infer(env)
       val ev = tp.evaluate(env)

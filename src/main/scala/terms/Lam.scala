@@ -1,7 +1,7 @@
 package terms
 
 import terms.Abstraction.Abs
-import terms.Variables.Simple
+import terms.Variables.{Variable, Dummy, Simple}
 import typecheck.Environment._
 import util.Implicits.type2EnvElem
 
@@ -16,11 +16,20 @@ final case class Lam(abs: Abs) extends Term {
     res <- abs.substHelper(env)
   } yield Lam(res)
 
-  override def inferHelper(env: Environment): State[Int, Term] = State.state {
-    // at this point, the type of abstraction should be inferred. Right?
-    val tp = abs.body.infer(env + (abs.v -> abs.tp))
-    Pi(Abs(abs.v, abs.tp, tp))
+  def isDummy(t: Term): Boolean = t match {
+    case TVar(v) => v.isInstanceOf[Dummy]
+    case _ => false
   }
+
+  override def inferHelper(env: Environment): State[Int, Term] = for {
+    ntp <- if (isDummy(abs.tp))
+            for {
+              i <- State.get[Int]
+              _ <- State.modify[Int](_ + 1)
+            } yield TVar(Simple(s"gen$i")) // TODO Simple -> Generated?
+            else State.state[Int, Term](abs.tp)
+    tp <- abs.body.inferHelper(env + (abs.v -> ntp))
+  } yield Pi(Abs(abs.v, ntp, tp))
 }
 
 object Lam {

@@ -15,7 +15,7 @@ final case class Pi(abs: Abs) extends Term {
     res <- abs.substHelper(env)
   } yield Pi(res)
 
-  override def inferHelper(env: Environment): State[Int, Term] = State.state(Common.inferPiSigma(abs, env))
+  override def inferHelper(env: Environment): State[Int, Term] = Common.inferPiSigma(abs, env)
 }
 
 object Pi {
