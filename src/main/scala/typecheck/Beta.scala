@@ -8,5 +8,5 @@ object Beta {
    * Beta equivalence in context: evaluation to normal form + alpha
    */
   def equivalent(env: Environment, t1: Term, t2: Term): Boolean =
-    Alpha.equivalent(env, t1.evaluate(env), t2.evaluate(env))
+    Alpha.equivalent(env, t1.evaluateAll(env), t2.evaluateAll(env))
 }

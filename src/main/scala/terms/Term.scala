@@ -2,6 +2,7 @@ package terms
 
 import terms.Abstraction.Abs
 import terms.Variables.{Variable, Simple, Dummy}
+import typecheck.Environment._
 import typecheck.{Beta, HasInference}
 import typecheck.inference.{HasSubst, HasEvaluate}
 import util.PrettyPrintable
@@ -53,5 +54,23 @@ abstract class Term
     }
 
     helper(this)
+  }
+
+  /**
+   * TODO HOW TO MOVE THIS TO HasEvaluate?
+   *
+   * Repeatedly evaluates the expression under the context until finished
+   * @param env the context
+   * @return
+   */
+  def evaluateAll(env: Environment): Term = {
+    var cur = this
+    var done = false
+    while (!done) {
+      val res = cur.evaluateAllHelper(env)
+      done = res._1
+      cur = res._2
+    }
+    cur
   }
 }

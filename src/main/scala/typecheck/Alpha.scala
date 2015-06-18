@@ -57,7 +57,33 @@ object Alpha {
             case Finite(sb) => sa.sameElements(sb) // TODO not sure if a good idea
             case _ => false
           }
-          // TODO DPair?
+        case Case(conda, casesa, dflta) =>
+          b match {
+            case Case(condb, casesb, dfltb) => {
+              if (!helper(env, map, conda, condb)) {
+                return false
+              }
+              if (!(casesa.keySet == casesb.keySet)) {
+                return false
+              }
+              for (key <- casesa.keys) {
+                if (!helper(env, map, casesa(key), casesb(key))) {
+                  return false
+                }
+              }
+              if (dflta.isEmpty ^ dfltb.isEmpty) {
+                return false
+              }
+              if (dflta.isDefined && dfltb.isDefined) {
+                if (!helper(env, map, dflta.get, dfltb.get)) {
+                  return false
+                }
+              }
+              true
+            }
+            case _ => false
+          }
+        // TODO DPair?
       }
     }
     helper(env, Map(), a, b)

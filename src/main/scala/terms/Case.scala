@@ -17,9 +17,23 @@ case class Case(cond: Term, cases: Map[Variable, Term], dflt: Option[Term]) exte
    */
   override def evaluate(env: Environment): Term = {
     val Var(cs) = cond.evaluate(env)
-    cases.get(cs) match {
-      case Some(x) => x
-      case None => dflt.get // TODO exception?
+    val Finite(elems) = cond.infer(env).evaluateAll(env)
+    if (elems.contains(cs)) { // try to match the value of the finite type
+      cases.get(cs) match {
+        case Some(x) => x
+        case None => dflt match {
+          case Some(x) => x
+          case None => throw TypeInferenceException(s"Expected default case for pattern $cs")
+        }
+      }
+    } else { // otherwise, search in the context
+      env.get(cs) match {
+        case Some(x) => x.dfn match {
+          case Some(dfn) => Case(dfn, cases, dflt)
+          case None => Case(Var(cs), cases, dflt)
+        }
+        case None => ??? // TODO unbound variable?
+      }
     }
   }
 
@@ -98,7 +112,9 @@ case class Case(cond: Term, cases: Map[Variable, Term], dflt: Option[Term]) exte
     }
   }
 
-  override def pretty(): String = ???
+  override def pretty(): String = {
+    s"case (${cond.pretty()}) of $cases default ${dflt.map(_.pretty())}"
+  }
 }
 
 object Case {

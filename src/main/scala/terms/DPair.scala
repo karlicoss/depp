@@ -10,7 +10,7 @@ import util.Implicits.type2EnvElem
 import scalaz.State
 
 case class DPair(a: Term, b: Term, tp: Term) extends Term{
-  override def pretty(): String = ??? // TODO
+  override def pretty(): String = s"(${a.pretty()} , ${b.pretty()})"
 
   /**
    * Infers the type of the expression under the given context
