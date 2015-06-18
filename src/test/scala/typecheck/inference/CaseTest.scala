@@ -57,12 +57,12 @@ class CaseTest extends UnitSpec with CustomMatchers {
   val BEmpty = DPair("BTEmpty", "uu", "MaybeBool")
 
   // BJust = λ b → BTJust , b
-  val BJust = "b".lam(DPair("BJust", "b", "MaybeBool"))
+  val BJust = "b".lam("Bool", DPair("BTJust", "b", "MaybeBool"))
 
   val envWithMaybeBool = IMap(
     vv("BTag") -> EnvValue(Level(0), BTag),
     vv("MaybeBool") -> EnvValue(Level(0), MaybeBool),
-    vv("BEmpty") -> EnvValue(Var("xxx"), BEmpty), // TODO dummy type variables
+    vv("BEmpty") -> EnvValue(TVar("xxx"), BEmpty), // TODO dummy type variables
     vv("BJust") -> EnvValue(TVar("yyy"), BJust)
   )
 

@@ -49,7 +49,9 @@ final case class Var(name: Variable) extends Term {
       case TVar(v) => x.dfn match {
         case Some(dfn) => dfn.infer(env)
         case None =>
-          throw TypeInferenceException("You should specify either the type or the definition")
+          throw TypeInferenceException(
+            s"Can't infer the type variable $v. You should either specify the type or the definition"
+          )
       }
       case other => other
     }
