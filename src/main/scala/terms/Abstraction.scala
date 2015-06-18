@@ -29,6 +29,7 @@ package object Abstraction {
 
     override def substHelper(env: Environment) = for {
       s <- State.get[Int] // TODO to string?
+      _ <- State.modify[Int](_ + 1)
       fv = Simple(s.toString) // TODO generated variable?
       resType <- tp.substHelper(env)
       resBody <- body.substHelper(env + (v -> Var(fv)))

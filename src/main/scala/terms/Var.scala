@@ -1,6 +1,6 @@
 package terms
 
-import terms.Variables.{Simple, Variable}
+import terms.Variables.{Dummy, Generated, Simple, Variable}
 import typecheck.Environment.{EnvValue, Environment}
 import typecheck.inference.TypeInferenceException
 import util.Utils
@@ -44,19 +44,22 @@ final case class Var(name: Variable) extends Term {
     env.toSeq.flatMap(p => aaa(p._1, p._2)).headOption
   }
 
-  override def inferHelper(env: Environment): State[Int, Term] = State.state(env.get(name) match {
+  override def inferHelper(env: Environment): State[Int, Term] = env.get(name) match {
     case Some(x) => x.tp match {
       case TVar(v) => x.dfn match {
-        case Some(dfn) => dfn.infer(env)
-        case None => TVar(v) // TODO well, we will probably infer it later?
+        case Some(dfn) => dfn.inferHelper(env)
+        case None => v match {
+          case Dummy() => State.state(???) // generate new name
+          case x => State.state(TVar(x)) // TODO well, we will probably infer it later?
+        }
       }
-      case other => other
+      case other => State.state(other)
     }
     case None => searchFinite(env) match {
-      case Some(x) => Var(x)
+      case Some(x) => State.state(Var(x))
       case None => throw TypeInferenceException(s"Unbound variable ${name.pretty()}")
     }
-  })
+  }
 }
 
 object Var {
