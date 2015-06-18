@@ -1,6 +1,5 @@
 package typecheck.inference
 
-import com.sun.org.apache.xpath.internal.operations.Variable
 import terms.Variables.vv
 import typecheck.Environment.EnvValue
 
@@ -14,7 +13,7 @@ import util.UnitSpec
 import util.Implicits._
 
 import UnitPairContext._
-import BooleanContext._
+import typecheck.inference.BooleanContext._
 
 
 class CaseTest extends UnitSpec with CustomMatchers {
@@ -26,17 +25,17 @@ class CaseTest extends UnitSpec with CustomMatchers {
     bif("tt", "ff", "tt") should beBequivalentTo(envWithBBool, "ff")
   }
 
-  val alalaEnv = envWithBBool ++ envWithUnit
+  val unitBoolEnv = envWithUnit ++ envWithBBool
 
   it should "infer type of wuut" in {
     val tp = Sigma(Abs(".", "Bool", bif(".", "Unit", "Bool")))
-    tp should haveTypeInContext(alalaEnv, Level(0))
+    tp should haveTypeInContext(unitBoolEnv, Level(0))
   }
 
   it should "infer type of fsfsd" in {
     // Σ Unit (λ { unit → Bool })
     val qq = Sigma(Abs(".", "Unit", Var(".").ccase(IMap(vv("uu") -> "Bool"))))
-    qq should haveTypeInContext(alalaEnv, Level(0))
+    qq should haveTypeInContext(unitBoolEnv, Level(0))
     DPair("uu", "tt", qq)
   }
 
@@ -67,11 +66,11 @@ class CaseTest extends UnitSpec with CustomMatchers {
   )
 
   it should "infer Empty :: MaybeBool" in {
-    Var("BEmpty") should haveTypeInContext(alalaEnv ++ envWithMaybeBool, "MaybeBool")
+    Var("BEmpty") should haveTypeInContext(unitBoolEnv ++ envWithMaybeBool, "MaybeBool")
   }
 
   it should "infer (Just false) :: MaybeBool, (Just true) :: MaybeBool" in {
-    "BJust".app("ff") should haveTypeInContext(alalaEnv ++ envWithMaybeBool, "MaybeBool")
-    "BJust".app("tt") should haveTypeInContext(alalaEnv ++ envWithMaybeBool, "MaybeBool")
+    "BJust".app("ff") should haveTypeInContext(unitBoolEnv ++ envWithMaybeBool, "MaybeBool")
+    "BJust".app("tt") should haveTypeInContext(unitBoolEnv ++ envWithMaybeBool, "MaybeBool")
   }
 }

@@ -60,11 +60,6 @@ class InferenceTest extends UnitSpec with CustomMatchers {
     letId.in("id".app("a")) should haveTypeInContext(simpleContext2, "A")
   }
 
-  it should "infer implicit type" in {
-    ("x".lam("x")).app("a").undummy() should haveTypeInContext(simpleContext2, "A")
-  }
-
-
   val alalaContext: Environment = Map(
     vv("A") -> Level(0)
   )
