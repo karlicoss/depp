@@ -13,8 +13,10 @@ import scala.collection.immutable.{Map => IMap}
  * Polymorphic identity function context
  */
 object IdContext {
+  // ∀ (A : Set) → (x : A) → A
   val pidType = "X".pi(Level(0), "x".pi("X", "X"))
-  val pid = ".".lam("x".lam("x"))
+  // λ (A : Set) → λ (x : A) → x
+  val pid = "X".lam(Level(0), "x".lam("X", "x"))
 
   val envWithPid = IMap(vv("pid") -> EnvValue(pidType, pid))
 }

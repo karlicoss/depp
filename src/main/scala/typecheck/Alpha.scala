@@ -52,6 +52,12 @@ object Alpha {
               helper(env, map, a1, b1) && helper(env, map, a2, b2)
             case _ => false
           }
+        case Finite(sa) =>
+          b match {
+            case Finite(sb) => sa.sameElements(sb) // TODO not sure if a good idea
+            case _ => false
+          }
+          // TODO DPair?
       }
     }
     helper(env, Map(), a, b)

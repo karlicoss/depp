@@ -3,7 +3,8 @@ package terms
 import terms.Variables.{Simple, Variable}
 import typecheck.Environment.{EnvValue, Environment}
 import typecheck.inference.TypeInferenceException
-import util.Utils.toInstance
+import util.Utils
+import util.Utils.{toFinite, toInstance}
 
 import scalaz.State
 
@@ -14,7 +15,7 @@ final case class Var(name: Variable) extends Term {
     env.get(name) match {
       case Some(EnvValue(tp, dfn)) => {
         dfn match {
-          case Some(x) => this // TODO FIXME x??
+          case Some(x) => x
           case None => this
         }
       }
@@ -37,7 +38,7 @@ final case class Var(name: Variable) extends Term {
   private def searchFinite(env: Environment): Option[Variable] = {
     def aaa(v: Variable, e: EnvValue): Option[Variable] = for {
       df <- e.dfn
-      finite <- toInstance[Finite](df)
+      finite <- toFinite(df)
       if finite.elems.contains(this.name)
     } yield v
     env.toSeq.flatMap(p => aaa(p._1, p._2)).headOption

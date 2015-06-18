@@ -25,6 +25,10 @@ class SimpleInferenceTest extends UnitSpec with CustomMatchers {
     Var("A") should beBequivalentTo(env, Level(0))
   }
 
+  it should "infer type of type of polymorphic identity" in {
+    pidType should haveTypeInContext(envWithPid, Level(1))
+  }
+
   it should "infer type of polymorphic identity" in {
     pid should haveTypeInContext(envWithPid, pidType)
   }
