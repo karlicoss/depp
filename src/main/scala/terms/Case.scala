@@ -1,6 +1,5 @@
 package terms
 
-import terms.Finite
 import terms.Variables.Variable
 import typecheck.Beta
 import typecheck.Environment.Environment
@@ -80,7 +79,7 @@ case class Case(cond: Term, cases: Map[Variable, Term], dflt: Option[Term]) exte
    * @param env the context
    * @return
    */
-  override def infer(env: Environment): Term = {
+  override def inferHelper(env: Environment): State[Int, Term] = State.state({
     // 1. cond should be Finite
     // 2. check for unknown patterns
     // 3. check that switch is exhaustive
@@ -110,7 +109,7 @@ case class Case(cond: Term, cases: Map[Variable, Term], dflt: Option[Term]) exte
       case _ =>
         throw TypeInferenceException(s"Expected $tp to be Finite")
     }
-  }
+  })
 
   override def pretty(): String = {
     s"case (${cond.pretty()}) of $cases default ${dflt.map(_.pretty())}"

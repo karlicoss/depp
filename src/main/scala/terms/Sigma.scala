@@ -14,7 +14,7 @@ case class Sigma(abs: Abs) extends Term {
    * @param env the context
    * @return
    */
-  override def infer(env: Environment): Term = Common.inferPiSigma(abs, env)
+  override def inferHelper(env: Environment): State[Int, Term] = State.state(Common.inferPiSigma(abs, env))
 
   override def substHelper(env: Environment): State[Int, Term] = for {
     res <- abs.substHelper(env)

@@ -44,7 +44,7 @@ final case class Var(name: Variable) extends Term {
     env.toSeq.flatMap(p => aaa(p._1, p._2)).headOption
   }
 
-  override def infer(env: Environment): Term = env.get(name) match {
+  override def inferHelper(env: Environment): State[Int, Term] = State.state(env.get(name) match {
     case Some(x) => x.tp match {
       case TVar(v) => x.dfn match {
         case Some(dfn) => dfn.infer(env)
@@ -56,7 +56,7 @@ final case class Var(name: Variable) extends Term {
       case Some(x) => Var(x)
       case None => throw TypeInferenceException(s"Unbound variable ${name.pretty()}")
     }
-  }
+  })
 }
 
 object Var {

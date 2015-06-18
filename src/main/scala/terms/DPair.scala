@@ -17,7 +17,7 @@ case class DPair(a: Term, b: Term, tp: Term) extends Term{
    * @param env the context
    * @return
    */
-  override def infer(env: Environment): Term = {
+  override def inferHelper(env: Environment): State[Int, Term] = State.state {
     val etp = tp.evaluate(env)
     val Sigma(t) = etp match {
       case Sigma(abs) => etp

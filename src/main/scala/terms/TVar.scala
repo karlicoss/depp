@@ -12,7 +12,8 @@ final case class TVar(v: Variable) extends Term {
   override def evaluate(env: Environment): Term = this // TODO??
 
   override def substHelper(env: Environment) = State.state(this) // TODO ???
-  override def infer(env: Environment): Term =
+
+  override def inferHelper(env: Environment): State[Int, Term] =
     throw TypeInferenceException("TODO: should this case even be possible?")
 }
 

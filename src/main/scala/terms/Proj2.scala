@@ -11,7 +11,7 @@ case class Proj2(trm: Term) extends Term {
    * @param env the context
    * @return
    */
-  override def infer(env: Environment): Term = {
+  override def inferHelper(env: Environment): State[Int, Term] = State.state {
     val abs = Common.inferSigma(env, trm)
     val first = Proj1(trm).evaluate(env) // TODO??
     abs.body.subst(Map(abs.v -> first)) // TODO ???

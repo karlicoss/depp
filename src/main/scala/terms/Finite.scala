@@ -10,12 +10,8 @@ import scalaz.State
  * @param elems the elements of the type
  */
 final case class Finite(elems: Set[Variable]) extends Term {
-  /**
-   * Infers the type of the expression under the given context
-   * @param env the context
-   * @return
-   */
-  override def infer(env: Environment): Term = Level(0) // TODO ?
+
+  override def inferHelper(env: Environment): State[Int, Term] = State.state(Level(0))
 
   override def substHelper(env: Environment): State[Int, Term] = State.state(this)
 

@@ -6,15 +6,10 @@ import scalaz.State
 
 case class Proj1(trm: Term) extends Term {
 
-  /**
-   * Infers the type of the expression under the given context
-   * @param env the context
-   * @return
-   */
-  override def infer(env: Environment): Term = {
+  override def inferHelper(env: Environment): State[Int, Term] = State.state({
     val abs = Common.inferSigma(env, trm)
     abs.tp
-  }
+  })
 
   override def substHelper(env: Environment): State[Int, Term] = for {
     aaa <- trm.substHelper(env)

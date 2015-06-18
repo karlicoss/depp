@@ -4,6 +4,8 @@ import terms.Abstraction.Abs
 import terms.Variables.Simple
 import typecheck.Environment._
 
+import scalaz.State
+
 final case class Pi(abs: Abs) extends Term {
   override def pretty(): String = "Ɐ" + abs.pretty()
 
@@ -13,7 +15,7 @@ final case class Pi(abs: Abs) extends Term {
     res <- abs.substHelper(env)
   } yield Pi(res)
 
-  override def infer(env: Environment): Term = Common.inferPiSigma(abs, env)
+  override def inferHelper(env: Environment): State[Int, Term] = State.state(Common.inferPiSigma(abs, env))
 }
 
 object Pi {

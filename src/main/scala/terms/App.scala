@@ -6,6 +6,8 @@ import typecheck.Environment._
 import typecheck.inference.{Inference, TypeInferenceException}
 import util.Implicits.type2EnvElem
 
+import scalaz.State
+
 final case class App(a: Term, b: Term) extends Term {
   override def pretty(): String = {
     (a, b) match {
@@ -30,7 +32,7 @@ final case class App(a: Term, b: Term) extends Term {
     resb <- b.substHelper(env)
   } yield App(resa, resb)
 
-  override def infer(env: Environment): Term = {
+  override def inferHelper(env: Environment): State[Int, Term] = State.state({
 
     def inferPi(env: Environment, term: Term): Abs = {
       val funType = term.infer(env)
@@ -70,5 +72,5 @@ final case class App(a: Term, b: Term) extends Term {
     }
 
     newabs.body.subst(Map(abs.v -> b))
-  }
+  })
 }
