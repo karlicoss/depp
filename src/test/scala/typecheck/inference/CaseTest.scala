@@ -42,29 +42,36 @@ class CaseTest extends UnitSpec with CustomMatchers {
 
   /*
     data BTag : Set where
-      BEmpty : BTag
-      BJust  : BTag
+      BTEmpty : BTag
+      BTJust  : BTag
    */
-  val BTag = Finite(Set("BEmpty", "BJust"))
+  val BTag = Finite(Set("BTEmpty", "BTJust"))
 
-  // MaybeBool = Σ BTag (λ { BEmpty → Unit ; BJust → Bool })
+  // MaybeBool = Σ BTag (λ { BTEmpty → Unit ; BTJust → Bool })
   val MaybeBool = Sigma(Abs("t", "BTag", Var("t").ccase(
     IMap(
-      vv("BEmpty") -> "Unit",
-      vv("BJust")  -> "Bool"))))
+      vv("BTEmpty") -> "Unit",
+      vv("BTJust")  -> "Bool"))))
 
-  // BEmpty = (MEmpty , unit)
-  val BEmpty = DPair("BEmpty", "uu", "MaybeBool")
+  // BEmpty = (BTEmpty , unit)
+  val BEmpty = DPair("BTEmpty", "uu", "MaybeBool")
 
-  // BJust = λ b → MJust , b
+  // BJust = λ b → BTJust , b
   val BJust = "b".lam(DPair("BJust", "b", "MaybeBool"))
 
   val envWithMaybeBool = IMap(
     vv("BTag") -> EnvValue(Level(0), BTag),
-    vv("MaybeBool") -> EnvValue(Level(0), MaybeBool)
+    vv("MaybeBool") -> EnvValue(Level(0), MaybeBool),
+    vv("BEmpty") -> EnvValue(Var("xxx"), BEmpty), // TODO dummy type variables
+    vv("BJust") -> EnvValue(TVar("yyy"), BJust)
   )
 
-  it should "alala maybebool" in {
-    BEmpty should haveTypeInContext(alalaEnv ++ envWithMaybeBool, "MaybeBool")
+  it should "infer Empty :: MaybeBool" in {
+    Var("BEmpty") should haveTypeInContext(alalaEnv ++ envWithMaybeBool, "MaybeBool")
+  }
+
+  it should "infer (Just false) :: MaybeBool, (Just true) :: MaybeBool" in {
+    "BJust".app("ff") should haveTypeInContext(alalaEnv ++ envWithMaybeBool, "MaybeBool")
+    "BJust".app("tt") should haveTypeInContext(alalaEnv ++ envWithMaybeBool, "MaybeBool")
   }
 }

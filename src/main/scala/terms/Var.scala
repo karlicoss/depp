@@ -45,7 +45,14 @@ final case class Var(name: Variable) extends Term {
   }
 
   override def infer(env: Environment): Term = env.get(name) match {
-    case Some(x) => x.tp
+    case Some(x) => x.tp match {
+      case TVar(v) => x.dfn match {
+        case Some(dfn) => dfn.infer(env)
+        case None =>
+          throw TypeInferenceException("You should specify either the type or the definition")
+      }
+      case other => other
+    }
     case None => searchFinite(env) match {
       case Some(x) => Var(x)
       case None => throw TypeInferenceException(s"Unbound variable ${name.pretty()}")

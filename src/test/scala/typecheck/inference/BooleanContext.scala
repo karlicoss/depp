@@ -9,8 +9,14 @@ import scala.collection.Map
 import scala.collection.immutable.{Map => IMap}
 
 object BooleanContext {
+  /**
+   * BBool = {tt, ff}
+   */
   val BBool = Finite(Set("tt", "ff"))
 
+  /**
+   * data Bool = {tt, ff}
+   */
   val envWithBBool = IMap(vv("Bool") -> EnvValue(Level(0), BBool))
 
   /*

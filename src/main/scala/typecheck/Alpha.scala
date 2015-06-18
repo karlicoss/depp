@@ -4,6 +4,7 @@ import terms.Abstraction.Abs
 import terms.Variables.Variable
 import terms._
 import typecheck.Environment.Environment
+import typecheck.inference.TypeInferenceException
 
 /**
  * Alpha equivalence
@@ -83,6 +84,9 @@ object Alpha {
             }
             case _ => false
           }
+        case TVar(_) => {
+          throw TypeInferenceException("TODO SHOULD NOT BE THE CASE")
+        }
         // TODO DPair?
       }
     }
