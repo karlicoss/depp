@@ -49,7 +49,10 @@ final case class Var(name: Variable) extends Term {
       case TVar(v) => x.dfn match {
         case Some(dfn) => dfn.inferHelper(env)
         case None => v match {
-          case Dummy() => State.state(???) // generate new name
+          case Dummy() => for {
+            i <- State.get[Int]
+            _ <- State.modify[Int](_ + 1) // generate new name
+          } yield TVar(Simple(s"gen$i")) // TODO Simple -> Generated?
           case x => State.state(TVar(x)) // TODO well, we will probably infer it later?
         }
       }
