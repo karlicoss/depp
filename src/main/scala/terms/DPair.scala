@@ -18,16 +18,16 @@ case class DPair(a: Term, b: Term, tp: Term) extends Term{
    * @return
    */
   override def infer(env: Environment): Term = {
-    // TODO just return tp for now? When should we typecheck?
-    val Sigma(t) = tp match {
-      case Sigma(abs) => tp
+    val etp = tp.evaluate(env)
+    val Sigma(t) = etp match {
+      case Sigma(abs) => etp
       case TVar(v) => {
         val dv = Variables.vv(".")
         val atp = a.infer(env)
         val btp = b.infer(env)
         Sigma(Abs(dv, atp, btp)) // TODO variable name
       }
-      case _ => throw TypeInferenceException(s"Sigma type expected, got $tp instead")
+      case _ => throw TypeInferenceException(s"Sigma type expected, got $etp instead")
     }
     val atp = a.infer(env)
     if (!Beta.equivalent(env, atp, t.tp)) {
@@ -36,7 +36,7 @@ case class DPair(a: Term, b: Term, tp: Term) extends Term{
     val btp = b.infer(env)
     val btype = t.body.subst(Map(t.v -> a))
     if (!Beta.equivalent(env, btp, btype)) {
-      throw TypeInferenceException("TODO")
+      throw TypeInferenceException(s"Expected the types $btp and $btype to be b-equivalent")
     }
     Sigma(t)
   }

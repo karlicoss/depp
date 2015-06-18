@@ -54,12 +54,15 @@ class CaseTest extends UnitSpec with CustomMatchers {
       vv("BJust")  -> "Bool"))))
 
   // BEmpty = (MEmpty , unit)
-  val BEmpty = DPair("BEmpty", "unit", "MaybeBool")
+  val BEmpty = DPair("BEmpty", "uu", "MaybeBool")
 
   // BJust = λ b → MJust , b
   val BJust = "b".lam(DPair("BJust", "b", "MaybeBool"))
 
-  val envWithMaybeBool = IMap(vv("MaybeBool") -> EnvValue(Level(0), MaybeBool))
+  val envWithMaybeBool = IMap(
+    vv("BTag") -> EnvValue(Level(0), BTag),
+    vv("MaybeBool") -> EnvValue(Level(0), MaybeBool)
+  )
 
   it should "alala maybebool" in {
     BEmpty should haveTypeInContext(alalaEnv ++ envWithMaybeBool, "MaybeBool")
