@@ -1,6 +1,6 @@
 package typecheck.inference
 
-import terms.{Case, Term, Level, Finite}
+import terms._
 import terms.Variables._
 import typecheck.Environment.EnvValue
 import util.Implicits._
@@ -17,7 +17,9 @@ object BooleanContext {
   /**
    * data Bool = {tt, ff}
    */
-  val envWithBBool = IMap(vv("Bool") -> EnvValue(Level(0), BBool))
+  val envWithBBool = IMap(
+    vv("Bool") -> EnvValue(Level(0), BBool)
+  )
 
   /*
     if cond then th else el
@@ -29,4 +31,14 @@ object BooleanContext {
     )
     Case(cond, cc)
   }
+
+  /**
+   * if = \cond.\then.\else.case (cond) of {tt -> then; ff -> else}
+   */
+  val ifTerm = "cond".lam("then".lam("else".lam(bif("cond", "then", "else"))))
+
+  val extendedBoolEnv = IMap(
+    vv("Bool") -> EnvValue(TVar.dummy, BBool),
+    vv("if") -> EnvValue(TVar.dummy, ifTerm)
+  )
 }

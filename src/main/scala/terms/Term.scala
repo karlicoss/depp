@@ -24,6 +24,18 @@ abstract class Term
    */
   def app(other: Term): Term = App(this, other)
 
+  /**
+   * Constructs a multi-arg application
+   * this.app(a1, a2, a3) <=> this a1 a2 a3
+   */
+  def app(args : Term*): Term = {
+    if (args.length == 1) {
+      this.app(args.head)
+    } else {
+      this.app(args.head).app(args.tail:_*)
+    }
+  }
+  
   def ccase(cases: Map[Variable, Term]): Case = Case(this, cases)
 
   def ccase(cases: Map[Variable, Term], dflt: Term): Case = Case(this, cases, dflt)
