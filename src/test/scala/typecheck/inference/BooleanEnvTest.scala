@@ -48,12 +48,12 @@ class BooleanEnvTest extends UnitSpec with CustomMatchers {
     /**
      * isTrue = \a.match (a) {tt -> tt, ff -> ff}
      */
-    val isTrueTerm = "a".lam("Bool", "a".ccase(Map("tt" -> fff, "ff" -> ftt)))
+    val isTrueTerm = "a".lam("Bool", "a".ccase(Map("tt" -> ftt, "ff" -> fff)))
     val env = extendedBoolEnv ++ Map(
       vv("isTrue") -> EnvValue(TVar.dummy, isTrueTerm)
     )
 
-    Var("isTrue") should haveTypeInContext(env, Level(0))
+    Var("isTrue") should haveTypeInContext(env, ".".pi("Bool", "Bool"))
     Var("isTrue").app(ftt) should beBequivalentTo(env, ftt)
     Var("isTrue").app(fff) should beBequivalentTo(env, fff)
   }
@@ -117,7 +117,7 @@ class BooleanEnvTest extends UnitSpec with CustomMatchers {
   }
 
   it should "infer eqb type" in {
-    Var("eqb") should haveTypeInContext(extendedBoolEnv, Level(1))
+    Var("eqb") should haveTypeInContext(extendedBoolEnv, "x".pi("Bool", "y".pi("Bool", Level(0))))
   }
 
   it should "rwerewr" in {
