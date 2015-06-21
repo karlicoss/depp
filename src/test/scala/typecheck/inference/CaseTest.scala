@@ -17,12 +17,16 @@ import typecheck.inference.BooleanContext._
 
 
 class CaseTest extends UnitSpec with CustomMatchers {
+  val fff = FElem("ff")
+  val ftt = FElem("tt")
+  val fuu = FElem("uu")
+
   it should "infer type of if-then-else-clause" in {
-    bif("tt", "ff", "tt") should haveTypeInContext(envWithBBool, "Bool")
+    bif(ftt, fff, ftt) should haveTypeInContext(envWithBBool, "Bool")
   }
 
   it should "evaluate if-then-else-clause" in {
-    bif("tt", "ff", "tt") should beBequivalentTo(envWithBBool, "ff")
+    bif(ftt, fff, ftt) should beBequivalentTo(envWithBBool, fff)
   }
 
   val unitBoolEnv = envWithUnit ++ envWithBBool
@@ -34,9 +38,9 @@ class CaseTest extends UnitSpec with CustomMatchers {
 
   it should "infer type of fsfsd" in {
     // Σ Unit (λ { unit → Bool })
-    val qq = Sigma(Abs(".", "Unit", Var(".").ccase(IMap(vv("uu") -> "Bool"))))
+    val qq = Sigma(Abs(".", "Unit", Var(".").ccase(IMap("uu" -> "Bool"))))
     qq should haveTypeInContext(unitBoolEnv, Level(0))
-    DPair("uu", "tt", qq)
+    DPair(fuu, ftt, qq)
   }
 
   /*
@@ -45,18 +49,20 @@ class CaseTest extends UnitSpec with CustomMatchers {
       BTJust  : BTag
    */
   val BTag = Finite(Set("BTEmpty", "BTJust"))
+  val fBTEmpty = FElem("BTEmpty")
+  val fBTJust = FElem("BTJust")
 
   // MaybeBool = Σ BTag (λ { BTEmpty → Unit ; BTJust → Bool })
   val MaybeBool = Sigma(Abs("t", "BTag", Var("t").ccase(
     IMap(
-      vv("BTEmpty") -> "Unit",
-      vv("BTJust")  -> "Bool"))))
+      "BTEmpty" -> "Unit",
+      "BTJust"  -> "Bool"))))
 
   // BEmpty = (BTEmpty , unit)
-  val BEmpty = DPair("BTEmpty", "uu", "MaybeBool")
+  val BEmpty = DPair(fBTEmpty, fuu, "MaybeBool")
 
   // BJust = λ b → BTJust , b
-  val BJust = "b".lam("Bool", DPair("BTJust", "b", "MaybeBool"))
+  val BJust = "b".lam("Bool", DPair(fBTJust, "b", "MaybeBool"))
 
   val envWithMaybeBool = IMap(
     vv("BTag") -> EnvValue(Level(0), BTag),
@@ -70,7 +76,7 @@ class CaseTest extends UnitSpec with CustomMatchers {
   }
 
   it should "infer (Just false) :: MaybeBool, (Just true) :: MaybeBool" in {
-    "BJust".app("ff") should haveTypeInContext(unitBoolEnv ++ envWithMaybeBool, "MaybeBool")
-    "BJust".app("tt") should haveTypeInContext(unitBoolEnv ++ envWithMaybeBool, "MaybeBool")
+    "BJust".app(fff) should haveTypeInContext(unitBoolEnv ++ envWithMaybeBool, "MaybeBool")
+    "BJust".app(ftt) should haveTypeInContext(unitBoolEnv ++ envWithMaybeBool, "MaybeBool")
   }
 }

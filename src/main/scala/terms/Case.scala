@@ -1,6 +1,5 @@
 package terms
 
-import terms.Variables.Variable
 import typecheck.Beta
 import typecheck.Environment.Environment
 import typecheck.inference.TypeInferenceException
@@ -8,31 +7,27 @@ import typecheck.inference.TypeInferenceException
 import scala.collection.Map
 import scalaz.State
 
-case class Case(cond: Term, cases: Map[Variable, Term], dflt: Option[Term]) extends Term {
+case class Case(cond: Term, cases: Map[FElem.FElemType, Term], dflt: Option[Term]) extends Term {
   /**
    * Evaluates the expression under the given context
    * @param env the context
    * @return
    */
   override def evaluate(env: Environment): Term = {
-    val Var(cs) = cond.evaluate(env)
-    val Finite(elems) = cond.infer(env).evaluateAll(env)
-    if (elems.contains(cs)) { // try to match the value of the finite type
-      cases.get(cs) match {
-        case Some(x) => x
-        case None => dflt match {
+    val tev = cond.evaluate(env)
+    tev match {
+      case FElem(name) => {
+        val Finite(elems) = cond.infer(env).evaluateAll(env)
+        cases.get(name) match {
           case Some(x) => x
-          case None => throw TypeInferenceException(s"Expected default case for pattern $cs")
+          case None => dflt match {
+            case Some(x) => x
+            case None => throw TypeInferenceException(s"Expected default case for pattern $name")
+          }
         }
       }
-    } else { // otherwise, search in the context
-      env.get(cs) match {
-        case Some(x) => x.dfn match {
-          case Some(dfn) => Case(dfn, cases, dflt)
-          case None => Case(Var(cs), cases, dflt)
-        }
-        case None => ??? // TODO unbound variable?
-      }
+      case other =>
+        new Case(other, cases, dflt)
     }
   }
 
@@ -117,6 +112,6 @@ case class Case(cond: Term, cases: Map[Variable, Term], dflt: Option[Term]) exte
 }
 
 object Case {
-  def apply(cond: Term, cases: Map[Variable, Term]): Case = Case(cond, cases, None)
-  def apply(cond: Term, cases: Map[Variable, Term], dflt: Term): Case = Case(cond, cases, Some(dflt))
+  def apply(cond: Term, cases: Map[FElem.FElemType, Term]): Case = Case(cond, cases, None)
+  def apply(cond: Term, cases: Map[FElem.FElemType, Term], dflt: Term): Case = Case(cond, cases, Some(dflt))
 }

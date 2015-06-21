@@ -22,9 +22,15 @@ object Alpha {
         case Var(aname) =>
           b match {
             case Var(bname) => {
-              aname == bname || map(aname) == bname
+              aname == bname || map(aname) == bname // TODO no need for aname == bname?
               // TODO check env.contains(aname) ?
             }
+            case _ => false
+          }
+        case FElem(aname) =>
+          b match {
+            case FElem(bname) =>
+              aname == bname
             case _ => false
           }
         case Level(akind) =>

@@ -36,9 +36,9 @@ abstract class Term
     }
   }
   
-  def ccase(cases: Map[Variable, Term]): Case = Case(this, cases)
+  def ccase(cases: Map[FElem.FElemType, Term]): Case = Case(this, cases)
 
-  def ccase(cases: Map[Variable, Term], dflt: Term): Case = Case(this, cases, dflt)
+  def ccase(cases: Map[FElem.FElemType, Term], dflt: Term): Case = Case(this, cases, dflt)
 
   /**
    * TODO HOW TO MOVE THIS TO HasEvaluate?

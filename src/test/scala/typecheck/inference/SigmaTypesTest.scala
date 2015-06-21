@@ -16,7 +16,9 @@ class SigmaTypesTest extends UnitSpec with CustomMatchers {
     PairType(PairType("Unit", "Unit"), PairType("Unit", "Unit")) should haveTypeInContext(envWithUnit, Level(0))
   }
 
+  val fuu = FElem("uu")
+
   it should "infer type of dependent pair" in {
-    DPair("uu", "uu") should haveTypeInContext(envWithUnit, PairType("Unit", "Unit"))
+    DPair(fuu, fuu) should haveTypeInContext(envWithUnit, PairType("Unit", "Unit"))
   }
 }

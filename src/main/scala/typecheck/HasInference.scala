@@ -12,5 +12,11 @@ trait HasInference[T] {
    */
   final def infer(env: Environment): T = inferHelper(env).eval(0)
 
-  def inferHelper(env: Environment): State[Int, T] // T is the implicit type variable counter
+  /**
+   * Helper function for type inference.
+   * The state is a fresh variable name counter.
+   * @param env the context
+   * @return
+   */
+  def inferHelper(env: Environment): State[Int, T]
 }

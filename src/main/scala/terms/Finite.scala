@@ -1,6 +1,5 @@
 package terms
 
-import terms.Variables.Variable
 import typecheck.Environment.Environment
 
 import scalaz.State
@@ -9,7 +8,7 @@ import scalaz.State
  * Simple finite type
  * @param elems the elements of the type
  */
-final case class Finite(elems: Set[Variable]) extends Term {
+final case class Finite(elems: Set[FElem.FElemType]) extends Term {
 
   override def inferHelper(env: Environment): State[Int, Term] = State.state(Level(0))
 

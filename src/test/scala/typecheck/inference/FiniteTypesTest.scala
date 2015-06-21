@@ -1,6 +1,6 @@
 package typecheck.inference
 
-import terms.{Var, Level, Finite}
+import terms.{FElem, Var, Level, Finite}
 import terms.Variables.Simple
 import terms.Variables.vv
 import typecheck.CustomMatchers
@@ -11,7 +11,7 @@ import util.UnitSpec
 class FiniteTypesTest extends UnitSpec with CustomMatchers {
 
   def makefinite(n: Integer): Finite = {
-    val names = (0 until n).map(i => Simple("f" + i))
+    val names = (0 until n).map(i => "f" + i)
     Finite(names.toSet)
   }
 
@@ -30,19 +30,19 @@ class FiniteTypesTest extends UnitSpec with CustomMatchers {
   it should "infer type of an element of finite type" in {
     val tp = makefinite(2) // f0, f1
     val env = Map(vv("Finite") -> EnvValue(Level(0), tp))
-    Var("f0") should haveTypeInContext(env, "Finite")
-    Var("f1") should haveTypeInContext(env, "Finite")
+    FElem("f0") should haveTypeInContext(env, "Finite")
+    FElem("f1") should haveTypeInContext(env, "Finite")
   }
 
   it should "evaluate elements of finite types" in {
     val tp = makefinite(1) // f0
     val env = Map(vv("Finite") -> EnvValue(Level(0), tp))
-    Var("f0") should beBequivalentTo(env, "f0")
+    FElem("f0") should beBequivalentTo(env, FElem("f0"))
   }
 
   it should "evaluate elements of finite types[2]" in {
     val tp = makefinite(2) // f0, f1
     val env = Map(vv("Finite") -> EnvValue(Level(0), tp))
-    Var("f1").evaluate(env) should beAequivalentTo(env, "f1")
+    FElem("f1").evaluate(env) should beAequivalentTo(env, FElem("f1"))
   }
 }

@@ -20,12 +20,19 @@ import typecheck.inference.BooleanContext._
  * Various tests for Bools
  */
 class BooleanEnvTest extends UnitSpec with CustomMatchers {
-  it should "ff : Bool, tt : Bool" in {
-    Var("ff") should haveTypeInContext(extendedBoolEnv, "Bool")
-    Var("tt") should haveTypeInContext(extendedBoolEnv, "Bool")
-  }
-  
-  it should "(if tt then ff else tt) -> ff" in {
-    Var("if").app("tt", "ff", "tt") should beBequivalentTo(extendedBoolEnv, "ff")
+//  it should "ff : Bool, tt : Bool" in {
+//    Var("ff") should haveTypeInContext(extendedBoolEnv, "Bool")
+//    Var("tt") should haveTypeInContext(extendedBoolEnv, "Bool")
+//  }
+//
+//  it should "(if tt then ff else tt) -> ff" in {
+//    Var("if").app("tt", "ff", "tt") should beBequivalentTo(extendedBoolEnv, "ff")
+//  }
+
+  it should "and function tests" in {
+    Var("and").app("tt", "tt") should beBequivalentTo(extendedBoolEnv, "tt")
+//    Var("and").app("tt", "ff") should beBequivalentTo(extendedBoolEnv, "ff")
+//    Var("and").app("ff", "tt") should beBequivalentTo(extendedBoolEnv, "ff")
+//    Var("and").app("ff", "ff") should beBequivalentTo(extendedBoolEnv, "ff")
   }
 }

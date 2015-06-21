@@ -26,8 +26,8 @@ object BooleanContext {
    */
   def bif(cond: Term, th: Term, el: Term): Term = {
     val cc = Map(
-      vv("tt") -> th,
-      vv("ff") -> el
+      "tt" -> th,
+      "ff" -> el
     )
     Case(cond, cc)
   }
@@ -37,8 +37,14 @@ object BooleanContext {
    */
   val ifTerm = "cond".lam("then".lam("else".lam(bif("cond", "then", "else"))))
 
+  /**
+   * and = \a.\b.if (a) then b else false
+   */
+  val andTerm = "a".lam("b".lam("if".app("a", "b", "ff")))
+
   val extendedBoolEnv = IMap(
     vv("Bool") -> EnvValue(TVar.dummy, BBool),
-    vv("if") -> EnvValue(TVar.dummy, ifTerm)
+    vv("if") -> EnvValue(TVar.dummy, ifTerm),
+    vv("and") -> EnvValue(TVar.dummy, andTerm)
   )
 }

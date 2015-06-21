@@ -67,4 +67,18 @@ class AlphaEquivalenceTest extends UnitSpec with CustomMatchers {
     val tp2 = Sigma(Abs("x", "Unit", "Unit"))
     tp1 should beAequivalentTo(envWithUnit, tp2)
   }
+
+
+  val Alala = Finite(Set("one", "two"))
+  val alalaEnv = Map(vv("Alala") -> EnvValue(Level(0), Unit))
+
+  it should "treat same elements of finite types as equivalent" in {
+    FElem("one") should beAequivalentTo(alalaEnv, FElem("one"))
+    FElem("two") should beAequivalentTo(alalaEnv, FElem("two"))
+  }
+
+  it should "treat different elements of finite types as not equivalent" in {
+    FElem("one") shouldNot beAequivalentTo(alalaEnv, FElem("two"))
+    FElem("two") shouldNot beAequivalentTo(alalaEnv, FElem("one"))
+  }
 }
