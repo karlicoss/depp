@@ -36,5 +36,5 @@ case class Proj2(trm: Term) extends Term {
     }
   }
 
-  override def pretty(): String = ???
+  override def pretty(): String = toString
 }

@@ -16,7 +16,7 @@ trait CustomMatchers {
   class EqualInContextMatcher(env: Environment, right: Term) extends Matcher[Term] {
     override def apply(left: Term) = MatchResult(
       Beta.equivalent(env, left, right),
-      "Should be beta-equivalent",
+      s"Expected ${left.pretty()} to be beta-equivalent to ${right.pretty()}",
       "Should not be beta-equivalent")
   }
 

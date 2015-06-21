@@ -10,12 +10,14 @@ import scala.collection.immutable.{Map => IMap}
 
 object BooleanContext {
   /**
-   * BBool = {tt, ff}
+   * BBool = {ff, tt}
    */
-  val BBool = Finite(Set("tt", "ff"))
+  val BBool = Finite(Set("ff", "tt"))
+  val fff = FElem("ff")
+  val ftt = FElem("tt")
 
   /**
-   * data Bool = {tt, ff}
+   * data Bool = {ff, tt}
    */
   val envWithBBool = IMap(
     vv("Bool") -> EnvValue(Level(0), BBool)
@@ -40,7 +42,7 @@ object BooleanContext {
   /**
    * and = \a.\b.if (a) then b else false
    */
-  val andTerm = "a".lam("b".lam("if".app("a", "b", "ff")))
+  val andTerm = "a".lam("b".lam("if".app("a", "b", fff)))
 
   val extendedBoolEnv = IMap(
     vv("Bool") -> EnvValue(TVar.dummy, BBool),

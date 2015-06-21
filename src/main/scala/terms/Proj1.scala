@@ -28,5 +28,5 @@ case class Proj1(trm: Term) extends Term {
     }
   }
 
-  override def pretty(): String = ???
+  override def pretty(): String = toString
 }
