@@ -1,6 +1,5 @@
 package terms
 
-import terms.Abstraction.Abs
 import typecheck.Beta
 import typecheck.Environment._
 import typecheck.inference.{Inference, TypeInferenceException}
@@ -22,7 +21,10 @@ final case class App(a: Term, b: Term) extends Term {
     val fn = a.evaluate(env)
     val arg = b.evaluate(env)
     fn match {
-      case Lam(abs) => abs.body.subst(Map(abs.v -> arg)).evaluate(env)
+      case Lam(abs) => {
+        val res = abs.body.subst(Map(abs.v -> EnvValue(arg)))
+        res.evaluate(env)
+      }
       case _ => App(fn, arg)
     }
   }

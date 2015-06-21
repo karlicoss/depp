@@ -2,7 +2,7 @@ package terms
 
 import java.lang.Math._
 
-import terms.Abstraction.Abs
+import terms.Abs
 import typecheck.Environment._
 import typecheck.inference.TypeInferenceException
 import util.Implicits.type2EnvElem

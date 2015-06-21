@@ -1,6 +1,6 @@
 package terms
 
-import terms.Abstraction.Abs
+import terms.Abs
 import terms.Variables.{Variable, Dummy, Simple}
 import typecheck.Environment._
 import util.Implicits.type2EnvElem
@@ -10,7 +10,9 @@ import scalaz.State
 final case class Lam(abs: Abs) extends Term {
   override def pretty(): String = "λ" + abs.pretty()
 
-  override def evaluate(env: Environment): Term = Lam(abs.evaluate(env))
+  override def evaluate(env: Environment): Term = {
+    Lam(abs.evaluate(env))
+  }
 
   override def substHelper(env: Environment) = for {
     res <- abs.substHelper(env)

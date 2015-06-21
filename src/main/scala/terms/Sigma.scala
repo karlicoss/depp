@@ -1,6 +1,5 @@
 package terms
 
-import terms.Abstraction.Abs
 import terms.Variables.Simple
 import typecheck.Environment.Environment
 

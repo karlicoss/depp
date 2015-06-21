@@ -1,9 +1,8 @@
 package typecheck
 
-import terms.Abstraction.Abs
 import terms.Variables.vv
 import terms._
-import typecheck.Environment.{Environment, EnvValue}
+import typecheck.Environment.{EnvValue, Environment}
 import util.Implicits._
 import util.Terms._
 import util.UnitSpec

@@ -1,6 +1,5 @@
 package typecheck
 
-import terms.Abstraction.Abs
 import terms.Variables.Variable
 import terms._
 import typecheck.Environment.Environment

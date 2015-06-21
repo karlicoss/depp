@@ -1,6 +1,5 @@
 package terms
 
-import terms.Abstraction.Abs
 import terms.Terms.Let
 import util.PrettyPrintable
 

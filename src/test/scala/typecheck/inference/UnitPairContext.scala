@@ -1,12 +1,10 @@
 package typecheck.inference
 
-import terms.Abstraction.Abs
 import terms.Variables._
-import terms.{Level, Sigma, Term, Finite}
-import util.Implicits._
+import terms._
 import typecheck.Environment.EnvValue
+import util.Implicits._
 
-import scala.collection.Map
 import scala.collection.immutable.{Map => IMap}
 
 object UnitPairContext {

@@ -1,15 +1,12 @@
 package typecheck.inference
 
-import terms.Abstraction.Abs
+import terms.Variables.{Dummy, vv}
 import terms._
-import terms.Variables.{Dummy, Generated, Simple, vv}
 import typecheck.CustomMatchers
 import typecheck.Environment._
 import util.Implicits._
 import util.UnitSpec
 
-import scala.App
-import scala.collection.Map
 import scala.collection.immutable.{Map => IMap}
 
 

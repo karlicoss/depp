@@ -1,19 +1,15 @@
 package typecheck.inference
 
 import terms.Variables.vv
-import typecheck.Environment.EnvValue
-
-import scala.collection.Map
-import scala.collection.immutable.{Map => IMap}
-
-import terms.Abstraction.Abs
 import terms._
 import typecheck.CustomMatchers
-import util.UnitSpec
-import util.Implicits._
-
-import UnitPairContext._
+import typecheck.Environment.EnvValue
 import typecheck.inference.BooleanContext._
+import typecheck.inference.UnitPairContext._
+import util.Implicits._
+import util.UnitSpec
+
+import scala.collection.immutable.{Map => IMap}
 
 
 class CaseTest extends UnitSpec with CustomMatchers {

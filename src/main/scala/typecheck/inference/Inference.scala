@@ -1,6 +1,5 @@
 package typecheck.inference
 
-import terms.Abstraction.Abs
 import terms.Variables.Variable
 import terms._
 

@@ -1,6 +1,6 @@
 package terms
 
-import terms.Abstraction.Abs
+import terms.Abs
 import typecheck.Beta
 import typecheck.Environment.Environment
 import typecheck.inference.TypeInferenceException
