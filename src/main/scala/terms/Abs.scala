@@ -14,7 +14,7 @@ import util.Implicits.type2EnvElem
 /*
   TODO: implicit dummy http://stackoverflow.com/a/5828982/706389
  */
-final case class Abs(v: Variable, tp: Term, body: Term, dummy: Unit)
+final case class Abs(v: Variable, var tp: Term, body: Term, dummy: Unit)
   extends PrettyPrintable with HasEvaluate[Abs] with HasSubst[Abs] {
 
   override def pretty(): String = s"${v.pretty()}:${tp.pretty()}.${body.pretty()}"

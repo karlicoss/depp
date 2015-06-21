@@ -1,5 +1,6 @@
 package terms
 
+import terms.Variables.{Dummy, Generated, Simple}
 import typecheck.Beta
 import typecheck.Environment._
 import typecheck.inference.{Inference, TypeInferenceException}
@@ -34,7 +35,14 @@ final case class App(a: Term, b: Term) extends Term {
     resb <- b.substHelper(env)
   } yield App(resa, resb)
 
-  private def inferPi(env: Environment, term: Term): Abs = {
+  /**
+   *
+   * @param env
+   * @param term
+   * @param hint "typing hint"
+   * @return
+   */
+  private def inferPi(env: Environment, term: Term, hint: Term): Abs = {
     val funType = term.infer(env)
     val ev = funType.evaluate(env)
     ev match {
@@ -56,23 +64,23 @@ final case class App(a: Term, b: Term) extends Term {
   override def inferHelper(env: Environment): State[Int, Term] = State.state {
 
     val argType = b.infer(env)
-    val abs = inferPi(env, a)
-    /*
-        If the type of the bound variable is a type variable, we substitute the argument type for it, no checks
+    val abs = inferPi(env, a, argType)
 
-        If the type of the bound is supplied, we should check it against the argument
-        // TODO check that it does not contain any type variables
-     */
-    val newabs = abs.tp match {
-      case TVar(name) =>
-        // TODO body substitution?
-        Abs(abs.v, argType, Inference.substTv(name, argType, abs.body))
-      case tp => {
-        assumeEqual(env, tp, argType)
-        abs
+    var body: Term = null
+    // if the type of the bound variable was not supplied, we just set it to the argument type
+    // TODO we should probably make Dummy a separate term instead?
+    abs.tp match {
+      case TVar(name) => {
+        // TODO check that name is not Dummy. It should probably be Generated only
+        body = Inference.substTv(name, argType, abs.body)
+      }
+      case _ => {
+        // now we should check the type of the bound variable against the argument type
+        assumeEqual(env, abs.tp, argType)
+        body = abs.body
       }
     }
 
-    newabs.body.subst(Map(abs.v -> b))
+    body.subst(Map(abs.v -> b))
   }
 }
