@@ -1,6 +1,6 @@
 package terms
 
-import terms.Variables.{Simple, Variable}
+import terms.Variables.{Dummy, Generated, Simple, Variable}
 import typecheck.Environment.Environment
 import typecheck.inference.{HasSubst, HasEvaluate}
 import util.PrettyPrintable
@@ -26,9 +26,13 @@ final case class Abs(v: Variable, tp: Term, body: Term, dummy: Unit)
   }
 
   override def substHelper(env: Environment) = for {
-    s <- State.get[Int] // TODO to string?
+    s <- State.get[Int]
     _ <- State.modify[Int](_ + 1)
-    fv = Simple(s.toString) // TODO generated variable?
+    fv = v match {
+      case Simple(name) => Generated(name, s)
+      case Generated(name, id) => Generated(name, s)
+      case Dummy() => null
+    }
     resType <- tp.substHelper(env)
     resBody <- body.substHelper(env + (v -> Var(fv)))
   } yield Abs(fv, resType, resBody)
