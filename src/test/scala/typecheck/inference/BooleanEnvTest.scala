@@ -110,22 +110,29 @@ class BooleanEnvTest extends UnitSpec with CustomMatchers {
 //  }
 //
 //  it should "infer if : Bool -> Bool -> Bool -> Bool type" in {
-//    Var("if") should haveTypeInContext(extendedBoolEnv, Level(0)) // todo
+//    Var("if") should haveTypeInContext(extendedBoolEnv, ".".pi("Bool", ".".pi("Bool", ".".pi("Bool", "Bool"))))
 //  }
-
-  it should "infer not type" in {
-    Var("not") should haveTypeInContext(extendedBoolEnv, ".".pi("Bool", "Bool"))
-  }
+//
+//  it should "infer not type" in {
+//    Var("not") should haveTypeInContext(extendedBoolEnv, ".".pi("Bool", "Bool"))
+//  }
 //
 //  it should "infer eqb type" in {
 //    Var("eqb") should haveTypeInContext(extendedBoolEnv, "x".pi("Bool", "y".pi("Bool", Level(0))))
 //  }
-//
-//  it should "rwerewr" in {
-//    /**
-//     * th1 : (a : Bool) → (qq : (ww : a eqb ff) → ⊥) → a eqb tt
-//     */
-//    val statement = "a".pi("Bool", "qq".pi("ww".pi("eqb".app("a", fff), "Bot"), "eqb".app("a", ftt)))
-//    statement should haveTypeInContext(extendedBoolEnv, Level(1))
-//  }
+
+  it should "rwerewr" in {
+    /**
+     * th1 : (a : Bool) → (qq : (ww : a eqb ff) → ⊥) → a eqb tt
+     */
+    val statement = "a".pi("Bool", "qq".pi("ww".pi("eqb".app("a", fff), "Bot"), "eqb".app("a", ftt)))
+    /**
+     * th1 = λ { tt → λ _ → top ; ff → λ z → z top }
+     */
+    val proof = "a".lam("Bool", "a".ccase(IMap(
+      "ff" -> "z".lam(".".pi("Top", "Bot"), "z".app(ftop)),
+      "tt" -> "z".lam(".".pi("Bot", "Bot"), ftop)
+    )))
+    proof should haveTypeInContext(extendedBoolEnv, statement)
+  }
 }

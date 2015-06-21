@@ -38,7 +38,7 @@ object BooleanContext {
   /**
    * if = \cond.\then.\else.case (cond) of {tt -> then; ff -> else}
    */
-  val ifTerm = "cond".lam("Bool", "then".lam("else".lam(bif("cond", "then", "else"))))
+  val ifTerm = "cond".lam("Bool", "then".lam("Bool", "else".lam("Bool", bif("cond", "then", "else"))))
 
   /**
    * and = \a.\b.if (a) then b else false
@@ -48,7 +48,7 @@ object BooleanContext {
   /**
    * not = \a. if(a) then false else true
    */
-  val notTerm = "a".lam("if".app("a", fff, ftt))
+  val notTerm = "a".lam("Bool", "if".app("a", fff, ftt))
 
   /**
    * or = \a.\b.not ((not a) and (not b))
@@ -61,6 +61,7 @@ object BooleanContext {
    *  top : Top
    */
   val topTerm = Finite(Set("top"))
+  val ftop = FElem("top")
 
   /**
    * data Bot : Set where
