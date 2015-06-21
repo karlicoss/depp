@@ -19,6 +19,7 @@ object Inference {
       case Lam(abs) => Lam(substTvAbs(tvname, tp, abs))
       case Pi(abs) => Pi(substTvAbs(tvname, tp, abs))
       case App(a, b) => App(substTv(tvname, tp, a), substTv(tvname, tp, b))
+      case Finite(set) => Finite(set)
     }
   }
 }

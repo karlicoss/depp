@@ -34,26 +34,26 @@ final case class App(a: Term, b: Term) extends Term {
     resb <- b.substHelper(env)
   } yield App(resa, resb)
 
-  override def inferHelper(env: Environment): State[Int, Term] = State.state({
-
-    def inferPi(env: Environment, term: Term): Abs = {
-      val funType = term.infer(env)
-      val ev = funType.evaluate(env)
-      ev match {
-        case Pi(abs) => abs
-        case _ => {
-          val message = s"Expected ${funType.pretty()} to be evaluated in Pi type, got ${ev.pretty()} instead"
-          throw TypeInferenceException(message)
-        }
+  private def inferPi(env: Environment, term: Term): Abs = {
+    val funType = term.infer(env)
+    val ev = funType.evaluate(env)
+    ev match {
+      case Pi(abs) => abs
+      case _ => {
+        val message = s"Expected ${funType.pretty()} to be evaluated in Pi type, got ${ev.pretty()} instead"
+        throw TypeInferenceException(message)
       }
     }
+  }
 
-    def assumeEqual(env: Environment, t1: Term, t2: Term): Unit = {
-      if (!Beta.equivalent(env, t1, t2)) {
-        throw TypeInferenceException(
-          s"Expected ${t1.pretty()} to be equal to ${t2.pretty()}")
-      }
+  private def assumeEqual(env: Environment, t1: Term, t2: Term): Unit = {
+    if (!Beta.equivalent(env, t1, t2)) {
+      throw TypeInferenceException(
+        s"Expected ${t1.pretty()} to be equal to ${t2.pretty()}")
     }
+  }
+
+  override def inferHelper(env: Environment): State[Int, Term] = State.state {
 
     val argType = b.infer(env)
     val abs = inferPi(env, a)
@@ -74,5 +74,5 @@ final case class App(a: Term, b: Term) extends Term {
     }
 
     newabs.body.subst(Map(abs.v -> b))
-  })
+  }
 }

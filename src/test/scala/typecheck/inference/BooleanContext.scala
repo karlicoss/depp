@@ -38,7 +38,7 @@ object BooleanContext {
   /**
    * if = \cond.\then.\else.case (cond) of {tt -> then; ff -> else}
    */
-  val ifTerm = "cond".lam("then".lam("else".lam(bif("cond", "then", "else"))))
+  val ifTerm = "cond".lam("Bool", "then".lam("else".lam(bif("cond", "then", "else"))))
 
   /**
    * and = \a.\b.if (a) then b else false

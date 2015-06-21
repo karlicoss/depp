@@ -34,12 +34,13 @@ class BooleanEnvTest extends UnitSpec with CustomMatchers {
     /**
      * isTrue = \a.if (a) then true else false
      */
-    val isTrueTerm = "a".lam("if".app("a", "a", fff))
+    // TODO val isTrueTerm = "a".lam("if".app("a", "a", fff)) should work
+    val isTrueTerm = "a".lam("Bool", "if".app("a", "a", fff))
     val env = extendedBoolEnv ++ Map(
       vv("isTrue") -> EnvValue(TVar.dummy, isTrueTerm)
     )
 
-    Var("isTrue") should haveTypeInContext(env, Level(0))
+    Var("isTrue") should haveTypeInContext(env, ".".pi("Bool", "Bool"))
     Var("isTrue").app(ftt) should beBequivalentTo(env, ftt)
     Var("isTrue").app(fff) should beBequivalentTo(env, fff)
   }
@@ -113,7 +114,7 @@ class BooleanEnvTest extends UnitSpec with CustomMatchers {
   }
 
   it should "infer not type" in {
-    Var("not") should haveTypeInContext(extendedBoolEnv, Level(0))
+    Var("not") should haveTypeInContext(extendedBoolEnv, ".".pi("Bool", "Bool"))
   }
 
   it should "infer eqb type" in {

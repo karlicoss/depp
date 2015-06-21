@@ -101,8 +101,9 @@ case class Case(cond: Term, cases: Map[FElem.FElemType, Term], dflt: Option[Term
         }
         ftype
       }
-      case _ =>
+      case _ => {
         throw TypeInferenceException(s"Expected $tp to be Finite")
+      }
     }
   }
 
