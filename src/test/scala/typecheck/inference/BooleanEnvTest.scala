@@ -39,9 +39,25 @@ class BooleanEnvTest extends UnitSpec with CustomMatchers {
       vv("isTrue") -> EnvValue(TVar.dummy, isTrueTerm)
     )
 
+    Var("isTrue") should haveTypeInContext(env, Level(0))
     Var("isTrue").app(ftt) should beBequivalentTo(env, ftt)
     Var("isTrue").app(fff) should beBequivalentTo(env, fff)
   }
+
+  it should "isTrue tests 2" in {
+    /**
+     * isTrue = \a.match (a) {tt -> tt, ff -> ff}
+     */
+    val isTrueTerm = "a".lam("Bool", "a".ccase(Map("tt" -> fff, "ff" -> ftt)))
+    val env = extendedBoolEnv ++ Map(
+      vv("isTrue") -> EnvValue(TVar.dummy, isTrueTerm)
+    )
+
+    Var("isTrue") should haveTypeInContext(env, Level(0))
+    Var("isTrue").app(ftt) should beBequivalentTo(env, ftt)
+    Var("isTrue").app(fff) should beBequivalentTo(env, fff)
+  }
+
 
   it should "first function tests" in {
     /**
@@ -81,5 +97,34 @@ class BooleanEnvTest extends UnitSpec with CustomMatchers {
     Var("or").app(ftt, fff) should beBequivalentTo(extendedBoolEnv, ftt)
     Var("or").app(fff, ftt) should beBequivalentTo(extendedBoolEnv, ftt)
     Var("or").app(fff, fff) should beBequivalentTo(extendedBoolEnv, fff)
+  }
+
+  it should "tt eqb tt, ff eqb ff are provable" in {
+    FElem("top") should haveTypeInContext(extendedBoolEnv, "eqb".app(ftt, ftt))
+    FElem("top") should haveTypeInContext(extendedBoolEnv, "eqb".app(fff, fff))
+  }
+
+  it should "infer Bool : Set" in {
+    Var("Bool") should haveTypeInContext(extendedBoolEnv, Level(0))
+  }
+
+  it should "infer if : Bool -> Bool -> Bool -> Bool type" in {
+    Var("if") should haveTypeInContext(extendedBoolEnv, Level(0)) // todo
+  }
+
+  it should "infer not type" in {
+    Var("not") should haveTypeInContext(extendedBoolEnv, Level(0))
+  }
+
+  it should "infer eqb type" in {
+    Var("eqb") should haveTypeInContext(extendedBoolEnv, Level(1))
+  }
+
+  it should "rwerewr" in {
+    /**
+     * th1 : (a : Bool) → (qq : (ww : a eqb ff) → ⊥) → a eqb tt
+     */
+    val statement = "a".pi("Bool", "qq".pi("ww".pi("eqb".app("a", fff), "Bot"), "eqb".app("a", ftt)))
+    statement should haveTypeInContext(extendedBoolEnv, Level(1))
   }
 }

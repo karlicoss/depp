@@ -1,7 +1,7 @@
 package terms
 
 import terms.Abs
-import terms.Variables.{Variable, Dummy, Simple}
+import terms.Variables.{Generated, Variable, Dummy, Simple}
 import typecheck.Environment._
 import util.Implicits.type2EnvElem
 
@@ -28,7 +28,7 @@ final case class Lam(abs: Abs) extends Term {
             for {
               i <- State.get[Int]
               _ <- State.modify[Int](_ + 1)
-            } yield TVar(Simple(s"gen$i")) // TODO Simple -> Generated?
+            } yield TVar(Generated("gen", i))
             else State.state[Int, Term](abs.tp)
     tp <- abs.body.inferHelper(env + (abs.v -> ntp))
   } yield Pi(Abs(abs.v, ntp, tp))

@@ -3,7 +3,8 @@ package typecheck.inference
 import terms.Variables.vv
 import terms._
 import typecheck.CustomMatchers
-import typecheck.Environment.EnvValue
+import typecheck.Environment.EnvValue.auto
+import typecheck.Environment.{Environment, EnvValue}
 import typecheck.inference.BooleanContext._
 import typecheck.inference.UnitPairContext._
 import util.Implicits._
@@ -23,6 +24,14 @@ class CaseTest extends UnitSpec with CustomMatchers {
 
   it should "evaluate if-then-else-clause" in {
     bif(ftt, fff, ftt) should beBequivalentTo(envWithBBool, fff)
+  }
+
+  it should "trarar" in {
+    val term = "a".lam("Unit", "a".ccase(Map("uu" -> fuu)))
+    term should haveTypeInContext(envWithUnit, ".".pi("Unit", "Unit"))
+
+    val env: Environment = envWithUnit + (vv("term") -> auto(term))
+    Var("term") should haveTypeInContext(env, ".".pi("Unit", "Unit"))
   }
 
   val unitBoolEnv = envWithUnit ++ envWithBBool

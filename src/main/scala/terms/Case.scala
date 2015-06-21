@@ -74,7 +74,7 @@ case class Case(cond: Term, cases: Map[FElem.FElemType, Term], dflt: Option[Term
    * @param env the context
    * @return
    */
-  override def inferHelper(env: Environment): State[Int, Term] = State.state({
+  override def inferHelper(env: Environment): State[Int, Term] = State.state {
     // 1. cond should be Finite
     // 2. check for unknown patterns
     // 3. check that switch is exhaustive
@@ -104,7 +104,7 @@ case class Case(cond: Term, cases: Map[FElem.FElemType, Term], dflt: Option[Term
       case _ =>
         throw TypeInferenceException(s"Expected $tp to be Finite")
     }
-  })
+  }
 
   override def pretty(): String = {
     s"case (${cond.pretty()}) of $cases default ${dflt.map(_.pretty())}"

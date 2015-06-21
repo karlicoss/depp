@@ -1,6 +1,6 @@
 package typecheck
 
-import terms.Term
+import terms.{TVar, Term}
 import terms.Variables.Variable
 
 import scala.collection.Map
@@ -11,6 +11,7 @@ package object Environment {
   object EnvValue {
     def apply(tp: Term, dfn: Term): EnvValue = EnvValue(tp, Some(dfn))
     def apply(tp: Term): EnvValue = EnvValue(tp, None)
+    def auto(dfn: Term): EnvValue = EnvValue(TVar.dummy, dfn)
   }
 
   /**
