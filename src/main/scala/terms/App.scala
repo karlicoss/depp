@@ -64,23 +64,21 @@ final case class App(a: Term, b: Term) extends Term {
   override def inferHelper(env: Environment): State[Int, Term] = State.state {
 
     val argType = b.infer(env)
-    val abs = inferPi(env, a, argType)
 
-    var body: Term = null
-    // if the type of the bound variable was not supplied, we just set it to the argument type
-    // TODO we should probably make Dummy a separate term instead?
-    abs.tp match {
-      case TVar(name) => {
-        // TODO check that name is not Dummy. It should probably be Generated only
-        body = Inference.substTv(name, argType, abs.body)
+    a match {
+      case Lam(abs) => {
+        abs.tp match {
+          case TVar(Dummy()) => {
+            abs.tp = argType
+          }
+          case _ =>
+        }
       }
-      case _ => {
-        // now we should check the type of the bound variable against the argument type
-        assumeEqual(env, abs.tp, argType)
-        body = abs.body
-      }
+      case _ =>
     }
 
-    body.subst(Map(abs.v -> b))
+    val abs = inferPi(env, a, argType)
+    assumeEqual(env, abs.tp, argType)
+    abs.body.subst(Map(abs.v -> b))
   }
 }

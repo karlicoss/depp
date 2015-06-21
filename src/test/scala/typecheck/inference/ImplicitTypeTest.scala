@@ -45,8 +45,22 @@ class ImplicitTypeTest extends UnitSpec with CustomMatchers {
     val tp = ("x".lam("x")).infer(env)
     hasDummy(tp) should be (false)
   }
-  
+
   it should "infer implicit type based on argument type" in {
     ("x".lam("x")).app("a") should haveTypeInContext(env, "A")
   }
+
+  it should "meh" in {
+    ("x".lam(("y".lam("A", "y")).app("x"))).app("a") should haveTypeInContext(env, "A")
+  }
+
+  /**
+   * Type inference: a very restricted sumset
+   *
+   * (\x:Dummy. body) (arg: Arg) : Arg should be immediately substituted instead of Dummy
+   * , BEFORE inferring the body type.
+   *
+   *
+   *
+   */
 }
