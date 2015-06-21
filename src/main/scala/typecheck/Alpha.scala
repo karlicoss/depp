@@ -10,19 +10,38 @@ import typecheck.inference.TypeInferenceException
  */
 object Alpha {
   def equivalent(env: Environment, a: Term, b: Term): Boolean = {
-    def absHelper(env: Environment, map: Map[Variable, Variable], a: Abs, b: Abs): Boolean = {
-      val typeEquiv = helper(env, map, a.tp, b.tp)
-      val bodyEquiv = helper(env, map + (a.v -> b.v), a.body, b.body)
+    def absHelper(
+                   env: Environment,
+                   map: Map[Variable, Variable],
+                   boundA: Set[Variable],
+                   boundB: Set[Variable],
+                   a: Abs,
+                   b: Abs): Boolean = {
+      val typeEquiv = helper(env, map, boundA, boundB, a.tp, b.tp)
+      val bodyEquiv = helper(env, map + (a.v -> b.v), boundA + a.v, boundB + b.v, a.body, b.body)
       typeEquiv && bodyEquiv
     }
 
-    def helper(env: Environment, map: Map[Variable, Variable], a: Term, b: Term): Boolean = {
+    def helper(
+                env: Environment,
+                map: Map[Variable, Variable],
+                boundA: Set[Variable],
+                boundB: Set[Variable],
+                a: Term,
+                b: Term): Boolean = {
       a match {
         case Var(aname) =>
           b match {
             case Var(bname) => {
-              aname == bname || map(aname) == bname // TODO no need for aname == bname?
-              // TODO check env.contains(aname) ?
+              (boundA contains aname, boundB contains bname) match {
+                case (true, true) => { // both variables are bound
+                  map(aname) == bname
+                }
+                case (false, false) => {
+                  aname == bname // both variables are free
+                }
+                case _ => false
+              }
             }
             case _ => false
           }
@@ -39,23 +58,23 @@ object Alpha {
           }
         case Lam(aabs) =>
           b match {
-            case Lam(babs) => absHelper(env, map, aabs, babs) // TODO variable name into context?
+            case Lam(babs) => absHelper(env, map, boundA, boundB, aabs, babs) // TODO variable name into context?
             case _ => false
           }
         case Pi(aabs) =>
           b match {
-            case Pi(babs) => absHelper(env, map, aabs, babs)
+            case Pi(babs) => absHelper(env, map, boundA, boundB, aabs, babs)
             case _ => false
           }
         case Sigma(aabs) =>
           b match {
-            case Sigma(babs) => absHelper(env, map, aabs, babs)
+            case Sigma(babs) => absHelper(env, map, boundA, boundB, aabs, babs)
             case _ => false
           }
         case App(a1, a2) =>
           b match {
             case App(b1, b2) =>
-              helper(env, map, a1, b1) && helper(env, map, a2, b2)
+              helper(env, map, boundA, boundB, a1, b1) && helper(env, map, boundA, boundB, a2, b2)
             case _ => false
           }
         case Finite(sa) =>
@@ -66,14 +85,14 @@ object Alpha {
         case Case(conda, casesa, dflta) =>
           b match {
             case Case(condb, casesb, dfltb) => {
-              if (!helper(env, map, conda, condb)) {
+              if (!helper(env, map, boundA, boundB, conda, condb)) {
                 return false
               }
               if (!(casesa.keySet == casesb.keySet)) {
                 return false
               }
               for (key <- casesa.keys) {
-                if (!helper(env, map, casesa(key), casesb(key))) {
+                if (!helper(env, map, boundA, boundB, casesa(key), casesb(key))) {
                   return false
                 }
               }
@@ -81,7 +100,7 @@ object Alpha {
                 return false
               }
               if (dflta.isDefined && dfltb.isDefined) {
-                if (!helper(env, map, dflta.get, dfltb.get)) {
+                if (!helper(env, map, boundA, boundB, dflta.get, dfltb.get)) {
                   return false
                 }
               }
@@ -90,11 +109,14 @@ object Alpha {
             case _ => false
           }
         case TVar(_) => {
-          throw TypeInferenceException("TODO SHOULD NOT BE THE CASE")
+          b match {
+            case TVar(_) => true
+            case _ => false
+          }
         }
         // TODO DPair?
       }
     }
-    helper(env, Map(), a, b)
+    helper(env, Map(), Set(), Set(), a, b)
   }
 }

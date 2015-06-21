@@ -39,12 +39,26 @@ class AlphaEquivalenceTest extends UnitSpec with CustomMatchers {
     term2 should beAequivalentTo(term1)
   }
 
-  it should "treat universes with same indices as eqivalent" in {
+  it should "fsfdsf" in {
+    val env: Environment = Map(vv("x") -> Level(0), vv("y") -> Level(0))
+    Var("x") shouldNot beAequivalentTo(env, Var("y"))
+    Var("y") shouldNot beAequivalentTo(env, Var("x"))
+  }
+
+  it should "treat captured variables" in {
+    val env: Environment = Map(vv("x") -> Level(0))
+    val term1 = "x".lam("x")
+    val term2 = "y".lam("x")
+    term1 shouldNot beAequivalentTo(env, term2)
+    term2 shouldNot beAequivalentTo(env, term1)
+  }
+
+  it should "treat universes with same indices as equivalent" in {
     Level(11) should beAequivalentTo(Level(11))
   }
 
   it should "treat universes with different indices as not equivalent" in {
-    Level(1) should not (beAequivalentTo(Level(2)))
+    Level(1) shouldNot beAequivalentTo(Level(2))
   }
 
   it should "treat bound variables as equivalent" in {
