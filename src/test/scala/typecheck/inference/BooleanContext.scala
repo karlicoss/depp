@@ -44,9 +44,21 @@ object BooleanContext {
    */
   val andTerm = "a".lam("b".lam("if".app("a", "b", fff)))
 
+  /**
+   * not = \a. if(a) then false else true
+   */
+  val notTerm = "a".lam("if".app("a", fff, ftt))
+
+  /**
+   * or = \a.\b.not ((not a) and (not b))
+   */
+  val orTerm = "a".lam("b".lam("not".app("and".app("not".app("a"), "not".app("b")))))
+
   val extendedBoolEnv = IMap(
     vv("Bool") -> EnvValue(TVar.dummy, BBool),
     vv("if") -> EnvValue(TVar.dummy, ifTerm),
-    vv("and") -> EnvValue(TVar.dummy, andTerm)
+    vv("and") -> EnvValue(TVar.dummy, andTerm),
+    vv("not") -> EnvValue(TVar.dummy, notTerm),
+    vv("or") -> EnvValue(TVar.dummy, orTerm)
   )
 }

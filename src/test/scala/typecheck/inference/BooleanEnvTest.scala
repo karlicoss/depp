@@ -66,8 +66,20 @@ class BooleanEnvTest extends UnitSpec with CustomMatchers {
 
   it should "and function tests" in {
     Var("and").app(ftt, ftt) should beBequivalentTo(extendedBoolEnv, ftt)
-//    Var("and").app(ftt, fff) should beBequivalentTo(extendedBoolEnv, fff)
-//    Var("and").app(fff, ftt) should beBequivalentTo(extendedBoolEnv, fff)
-//    Var("and").app(fff, fff) should beBequivalentTo(extendedBoolEnv, fff)
+    Var("and").app(ftt, fff) should beBequivalentTo(extendedBoolEnv, fff)
+    Var("and").app(fff, ftt) should beBequivalentTo(extendedBoolEnv, fff)
+    Var("and").app(fff, fff) should beBequivalentTo(extendedBoolEnv, fff)
+  }
+
+  it should "not function tests" in {
+    Var("not").app(ftt) should beBequivalentTo(extendedBoolEnv, fff)
+    Var("not").app(fff) should beBequivalentTo(extendedBoolEnv, ftt)
+  }
+
+  it should "or function tests" in {
+    Var("or").app(ftt, ftt) should beBequivalentTo(extendedBoolEnv, ftt)
+    Var("or").app(ftt, fff) should beBequivalentTo(extendedBoolEnv, ftt)
+    Var("or").app(fff, ftt) should beBequivalentTo(extendedBoolEnv, ftt)
+    Var("or").app(fff, fff) should beBequivalentTo(extendedBoolEnv, fff)
   }
 }
