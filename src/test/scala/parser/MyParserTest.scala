@@ -121,6 +121,12 @@ class MyParserTest extends UnitSpec {
       """.stripMargin) shouldBe an[Case]
   }
 
+  it should "parse definition" in {
+    implicit val ptest = p.dfn
+    p.parsing("v = a a")
+    p.parsing("v: Fail = tratata")
+  }
+
   it should "other tests" in {
     implicit val ptest = p.expr
     p.parsing("(x)")

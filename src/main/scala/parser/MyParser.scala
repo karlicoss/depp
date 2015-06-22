@@ -2,6 +2,7 @@ package parser
 
 import terms.Variables.{Simple, Variable}
 import terms._
+import typecheck.Environment.EnvValue
 
 import scala.util.parsing.combinator.lexical.StdLexical
 import scala.util.parsing.combinator.syntactical.StdTokenParsers
@@ -26,8 +27,9 @@ class MyParser extends StdTokenParsers
     "{", "}", // finite
     "#", // level
     ":", // type annotation
-    ";", // cases separator
-    "@" // finite element identifier
+    ";", // cases separator, definitions separator
+    "@", // finite element identifier
+    "=" // definition
   )
 
   lexical.reserved ++= Seq(
@@ -113,6 +115,14 @@ class MyParser extends StdTokenParsers
 
   lazy val dflt: Parser[Term] =
     ("default" ~ "=>") ~> expr <~ ";"
+
+  lazy val dfn: Parser[(Variable, EnvValue)] =
+    varname ~ opt(":" ~> expr) ~ ("=" ~> expr) ^^ flatten3((a, b, c) => {
+      b match {
+        case Some(x) => (a, EnvValue(x, c))
+        case None => (a, EnvValue.auto(c))
+      }
+    })
 
   def parse(source: String): ParseResult[Any] = {
     val tokens = new lexical.Scanner(source)
