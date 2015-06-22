@@ -12,12 +12,13 @@ class MyParser extends StdTokenParsers
   override type Tokens = StdLexical
   override val lexical = new Tokens
   lexical.delimiters ++= Seq(
-    "\\", "λ",
-    "->", "=>",
-    ".",
-    "(", ")",
-    ":",
-    "@"
+    "\\", "λ", // lambda
+    "->", "=>", // pi
+    ".", // lambda
+    ",", // dependent pair constructor
+    "(", ")", // dependent pair constructor
+    ":", // type annotation
+    "@" // finite element identifier
   )
   lexical.reserved ++= Seq(
     "forall",
@@ -36,7 +37,7 @@ class MyParser extends StdTokenParsers
       "(" ~> expr <~ ")"
 
   lazy val appterm: Parser[Term] =
-      rep1(aterm) ^^ (x => x.head.app(x.tail: _*))
+      rep1(aterm) ^^ (x => if (x.length == 1) x.head else x.head.app(x.tail: _*))
 
   lazy val varname: Parser[Variable] = ident ^^ (Simple(_))
 
