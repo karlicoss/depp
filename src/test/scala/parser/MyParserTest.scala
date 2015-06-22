@@ -1,7 +1,7 @@
 package parser
 
 import org.scalatest.{FlatSpec, ShouldMatchers}
-import terms.{Finite, DPair, App, Lam}
+import terms._
 import terms.Variables.Simple
 import typecheck.CustomMatchers
 import util.UnitSpec
@@ -63,6 +63,13 @@ class MyParserTest extends UnitSpec {
     p.parsing("{a, b}") shouldBe an[Finite]
     p.parsing("{a, b, d}") shouldBe an[Finite]
     p.failure("{a, @b, d}")
+  }
+
+  it should "parse level" in {
+    implicit val plevel = p.level
+    p.parsing("Type") shouldEqual Level(0)
+    p.parsing("Type#2") shouldEqual Level(2)
+    p.parsing("Type#32") shouldEqual Level(32)
   }
 
   it should "other tests" in {

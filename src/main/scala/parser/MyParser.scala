@@ -11,6 +11,9 @@ class MyParser extends StdTokenParsers
   with ImplicitConversions {
   override type Tokens = StdLexical
   override val lexical = new Tokens
+
+  def identChar = lexical.letter
+
   lexical.delimiters ++= Seq(
     "\\", "λ", // lambda
     "->", "=>", // pi
@@ -18,13 +21,15 @@ class MyParser extends StdTokenParsers
     ",", // dependent pair constructor, finite type
     "(", ")", // dependent pair constructor
     "{", "}", // finite
+    "#", // level
     ":", // type annotation
     "@" // finite element identifier
   )
   lexical.reserved ++= Seq(
     "forall",
     "exists",
-    "case"
+    "case",
+    "Type"
   )
 
   lazy val expr: Parser[Term] = term
@@ -34,7 +39,9 @@ class MyParser extends StdTokenParsers
   lazy val aterm: Parser[Term] =
       varname ^^ (Var(_)) |
       felem |
+      finite |
       pair |
+      level |
       lam | pi | sigma |
       "(" ~> expr <~ ")"
 
@@ -44,6 +51,10 @@ class MyParser extends StdTokenParsers
   lazy val varname: Parser[Variable] = ident ^^ (Simple(_))
 
   lazy val felem: Parser[FElem] = "@" ~> ident ^^ (FElem(_))
+
+  lazy val level: Parser[Level] =
+    "Type" ~> "#" ~> numericLit ^^ (s => Level(s.toInt)) |
+    "Type" ^^ (_ => Level(0))
 
   lazy val abs: Parser[(Variable, Option[Term], Term)] =
       varname ~ (":" ~> term) ~ ("." ~> term) ^^ flatten3((v, tp, body) => (v, Some(tp), body)) |
