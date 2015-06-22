@@ -15,8 +15,9 @@ class MyParser extends StdTokenParsers
     "\\", "λ", // lambda
     "->", "=>", // pi
     ".", // lambda
-    ",", // dependent pair constructor
+    ",", // dependent pair constructor, finite type
     "(", ")", // dependent pair constructor
+    "{", "}", // finite
     ":", // type annotation
     "@" // finite element identifier
   )
@@ -70,6 +71,16 @@ class MyParser extends StdTokenParsers
       case Some(tp) => Sigma.create(x._1, tp, x._3)
       case None => throw ParserException("TODO")
     })
+
+  def delimParser[T](delim: Parser[String], p: Parser[T]): Parser[List[T]] = {
+    rep(p <~ delim) ~ opt(p) ^^ flatten2((a, b) => b match {
+      case Some(x) => a :+ x
+      case None => a
+    })
+  }
+
+  lazy val finite: Parser[Finite] =
+    "{" ~> delimParser(",", ident) <~ "}" ^^ (x => Finite(x.toSet))
 
 
   def parse(source: String): ParseResult[Any] = {

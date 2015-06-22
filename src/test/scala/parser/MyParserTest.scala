@@ -1,7 +1,7 @@
 package parser
 
 import org.scalatest.{FlatSpec, ShouldMatchers}
-import terms.{DPair, App, Lam}
+import terms.{Finite, DPair, App, Lam}
 import terms.Variables.Simple
 import typecheck.CustomMatchers
 import util.UnitSpec
@@ -22,7 +22,7 @@ class MyParserTest extends UnitSpec {
     }
 
     def assertFail[T](input:String)(implicit p:Parser[T]) {
-      evaluating(parsing(input)(p)) should produce[IllegalArgumentException]
+      an[IllegalArgumentException] shouldBe thrownBy(parsing(input)(p))
     }
 
   }
@@ -54,6 +54,15 @@ class MyParserTest extends UnitSpec {
   it should "parse dependent pair" in {
     implicit val ptest = p.pair
     p.parsing("(a, b)") shouldBe an[DPair]
+  }
+
+  it should "parse finite types" in {
+    implicit val ptest = p.finite
+    p.parsing("{}") shouldBe an[Finite]
+    p.parsing("{a}") shouldBe an[Finite]
+    p.parsing("{a, b}") shouldBe an[Finite]
+    p.parsing("{a, b, d}") shouldBe an[Finite]
+    p.failure("{a, @b, d}")
   }
 
   it should "other tests" in {
