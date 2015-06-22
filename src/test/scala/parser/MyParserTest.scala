@@ -16,15 +16,14 @@ class MyParserTest extends UnitSpec {
       val input = new lexical.Scanner(s)
       phraseParser(input) match {
         case Success(t,_)     => t
-        case NoSuccess(msg,_) => throw new IllegalArgumentException(
-          "Could not parse '" + s + "': " + msg)
+        case e @ NoSuccess(msg, _) =>
+          throw new IllegalArgumentException(e.toString)
       }
     }
 
     def assertFail[T](input:String)(implicit p:Parser[T]) {
       an[IllegalArgumentException] shouldBe thrownBy(parsing(input)(p))
     }
-
   }
   
   it should "parse variable" in {
@@ -47,6 +46,11 @@ class MyParserTest extends UnitSpec {
   it should "parse lambda" in {
     implicit val ptest = p.lam
     p.parsing("\\x.x") shouldBe an[Lam]
+    p.parsing(
+      """
+        |\x.
+        |x
+      """.stripMargin) shouldBe an[Lam]
     p.parsing("\\a:T.a") shouldBe an[Lam]
     p.parsing("\\a:T.a a") shouldBe an[Lam]
   }
@@ -80,6 +84,41 @@ class MyParserTest extends UnitSpec {
   it should "parse proj2" in {
     implicit val ptest = p.snd
     p.parsing("snd pair") shouldBe an[Proj2]
+  }
+
+  it should "parse dflt" in {
+    implicit val ptest = p.dflt
+    p.parsing("default => alala ;")
+  }
+
+  it should "parse cases" in {
+    implicit val ptest = p.cases
+    p.parsing(" ")
+    p.parsing(" fsdfs => fwefw ; ewfwef => fewfwef;")
+  }
+
+  it should "parse case" in {
+    implicit val ptest = p.ccase
+    p.parsing("elim (alala) { default => term ; }") shouldBe an[Case]
+    p.parsing(
+      """ elim (alala) {
+        |   dasd => term ;
+        | }
+      """.stripMargin) shouldBe an[Case]
+    p.parsing(
+      """
+        | elim (a a) {
+        |   xx => y ;
+        |   zz => z ;
+        |   default => e w;
+        | }
+      """.stripMargin) shouldBe an[Case]
+    p.parsing("elim (c) {}") shouldBe an[Case]
+    p.parsing(
+      """
+        | elim (a {}) {
+        | }
+      """.stripMargin) shouldBe an[Case]
   }
 
   it should "other tests" in {

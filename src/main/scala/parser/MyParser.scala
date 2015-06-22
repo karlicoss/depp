@@ -7,6 +7,9 @@ import scala.util.parsing.combinator.lexical.StdLexical
 import scala.util.parsing.combinator.syntactical.StdTokenParsers
 import scala.util.parsing.combinator.ImplicitConversions
 
+import scala.collection.Map
+import scala.collection.immutable.{Map => IMap}
+
 class MyParser extends StdTokenParsers
   with ImplicitConversions {
   override type Tokens = StdLexical
@@ -23,12 +26,14 @@ class MyParser extends StdTokenParsers
     "{", "}", // finite
     "#", // level
     ":", // type annotation
+    ";", // cases separator
     "@" // finite element identifier
   )
+
   lexical.reserved ++= Seq(
     "forall",
     "exists",
-    "case",
+    "elim", "default",
     "Type",
     "fst", "snd" // dependend pairs elimination
   )
@@ -41,8 +46,9 @@ class MyParser extends StdTokenParsers
       varname ^^ (Var(_)) |
       felem |
       finite |
-      pair | fst | snd
+      pair | fst | snd |
       level |
+      ccase |
       lam | pi | sigma |
       "(" ~> expr <~ ")"
 
@@ -90,16 +96,23 @@ class MyParser extends StdTokenParsers
       case None => throw ParserException("TODO")
     })
 
-  def delimParser[T](delim: Parser[String], p: Parser[T]): Parser[List[T]] = {
-    rep(p <~ delim) ~ opt(p) ^^ flatten2((a, b) => b match {
-      case Some(x) => a :+ x
-      case None => a
-    })
-  }
-
   lazy val finite: Parser[Finite] =
-    "{" ~> delimParser(",", ident) <~ "}" ^^ (x => Finite(x.toSet))
+    "{" ~> repsep(ident, ",") <~ "}" ^^ (x => Finite(x.toSet))
 
+  // TODO type?
+  lazy val ccase: Parser[Case] =
+    ("elim" ~> "(" ~> expr <~ ")") ~ ("{" ~> cases) ~ (opt(dflt) <~ "}") ^^ flatten3((a, b, c) => {
+      c match {
+        case Some(df) => a.ccase(b.toMap, df)
+        case None => a.ccase(b.toMap)
+      }
+    })
+
+  lazy val cases: Parser[List[(FElem.FElemType, Term)]] =
+    rep(ident ~ ("=>" ~> expr <~ ";") ^^ (x => (x._1, x._2)))
+
+  lazy val dflt: Parser[Term] =
+    ("default" ~ "=>") ~> expr <~ ";"
 
   def parse(source: String): ParseResult[Any] = {
     val tokens = new lexical.Scanner(source)
