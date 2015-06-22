@@ -95,15 +95,18 @@ object BooleanContext {
           ), Level(0))
     ), Level(0))))
 
+  val topBotEnv = IMap(
+    vv("Top") -> auto(topTerm),
+    vv("Bot") -> auto(botTerm),
+    vv("negTerm") -> auto(negTerm)
+  )
+
   val extendedBoolEnv = IMap(
     vv("Bool") -> auto(BBool),
     vv("if") -> auto(ifTerm),
     vv("and") -> auto(andTerm),
     vv("not") -> auto(notTerm),
     vv("or") -> auto(orTerm),
-    vv("Top") -> auto(topTerm),
-    vv("Bot") -> auto(botTerm),
-    vv("negTerm") -> auto(negTerm),
     vv("eqb") -> auto(eqbTerm)
-  )
+  ) ++ topBotEnv
 }

@@ -48,6 +48,18 @@ class CaseTest extends UnitSpec with CustomMatchers {
     DPair(fuu, ftt, qq)
   }
 
+  it should "regerger" in {
+
+    val topEnv = BooleanContext.topBotEnv
+    // woo : (a : Unit) → (equ a unit → ⊥) → ⊥
+    val statement = "a".pi("Unit", "qq".pi("ww".pi("equ".app("a", fuu), "Bot"), "Bot"))
+    //  woo = λ { unit → λ z → z top }
+    val proof = "x".ccaset(IMap(
+      "uu" -> "z".lam("z".app(FElem("top")))
+    ), "qq".pi("ww".pi("equ".app("a", fuu), "Bot"), "Bot"))
+    proof should haveTypeInContext(topEnv, statement)
+  }
+
   /*
     data BTag : Set where
       BTEmpty : BTag

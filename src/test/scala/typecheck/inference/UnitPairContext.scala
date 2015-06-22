@@ -9,6 +9,7 @@ import scala.collection.immutable.{Map => IMap}
 
 object UnitPairContext {
   val Unit = Finite(Set("uu"))
+  val fuu = FElem("uu")
 
   def PairType(A: Term, B: Term): Term = Sigma(Abs(".", A, B))
 
