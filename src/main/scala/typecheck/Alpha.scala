@@ -82,9 +82,9 @@ object Alpha {
             case Finite(sb) => sa.sameElements(sb) // TODO not sure if a good idea
             case _ => false
           }
-        case Case(conda, casesa, dflta) =>
+        case Case(conda, casesa, dflta, _) =>
           b match {
-            case Case(condb, casesb, dfltb) => {
+            case Case(condb, casesb, dfltb, _) => {
               if (!helper(env, map, boundA, boundB, conda, condb)) {
                 return false
               }

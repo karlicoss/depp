@@ -1,6 +1,6 @@
 package terms
 
-import terms.Variables.Simple
+import terms.Variables.{Variable, Simple}
 import typecheck.Environment.Environment
 
 import scalaz.State
@@ -15,9 +15,7 @@ case class Sigma(abs: Abs) extends Term {
    */
   override def inferHelper(env: Environment): State[Int, Term] = Common.inferPiSigma(abs, env)
 
-  override def substHelper(env: Environment): State[Int, Term] = for {
-    res <- abs.substHelper(env)
-  } yield Sigma(res)
+  override def substHelper(env: Environment): State[Int, Term] = abs.substHelper(env).map(Sigma(_))
 
   /**
    * Evaluates the expression under the given context
@@ -28,5 +26,5 @@ case class Sigma(abs: Abs) extends Term {
 }
 
 object Sigma {
-  def create(name: String, tp: Term, body: Term): Sigma = Sigma(Abs(Simple(name), tp, body))
+  def create(name: Variable, tp: Term, body: Term): Sigma = Sigma(Abs(name, tp, body))
 }
