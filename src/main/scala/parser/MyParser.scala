@@ -7,7 +7,7 @@ import scala.util.parsing.combinator.lexical.StdLexical
 import scala.util.parsing.combinator.syntactical.StdTokenParsers
 import scala.util.parsing.combinator.ImplicitConversions
 
-class Parser extends StdTokenParsers
+class MyParser extends StdTokenParsers
   with ImplicitConversions {
   override type Tokens = StdLexical
   override val lexical = new Tokens
@@ -47,6 +47,9 @@ class Parser extends StdTokenParsers
       varname ~ ("." ~> term) ^^ flatten2((v, body) => (v, None, body))
 
   def absParser(s: String): Parser[(Variable, Option[Term], Term)] = s ~> abs
+
+  lazy val pair: Parser[DPair] =
+    ("(" ~> term <~ ",") ~ (term <~ ")") ^^ flatten2((fst, snd) => DPair(fst, snd))
 
   lazy val lam: Parser[Lam] =
     absParser("\\") ^^ (x => x._2 match {
