@@ -33,6 +33,7 @@ class MyParser extends StdTokenParsers
   lazy val aterm: Parser[Term] =
       varname ^^ (Var(_)) |
       felem |
+      pair |
       lam | pi | sigma |
       "(" ~> expr <~ ")"
 
