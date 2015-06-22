@@ -29,7 +29,8 @@ class MyParser extends StdTokenParsers
     "forall",
     "exists",
     "case",
-    "Type"
+    "Type",
+    "fst", "snd" // dependend pairs elimination
   )
 
   lazy val expr: Parser[Term] = term
@@ -40,7 +41,7 @@ class MyParser extends StdTokenParsers
       varname ^^ (Var(_)) |
       felem |
       finite |
-      pair |
+      pair | fst | snd
       level |
       lam | pi | sigma |
       "(" ~> expr <~ ")"
@@ -64,6 +65,12 @@ class MyParser extends StdTokenParsers
 
   lazy val pair: Parser[DPair] =
     ("(" ~> term <~ ",") ~ (term <~ ")") ^^ flatten2((fst, snd) => DPair(fst, snd))
+
+  lazy val fst: Parser[Proj1] =
+     "fst" ~> term ^^ (Proj1(_))
+
+  lazy val snd: Parser[Proj2] =
+    "snd" ~> term ^^ (Proj2(_))
 
   lazy val lam: Parser[Lam] =
     absParser("\\") ^^ (x => x._2 match {

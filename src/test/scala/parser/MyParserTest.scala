@@ -66,10 +66,20 @@ class MyParserTest extends UnitSpec {
   }
 
   it should "parse level" in {
-    implicit val plevel = p.level
+    implicit val ptest = p.level
     p.parsing("Type") shouldEqual Level(0)
     p.parsing("Type#2") shouldEqual Level(2)
     p.parsing("Type#32") shouldEqual Level(32)
+  }
+
+  it should "parse proj1" in {
+    implicit val ptest = p.fst
+    p.parsing("fst pair") shouldBe an[Proj1]
+  }
+
+  it should "parse proj2" in {
+    implicit val ptest = p.snd
+    p.parsing("snd pair") shouldBe an[Proj2]
   }
 
   it should "other tests" in {
