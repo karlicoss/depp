@@ -19,15 +19,15 @@ class CaseTest extends UnitSpec with CustomMatchers {
   val fuu = FElem("uu")
 
   it should "infer type of if-then-else-clause" in {
-    bif(ftt, fff, ftt) should haveTypeInContext(envWithBBool, "Bool")
+    bif(ftt, fff, ftt, "Bool") should haveTypeInContext(envWithBBool, "Bool")
   }
 
   it should "evaluate if-then-else-clause" in {
-    bif(ftt, fff, ftt) should beBequivalentTo(envWithBBool, fff)
+    bif(ftt, fff, ftt, "Bool") should beBequivalentTo(envWithBBool, fff)
   }
 
   it should "trarar" in {
-    val term = "a".lam("Unit", "a".ccase(Map("uu" -> fuu)))
+    val term = "a".lam("Unit", "a".ccaset(Map("uu" -> fuu), "Unit"))
     term should haveTypeInContext(envWithUnit, ".".pi("Unit", "Unit"))
 
     val env: Environment = envWithUnit + (vv("term") -> auto(term))
@@ -37,13 +37,13 @@ class CaseTest extends UnitSpec with CustomMatchers {
   val unitBoolEnv = envWithUnit ++ envWithBBool
 
   it should "infer type of wuut" in {
-    val tp = Sigma(Abs(".", "Bool", bif(".", "Unit", "Bool")))
+    val tp = Sigma(Abs(".", "Bool", bif(".", "Unit", "Bool", Level(0))))
     tp should haveTypeInContext(unitBoolEnv, Level(0))
   }
 
   it should "infer type of fsfsd" in {
     // Σ Unit (λ { unit → Bool })
-    val qq = Sigma(Abs(".", "Unit", Var(".").ccase(IMap("uu" -> "Bool"))))
+    val qq = Sigma(Abs(".", "Unit", ".".ccaset(IMap("uu" -> "Bool"), Level(0))))
     qq should haveTypeInContext(unitBoolEnv, Level(0))
     DPair(fuu, ftt, qq)
   }
@@ -58,10 +58,11 @@ class CaseTest extends UnitSpec with CustomMatchers {
   val fBTJust = FElem("BTJust")
 
   // MaybeBool = Σ BTag (λ { BTEmpty → Unit ; BTJust → Bool })
-  val MaybeBool = Sigma(Abs("t", "BTag", Var("t").ccase(
+  val MaybeBool = Sigma(Abs("t", "BTag", Var("t").ccaset(
     IMap(
       "BTEmpty" -> "Unit",
-      "BTJust"  -> "Bool"))))
+      "BTJust"  -> "Bool"),
+    Level(0))))
 
   // BEmpty = (BTEmpty , unit)
   val BEmpty = DPair(fBTEmpty, fuu, "MaybeBool")

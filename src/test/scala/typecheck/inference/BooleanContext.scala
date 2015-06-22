@@ -26,19 +26,21 @@ object BooleanContext {
 
   /*
     if cond then th else el
+
+    TODO FIXME MAKE POLYMORPHIC!!!
    */
-  def bif(cond: Term, th: Term, el: Term): Term = {
+  def bif(cond: Term, th: Term, el: Term, tp: Term): Term = {
     val cc = Map(
       "tt" -> th,
       "ff" -> el
     )
-    Case(cond, cc)
+    Case(cond, cc, None, tp)
   }
 
   /**
    * if = \cond.\then.\else.case (cond) of {tt -> then; ff -> else}
    */
-  val ifTerm = "cond".lam("Bool", "then".lam("Bool", "else".lam("Bool", bif("cond", "then", "else"))))
+  val ifTerm = "cond".lam("Bool", "then".lam("Bool", "else".lam("Bool", bif("cond", "then", "else", "Bool"))))
 
   /**
    * and = \a.\b.if (a) then b else false
@@ -82,16 +84,16 @@ object BooleanContext {
   val eqbTerm =
     "a".lam("Bool",
       "b".lam("Bool",
-        "a".ccase(Map(
-          "ff" -> "b".ccase(Map(
+        "a".ccaset(Map(
+          "ff" -> "b".ccaset(Map(
             "ff" -> "Top",
             "tt" -> "Bot"
-          )),
-          "tt" -> "b".ccase(Map(
+          ), Level(0)),
+          "tt" -> "b".ccaset(Map(
             "ff" -> "Bot",
             "tt" -> "Top"
-          ))
-    ))))
+          ), Level(0))
+    ), Level(0))))
 
   val extendedBoolEnv = IMap(
     vv("Bool") -> auto(BBool),

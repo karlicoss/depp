@@ -7,7 +7,11 @@ import typecheck.inference.TypeInferenceException
 import scala.collection.Map
 import scalaz.State
 
-case class Case(cond: Term, cases: Map[FElem.FElemType, Term], dflt: Option[Term]) extends Term {
+case class Case(
+                 cond: Term,
+                 cases: Map[FElem.FElemType, Term],
+                 dflt: Option[Term],
+                 tp: Term) extends Term {
   /**
    * Evaluates the expression under the given context
    * @param env the context
@@ -27,7 +31,7 @@ case class Case(cond: Term, cases: Map[FElem.FElemType, Term], dflt: Option[Term
         }
       }
       case other =>
-        new Case(other, cases, dflt)
+        new Case(other, cases, dflt, tp)
     }
   }
 
@@ -67,7 +71,8 @@ case class Case(cond: Term, cases: Map[FElem.FElemType, Term], dflt: Option[Term
     scond <- cond.substHelper(env)
     scases <- promoteMap(cases.mapValues(_.substHelper(env))) // TODO Applicative.sequence
     sdflt <- liftOption(dflt.map(_.substHelper(env))) // TODO monadic lift?
-  } yield new Case(scond, scases, sdflt)
+    stp <- tp.substHelper(env)
+  } yield new Case(scond, scases, sdflt, stp)
 
   /**
    * Infers the type of the expression under the given context
@@ -80,8 +85,8 @@ case class Case(cond: Term, cases: Map[FElem.FElemType, Term], dflt: Option[Term
     // 3. check that switch is exhaustive
     // 4. types of all the branches should be the same
 
-    val tp = cond.infer(env) // tp should be the name of finite type
-    tp match {
+    val ctp = cond.infer(env) // tp should be the name of finite type
+    ctp match {
       case Var(name) => {
         val Finite(elems) = env.get(name).get.dfn.get // TODO oh my...
         val ccases = cases.keySet
@@ -92,14 +97,20 @@ case class Case(cond: Term, cases: Map[FElem.FElemType, Term], dflt: Option[Term
         if (ccases.size < elems.size) {
           clauses = clauses ++ Seq(dflt.get) // TODO should provide default, throw exception
         }
-        val btypes = clauses.map(_.infer(env))
-        val ftype = btypes.head
-        for (tp <- btypes.tail) {
-          if (!Beta.equivalent(env, ftype, tp)) {
-            throw TypeInferenceException(s"Expected types $ftype and $tp to be equal!")
+        for (cltp <- clauses.map(_.infer(env))) {
+          if (!Beta.equivalent(env, tp, cltp)) {
+            throw TypeInferenceException(s"Expected types $tp and $cltp to be equal!")
           }
         }
-        ftype
+//        val btypes = clauses.map(_.infer(env))
+//        val ftype = btypes.head
+//        for (tp <- btypes.tail) {
+//          if (!Beta.equivalent(env, ftype, tp)) {
+//            throw TypeInferenceException(s"Expected types $ftype and $tp to be equal!")
+//          }
+//        }
+//        ftype
+        tp
       }
       case _ => {
         throw TypeInferenceException(s"Expected $tp to be Finite")
@@ -113,6 +124,7 @@ case class Case(cond: Term, cases: Map[FElem.FElemType, Term], dflt: Option[Term
 }
 
 object Case {
-  def apply(cond: Term, cases: Map[FElem.FElemType, Term]): Case = Case(cond, cases, None)
-  def apply(cond: Term, cases: Map[FElem.FElemType, Term], dflt: Term): Case = Case(cond, cases, Some(dflt))
+  def apply(cond: Term, cases: Map[FElem.FElemType, Term]): Case = new Case(cond, cases, None, null) // FIXME
+  def apply(cond: Term, cases: Map[FElem.FElemType, Term], dflt: Term): Case = new Case(cond, cases, Some(dflt), null) // FIXME
+  def apply(cond: Term, cases: Map[FElem.FElemType, Term], dflt: Term, tp: Term): Case = new Case(cond, cases, Some(dflt), tp)
 }

@@ -1,10 +1,8 @@
 package terms
 
-import terms.Abstraction.Abs
-import terms.Variables.{Variable, Simple, Dummy}
 import typecheck.Environment._
+import typecheck.inference.{HasEvaluate, HasSubst}
 import typecheck.{Beta, HasInference}
-import typecheck.inference.{HasSubst, HasEvaluate}
 import util.PrettyPrintable
 
 import scala.collection.Map
@@ -39,6 +37,8 @@ abstract class Term
   def ccase(cases: Map[FElem.FElemType, Term]): Case = Case(this, cases)
 
   def ccase(cases: Map[FElem.FElemType, Term], dflt: Term): Case = Case(this, cases, dflt)
+
+  def ccaset(cases: Map[FElem.FElemType, Term], tp: Term): Case = Case(this, cases, None, tp)
 
   /**
    * TODO HOW TO MOVE THIS TO HasEvaluate?
