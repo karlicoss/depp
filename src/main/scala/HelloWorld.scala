@@ -1,7 +1,7 @@
-
+import parser.Parser
 
 object HelloWorld {
   def main(args: Array[String]): Unit = {
-    println("Hellooo")
+    println(new Parser().parse("hey"))
   }
 }
