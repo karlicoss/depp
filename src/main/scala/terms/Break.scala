@@ -46,9 +46,9 @@ case class Break(what: Term, f: Variable, s: Variable, body: Term) extends Term 
     wt <- what.inferHelper(env).map(_.evaluateAll(env))
     Sigma(abs) = wt // what should be Sigma
     // the type of Break is the type of body
-    nenv: Environment = env + (f -> EnvValue(abs.tp)) + (s -> EnvValue(abs.body.app(Var(abs.v))))
+    nenv: Environment = env + (f -> EnvValue(abs.tp)) + (s -> EnvValue(abs.body.subst(Map(abs.v -> EnvValue(Var(f))))))
     bt <- body.inferHelper(nenv)
   } yield bt
 
-  override def pretty(): String = ???
+  override def pretty(): String = toString
 }

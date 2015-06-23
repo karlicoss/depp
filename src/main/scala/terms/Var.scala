@@ -18,8 +18,9 @@ final case class Var(name: Variable) extends Term {
           case None => this // otherwise, leave it intact
         }
       }
-      case None =>
+      case None => {
         throw TypeInferenceException(s"Unbound variable ${name.pretty()}") // TODO EvaluationException
+      }
     }
   }
 

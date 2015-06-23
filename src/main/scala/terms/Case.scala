@@ -4,6 +4,7 @@ import terms.FElem.FElemType
 import terms.Variables.Variable
 import terms.erase.{EType, ECase, ETerm}
 import typecheck.Beta
+import typecheck.Environment.EnvValue.auto
 import typecheck.Environment.{EnvValue, Environment}
 import typecheck.inference.TypeInferenceException
 
@@ -101,50 +102,46 @@ case class Case(
     // 4. types of all the branches should be the same
 
     val ctp = cond.infer(env) // tp should be the name of finite type
-    ctp match {
+    val elems = ctp match {
+      case Finite(ee) => ee
       case Var(name) => {
-        val Finite(elems) = env.get(name).get.dfn.get // TODO oh my...
-        val ccases = cases.keySet
-        if (!ccases.subsetOf(elems)) {
-          throw TypeInferenceException(s"Unknown cases in $ccases, expected $elems")
-        }
-        var css: Map[FElemType, Term] = null
-        cond match {
-          case Var(v) => {
-            // dependent elimination, replace variable with its value
-            def eee(f: FElemType): Environment = {
-              Map(v -> EnvValue(FElem(f)))
-            }
-            css = for {
-              (k, v) <- cases
-              newv = v.subst(eee(k))
-            } yield (k, newv)
-          }
-          case _ => css = cases
-        }
-        var clauses = css.values
-        if (ccases.size < elems.size) {
-          clauses = clauses ++ Seq(dflt.get) // TODO should provide default, throw exception
-        }
-        for (cltp <- clauses.map(cl => cl.infer(env))) {
-          if (!Beta.equivalent(env, tp, cltp)) {
-            throw TypeInferenceException(s"Expected types $tp and $cltp to be equal!")
-          }
-        }
-//        val btypes = clauses.map(_.infer(env))
-//        val ftype = btypes.head
-//        for (tp <- btypes.tail) {
-//          if (!Beta.equivalent(env, ftype, tp)) {
-//            throw TypeInferenceException(s"Expected types $ftype and $tp to be equal!")
-//          }
-//        }
-//        ftype
-        tp
+        val Finite(ee) = env.get(name).get.dfn.get // TODO oh my...
+        ee
       }
       case _ => {
         throw TypeInferenceException(s"Expected $tp to be Finite")
       }
     }
+    val ccases = cases.keySet
+    if (!ccases.subsetOf(elems)) {
+      throw TypeInferenceException(s"Unknown cases in $ccases, expected $elems")
+    }
+    var clauses: List[(Term, Environment)] = cond match {
+      case Var(name) => {
+        // dependent elimination, replace variable with its value
+        def eee(f: FElemType): Environment = {
+          Map(name -> auto(FElem(f)))
+        }
+        for {
+          (k, v) <- cases.toList
+        } yield (v, env ++ eee(k))
+      }
+      case _ => {
+        for {
+          (k, v) <- cases.toList
+        } yield (v, env)
+      }
+    }
+    if (ccases.size < elems.size) {
+      clauses = clauses ++ Seq((dflt.get, env)) // TODO should provide default, throw exception
+    }
+    for ((cl, ee) <- clauses) {
+      val cltp = cl.infer(ee)
+      if (!Beta.equivalent(ee, tp, cltp)) {
+        throw TypeInferenceException(s"Expected types $tp and $cltp to be equal!")
+      }
+    }
+    tp
   }
 
   override def pretty(): String = {

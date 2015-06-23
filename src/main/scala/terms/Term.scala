@@ -1,5 +1,6 @@
 package terms
 
+import terms.Variables.Variable
 import terms.erase.{EType, ETerm, HasErasure}
 import typecheck.Environment._
 import typecheck.inference.{HasEvaluate, HasSubst}
@@ -34,7 +35,9 @@ abstract class Term
       this.app(args.head).app(args.tail:_*)
     }
   }
-  
+
+  def break(f: Variable, s: Variable, body: Term): Break = Break(this, f, s, body)
+
   def ccase(cases: Map[FElem.FElemType, Term]): Case = Case(this, cases)
 
   def ccase(cases: Map[FElem.FElemType, Term], dflt: Term): Case = Case(this, cases, dflt)
