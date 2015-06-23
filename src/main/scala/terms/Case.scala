@@ -4,7 +4,7 @@ import terms.FElem.FElemType
 import terms.Variables.Variable
 import terms.erase.{EType, ECase, ETerm}
 import typecheck.Beta
-import typecheck.Environment.Environment
+import typecheck.Environment.{EnvValue, Environment}
 import typecheck.inference.TypeInferenceException
 
 import scala.collection.Map
@@ -108,11 +108,25 @@ case class Case(
         if (!ccases.subsetOf(elems)) {
           throw TypeInferenceException(s"Unknown cases in $ccases, expected $elems")
         }
-        var clauses = cases.values
+        var css: Map[FElemType, Term] = null
+        cond match {
+          case Var(v) => {
+            // dependent elimination, replace variable with its value
+            def eee(f: FElemType): Environment = {
+              Map(v -> EnvValue(FElem(f)))
+            }
+            css = for {
+              (k, v) <- cases
+              newv = v.subst(eee(k))
+            } yield (k, newv)
+          }
+          case _ => css = cases
+        }
+        var clauses = css.values
         if (ccases.size < elems.size) {
           clauses = clauses ++ Seq(dflt.get) // TODO should provide default, throw exception
         }
-        for (cltp <- clauses.map(_.infer(env))) {
+        for (cltp <- clauses.map(cl => cl.infer(env))) {
           if (!Beta.equivalent(env, tp, cltp)) {
             throw TypeInferenceException(s"Expected types $tp and $cltp to be equal!")
           }

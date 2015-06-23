@@ -2,12 +2,18 @@ package typecheck.inference
 
 import terms._
 import typecheck.CustomMatchers
+import typecheck.Environment.EnvValue.auto
+import typecheck.Environment.{EnvValue, Environment}
+import typecheck.inference.BooleanContext.envWithBBool
 import util.UnitSpec
 import util.Implicits._
 import UnitPairContext._
+import terms.Variables.vv
 
 class DPairInferenceTest extends UnitSpec with CustomMatchers {
 
+  val fff = FElem("ff")
+  val ftt = FElem("tt")
   val fuu = FElem("uu")
 
   it should "infer dependend pair type" in {
@@ -36,5 +42,23 @@ class DPairInferenceTest extends UnitSpec with CustomMatchers {
 
   it should "infer proj2 type [simple][2]" in {
     Proj2(DPair("Unit", "Unit")) should haveTypeInContext(envWithUnit, Level(0))
+  }
+
+  it should "break dependent pairs" in {
+    Break(DPair(fuu, fuu), "f", "s", "f") should haveTypeInContext(envWithUnit, "Unit")
+  }
+
+  it should "break dependent pairs 2" in {
+    val BBB = Sigma(Abs("qqqq", "Bool", "qqqq".ccaset(Map(
+      "ff" -> "Unit",
+      "tt" -> "Bool"), Level(0))))
+    val bbb = DPair(ftt, fff, "BBB")
+    val eenv: Environment = Map(
+      vv("BBB") -> auto(BBB),
+      vv("bbb") -> auto(bbb)
+    )
+    val env: Environment = envWithUnit ++ envWithBBool ++ eenv
+//    Break(bbb, "f", "s", "f") should haveTypeInContext(env, "Bool")
+    Break(bbb, "f", "s", "s") should haveTypeInContext(env, "Bool")
   }
 }
