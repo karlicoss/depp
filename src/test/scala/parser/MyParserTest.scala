@@ -157,6 +157,17 @@ class MyParserTest extends UnitSpec {
         | };
         | and (not tt) (and ff (not ff))
       """.stripMargin)
+    p.parsing(
+      """
+        | Bot = { };
+        | Top = { top };
+        | Bool = { tt, ff };
+        | truth = \t. elim (t) {
+        |   tt => Top ;
+        |   ff => Bot ;
+        | };
+        | truth tt
+      """.stripMargin)
   }
 
 }

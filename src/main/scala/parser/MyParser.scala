@@ -21,7 +21,7 @@ class MyParser extends StdTokenParsers
   lexical.delimiters ++= Seq(
     "\\", "λ", // lambda
     "->", "=>", // pi
-    ".", // lambda
+    ".", // abstraction separator
     ",", // dependent pair constructor, finite type
     "(", ")", // dependent pair constructor
     "{", "}", // finite
