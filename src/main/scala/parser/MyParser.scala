@@ -2,7 +2,7 @@ package parser
 
 import terms.Variables.{Simple, Variable}
 import terms._
-import typecheck.Environment.EnvValue
+import typecheck.Environment.{Environment, EnvValue}
 
 import scala.util.parsing.combinator.lexical.StdLexical
 import scala.util.parsing.combinator.syntactical.StdTokenParsers
@@ -39,6 +39,9 @@ class MyParser extends StdTokenParsers
     "Type",
     "fst", "snd" // dependend pairs elimination
   )
+
+  lazy val program: Parser[(Environment, Term)] =
+    rep(dfn <~ ";") ~ expr ^^ flatten2((dfns, prog) => (dfns.toMap, prog))
 
   lazy val expr: Parser[Term] = term
 

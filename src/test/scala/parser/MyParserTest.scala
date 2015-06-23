@@ -134,4 +134,29 @@ class MyParserTest extends UnitSpec {
     p.parsing("((x, y))")
   }
 
+  it should "parse programs" in {
+    implicit val ptest = p.program
+    p.parsing(
+      """
+        | Bot = { };
+        | Top = { top };
+        | Bool = { tt, ff };
+        | not = \b. elim (b) {
+        |   tt => ff ;
+        |   ff => tt ;
+        | };
+        | and = \a. \b. elim (a) {
+        |   tt => elim (b) {
+        |     tt => tt;
+        |     ff => ff;
+        |   };
+        |   ff => elim (b) {
+        |     tt => ff;
+        |     ff => tt;
+        |   };
+        | };
+        | and (not tt) (and ff (not ff))
+      """.stripMargin)
+  }
+
 }
