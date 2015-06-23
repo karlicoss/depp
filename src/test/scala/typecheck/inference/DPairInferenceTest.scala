@@ -65,18 +65,22 @@ class DPairInferenceTest extends UnitSpec with CustomMatchers {
     ex.app("uuu") should haveTypeInContext(env, "Unit")
     "ex".app("uuu") should haveTypeInContext(env, "Unit")
   }
-//
-//  it should "break dependent pairs 3" in {
-//    val BBB = Sigma(Abs("qqqq", "Bool", "qqqq".ccaset(Map(
-//      "ff" -> "Unit",
-//      "tt" -> "Bool"), Level(0))))
-//    val bbb = DPair(ftt, fff, "BBB")
-//    val eenv: Environment = Map(
-//      vv("BBB") -> auto(BBB),
-//      vv("bbb") -> auto(bbb)
-//    )
-//    val env: Environment = envWithUnit ++ envWithBBool ++ eenv
-////    Break(bbb, "f", "s", "f") should haveTypeInContext(env, "Bool")
-//    Break(bbb, "f", "s", "s") should haveTypeInContext(env, "Bool")
-//  }
+
+  it should "break dependent pairs 3" in {
+    val BBB = Sigma(Abs("qq", "Bool", "qq".ccaset(Map(
+      "ff" -> "Unit",
+      "tt" -> "Bool"), Level(0))))
+    val bbb = DPair(ftt, fff, "BBB")
+    val eenv: Environment = Map(
+      vv("BBB") -> auto(BBB),
+      vv("bbb") -> auto(bbb)
+    )
+    val env: Environment = envWithUnit ++ envWithBBool ++ eenv
+    Var("bbb") should haveTypeInContext(env, "BBB")
+    Break(bbb, "f", "s", "f") should haveTypeInContext(env, "Bool")
+  }
+
+  it should "kinda functor" in {
+
+  }
 }

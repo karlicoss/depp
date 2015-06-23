@@ -7,6 +7,7 @@ import typecheck.Environment.EnvValue.auto
 import typecheck.Environment.{Environment, EnvValue}
 import typecheck.inference.BooleanContext._
 import typecheck.inference.UnitPairContext._
+import typecheck.inference.MaybeBoolContext._
 import util.Implicits._
 import util.UnitSpec
 
@@ -59,35 +60,6 @@ class CaseTest extends UnitSpec with CustomMatchers {
     ), "qq".pi("ww".pi("equ".app("a", fuu), "Bot"), "Bot")))
     proof should haveTypeInContext(topEnv, statement)
   }
-
-  /*
-    data BTag : Set where
-      BTEmpty : BTag
-      BTJust  : BTag
-   */
-  val BTag = Finite(Set("BTEmpty", "BTJust"))
-  val fBTEmpty = FElem("BTEmpty")
-  val fBTJust = FElem("BTJust")
-
-  // MaybeBool = Σ BTag (λ { BTEmpty → Unit ; BTJust → Bool })
-  val MaybeBool = Sigma(Abs("t", "BTag", Var("t").ccaset(
-    IMap(
-      "BTEmpty" -> "Unit",
-      "BTJust"  -> "Bool"),
-    Level(0))))
-
-  // BEmpty = (BTEmpty , unit)
-  val BEmpty = DPair(fBTEmpty, fuu, "MaybeBool")
-
-  // BJust = λ b → BTJust , b
-  val BJust = "b".lam("Bool", DPair(fBTJust, "b", "MaybeBool"))
-
-  val envWithMaybeBool = IMap(
-    vv("BTag") -> EnvValue(Level(0), BTag),
-    vv("MaybeBool") -> EnvValue(Level(0), MaybeBool),
-    vv("BEmpty") -> EnvValue(TVar("xxx"), BEmpty), // TODO dummy type variables
-    vv("BJust") -> EnvValue(TVar("yyy"), BJust)
-  )
 
   it should "infer Empty :: MaybeBool" in {
     Var("BEmpty") should haveTypeInContext(unitBoolEnv ++ envWithMaybeBool, "MaybeBool")
