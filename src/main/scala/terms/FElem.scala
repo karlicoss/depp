@@ -1,7 +1,7 @@
 package terms
 
 import terms.Variables.Variable
-import terms.erase.ETerm
+import terms.erase.{EFElem, EType, ETerm}
 import typecheck.Environment.{EnvValue, Environment}
 import typecheck.inference.TypeInferenceException
 import util.Utils._
@@ -41,7 +41,7 @@ case class FElem(name: FElem.FElemType) extends Term {
 
   override def pretty(): String = s"@$name"
 
-  override def erase(): Option[ETerm] = ???
+  override def erase(): Option[Either[ETerm, EType]] = Some(Left(EFElem(name)))
 }
 
 object FElem {

@@ -1,7 +1,7 @@
 package terms
 
 import terms.Variables.{Dummy, Simple, Variable}
-import terms.erase.ETerm
+import terms.erase.{EVar, EType, ETerm}
 import typecheck.Environment.{EnvValue, Environment}
 import typecheck.inference.TypeInferenceException
 
@@ -48,7 +48,7 @@ final case class Var(name: Variable) extends Term {
       throw TypeInferenceException(s"Unbound variable ${name.pretty()}")
   }
 
-  override def erase(): Option[ETerm] = ???
+  override def erase(): Option[Either[ETerm, EType]] = Some(Left(EVar(name)))
 }
 
 object Var {

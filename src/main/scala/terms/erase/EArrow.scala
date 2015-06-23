@@ -1,5 +1,5 @@
 package terms.erase
 
-case class EArrow(left: ETerm, right: ETerm) extends ETerm { // TODO EType?
+case class EArrow(left: EType, right: EType) extends EType {
 
 }

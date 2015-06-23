@@ -1,8 +1,9 @@
 package terms
 
-import terms.erase.{EProj1, ETerm}
+import terms.erase.{EType, EProj1, ETerm}
 import typecheck.Environment.Environment
 
+import scala.util.Left
 import scalaz.State
 
 case class Proj1(pair: Term) extends Term {
@@ -29,5 +30,7 @@ case class Proj1(pair: Term) extends Term {
 
   override def pretty(): String = toString
 
-  override def erase(): Option[ETerm] = pair.erase().map(EProj1)
+  override def erase(): Option[Either[ETerm, EType]] = for {
+    pe <- pair.erase()
+  } yield Left(EProj1(pe.left.get))
 }

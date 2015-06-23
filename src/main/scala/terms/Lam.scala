@@ -2,7 +2,7 @@ package terms
 
 import terms.Abs
 import terms.Variables.{Generated, Variable, Dummy, Simple}
-import terms.erase.{ELam, ETerm}
+import terms.erase.{EType, ELam, ETerm}
 import typecheck.Environment._
 import util.Implicits.type2EnvElem
 
@@ -34,10 +34,10 @@ final case class Lam(abs: Abs) extends Term {
     tp <- abs.body.inferHelper(env + (abs.v -> ntp))
   } yield Pi(Abs(abs.v, ntp, tp))
 
-  override def erase(): Option[ETerm] = for {
+  override def erase(): Option[Either[ETerm, EType]] = for {
     tp <- abs.tp.erase()
     bd <- abs.body.erase()
-  } yield ELam(abs.v, tp, bd)
+  } yield Left(ELam(abs.v, tp.right.get, bd.left.get))
 }
 
 object Lam {

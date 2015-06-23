@@ -1,5 +1,5 @@
 package terms.erase
 
-case class ETuple(a: ETerm, b: ETerm) extends ETerm { // TODO EType?
+case class ETuple(a: EType, b: EType) extends EType { // TODO EType?
 
 }

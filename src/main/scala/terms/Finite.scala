@@ -1,6 +1,6 @@
 package terms
 
-import terms.erase.ETerm
+import terms.erase.{EFinite, EType, ETerm}
 import typecheck.Environment.Environment
 
 import scalaz.State
@@ -24,5 +24,5 @@ final case class Finite(elems: Set[FElem.FElemType]) extends Term {
 
   override def pretty(): String = elems.toString()
 
-  override def erase(): Option[ETerm] = ???
+  override def erase(): Option[Either[ETerm, EType]] = Some(Right(EFinite(elems)))
 }

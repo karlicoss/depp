@@ -1,7 +1,7 @@
 package terms
 
 import terms.Variables.{Variable, Simple}
-import terms.erase.{ETuple, ETerm}
+import terms.erase.{EType, ETuple, ETerm}
 import typecheck.Environment.Environment
 
 import scalaz.State
@@ -25,10 +25,10 @@ case class Sigma(abs: Abs) extends Term {
    */
   override def evaluate(env: Environment): Term = Sigma(abs.evaluate(env))
 
-  override def erase(): Option[ETerm] = for {
+  override def erase(): Option[Either[ETerm, EType]] = for {
     ftype <- abs.tp.erase()
     stype <- abs.body.erase() // TODO weird..
-  } yield ETuple(ftype, stype)
+  } yield Right(ETuple(ftype.right.get, stype.right.get))
 }
 
 object Sigma {

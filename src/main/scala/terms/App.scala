@@ -1,7 +1,7 @@
 package terms
 
 import terms.Variables.{Dummy, Generated, Simple}
-import terms.erase.{EApp, ETerm}
+import terms.erase.{EType, EApp, ETerm}
 import typecheck.Beta
 import typecheck.Environment._
 import typecheck.inference.{Inference, TypeInferenceException}
@@ -83,8 +83,8 @@ final case class App(a: Term, b: Term) extends Term {
     abs.body.subst(Map(abs.v -> b))
   }
 
-  override def erase(): Option[ETerm] = for {
+  override def erase(): Option[Either[ETerm, EType]] = for {
     ae <- a.erase()
     be <- b.erase()
-  } yield EApp(ae, be)
+  } yield Left(EApp(ae.left.get, be.left.get))
 }
