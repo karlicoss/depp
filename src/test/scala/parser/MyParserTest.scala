@@ -170,4 +170,48 @@ class MyParserTest extends UnitSpec {
       """.stripMargin)
   }
 
+  it should "parse break" in {
+    implicit val ptest = p.brk
+    p.parsing("break (p) with (f, s) in f")
+  }
+
+  it should "parse functor" in {
+    implicit val ptest = p.program
+    p.parsing(
+      """
+        | Top = { tt };
+        | Bot = { };
+        |
+        | Unit = { uu };
+        |
+        | Bool = { tt, ff };
+        | if = fun cond: Bool.fun then: Bool. fun else: Bool. elim (cond) {
+        |   tt => then;
+        |   ff => else;
+        | };
+        | not = fun a: Bool. if a then @ff else @tt;
+        |
+        | truth : (forall qq: Bool. Type) = fun a: Bool. elim (a) {
+        |   tt => Top;
+        |   ff => Bot;
+        | };
+        |
+        | MBTag = { MBEmpty, MBJust };
+        | MaybeBool = exists t: MBTag. elim (t) {
+        |   MBEmpty => Unit ;
+        |   MBJust  => Bool ;
+        | };
+        | BEmpty = (@MBEmpty, uu);  // kinda constructors
+        | BJust = fun x: Bool. (@MBJust, x);
+        |
+        | bfmap =
+        |   fun f: (forall w: Bool. Bool).fun m: MaybeBool. break (m) with (f, s) in
+        |     elim (f) {
+        |       BTEmpty => BEmpty ;
+        |       BTJust  => BJust (f s) ;
+        |     } ;
+        | bfmap not (BJust @ff)
+      """.stripMargin)
+  }
+
 }

@@ -39,7 +39,8 @@ class MyParser extends StdTokenParsers
     "fun", "λ", // lambda
     "elim", "default",
     "Type",
-    "fst", "snd" // dependend pairs elimination
+    "fst", "snd", // dependend pairs elimination
+    "break", "with", "in" // break (pair) with (f, s) in { }
   )
 
   lazy val lambda: Parser[String] =
@@ -62,7 +63,7 @@ class MyParser extends StdTokenParsers
       varname ^^ (Var(_)) |
       felem |
       finite |
-      pair | fst | snd |
+      pair | fst | snd | brk |
       level |
       ccase |
       lam | pi | sigma |
@@ -137,6 +138,12 @@ class MyParser extends StdTokenParsers
         case None => (a, EnvValue.auto(c))
       }
     })
+
+  lazy val brk: Parser[Break] =
+    ("break" ~> expr <~ "with") ~
+      ("(" ~> varname <~ ",") ~
+      (varname <~ ")") ~
+      ("in" ~> expr) ^^ flatten4((what, f, s, body) => Break(what, f, s, body))
 
   def parse(source: String): ParseResult[Any] = {
     val tokens = new lexical.Scanner(source)
