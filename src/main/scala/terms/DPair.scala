@@ -1,6 +1,7 @@
 package terms
 
 import terms.Abs
+import terms.erase.{EPair, ETerm}
 import typecheck.Beta
 import typecheck.Environment.Environment
 import typecheck.inference.TypeInferenceException
@@ -57,6 +58,11 @@ case class DPair(a: Term, b: Term, tp: Term) extends Term{
     val p2 = b.evaluate(env)
     DPair(p1, p2, tp)
   }
+
+  override def erase(): Option[EPair] = for {
+    ae <- a.erase()
+    be <- b.erase()
+  } yield EPair(ae, be)
 }
 
 object DPair {

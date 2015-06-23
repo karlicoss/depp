@@ -1,5 +1,8 @@
 package terms
 
+import terms.FElem.FElemType
+import terms.Variables.Variable
+import terms.erase.{ECase, ETerm}
 import typecheck.Beta
 import typecheck.Environment.Environment
 import typecheck.inference.TypeInferenceException
@@ -48,6 +51,18 @@ case class Case(
     }
     (curs, res)
   })
+
+  def promoteMapOption[K, V](m: Map[K, Option[V]]): Option[Map[K, V]] = {
+    val res = collection.mutable.Map[K, V]()
+    for ((k, v) <- m) {
+      val a = v match {
+        case Some(x) => x
+        case None => return None
+      }
+      res.put(k, a)
+    }
+    Some(res)
+  }
 
   def liftOption[S, A](m: Option[State[S, A]]): State[S, Option[A]] = State(s => {
     var curs = s
@@ -121,6 +136,11 @@ case class Case(
   override def pretty(): String = {
     s"case (${cond.pretty()}) of $cases default ${dflt.map(_.pretty())}"
   }
+
+  override def erase(): Option[ETerm] = for {
+    econd <- cond.erase()
+    emap: Map[FElemType, ETerm] <- promoteMapOption(cases.mapValues(_.erase()))
+  } yield ECase(econd, emap)
 }
 
 object Case {

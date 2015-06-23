@@ -1,6 +1,7 @@
 package terms
 
 import terms.Variables.{Dummy, Variable}
+import terms.erase.ETerm
 import typecheck.Environment._
 import typecheck.inference.TypeInferenceException
 
@@ -15,6 +16,9 @@ final case class TVar(v: Variable) extends Term {
 
   override def inferHelper(env: Environment): State[Int, Term] =
     throw TypeInferenceException("TODO: should this case even be possible?")
+
+  override def erase(): Option[ETerm] = // TODO eraasure exception?
+    throw TypeInferenceException("TODO")
 }
 
 object TVar {

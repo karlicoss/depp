@@ -1,5 +1,6 @@
 package terms
 
+import terms.erase.{ETerm, HasErasure}
 import typecheck.Environment._
 import typecheck.inference.{HasEvaluate, HasSubst}
 import typecheck.{Beta, HasInference}
@@ -10,7 +11,7 @@ import scala.collection.immutable.{Map => IMap}
 
 // TODO sealed
 abstract class Term
-  extends PrettyPrintable with HasEvaluate[Term] with HasSubst[Term] with HasInference[Term] {
+  extends PrettyPrintable with HasEvaluate[Term] with HasSubst[Term] with HasInference[Term] with HasErasure[ETerm] {
 
   /**
    * Beta equality

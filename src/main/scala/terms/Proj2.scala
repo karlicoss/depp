@@ -1,24 +1,25 @@
 package terms
 
+import terms.erase.{EProj2, ETerm}
 import typecheck.Environment.Environment
 
 import scalaz.State
 import util.Implicits._
 
-case class Proj2(trm: Term) extends Term {
+case class Proj2(pair: Term) extends Term {
   /**
    * Infers the type of the expression under the given context
    * @param env the context
    * @return
    */
   override def inferHelper(env: Environment): State[Int, Term] = State.state {
-    val abs = Common.inferSigma(env, trm)
-    val first = Proj1(trm).evaluate(env) // TODO??
+    val abs = Common.inferSigma(env, pair)
+    val first = Proj1(pair).evaluate(env) // TODO??
     abs.body.subst(Map(abs.v -> first)) // TODO ???
   }
 
   override def substHelper(env: Environment): State[Int, Term] = for {
-    s <- trm.substHelper(env)
+    s <- pair.substHelper(env)
   } yield Proj2(s)
 
   /**
@@ -27,7 +28,7 @@ case class Proj2(trm: Term) extends Term {
    * @return
    */
   override def evaluate(env: Environment): Term = {
-    val nt = trm.evaluate(env)
+    val nt = pair.evaluate(env)
     nt match {
       case DPair(_, b, _) => {
         b
@@ -37,4 +38,6 @@ case class Proj2(trm: Term) extends Term {
   }
 
   override def pretty(): String = toString
+
+  override def erase(): Option[ETerm] = pair.erase().map(EProj2)
 }

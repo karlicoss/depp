@@ -1,19 +1,18 @@
 package terms
 
+import terms.erase.{EProj1, ETerm}
 import typecheck.Environment.Environment
 
 import scalaz.State
 
-case class Proj1(trm: Term) extends Term {
+case class Proj1(pair: Term) extends Term {
 
   override def inferHelper(env: Environment): State[Int, Term] = State.state({
-    val abs = Common.inferSigma(env, trm)
+    val abs = Common.inferSigma(env, pair)
     abs.tp
   })
 
-  override def substHelper(env: Environment): State[Int, Term] = for {
-    aaa <- trm.substHelper(env)
-  } yield Proj1(aaa)
+  override def substHelper(env: Environment): State[Int, Term] = pair.substHelper(env).map(Proj1)
 
   /**
    * Evaluates the expression under the given context
@@ -21,7 +20,7 @@ case class Proj1(trm: Term) extends Term {
    * @return
    */
   override def evaluate(env: Environment): Term = {
-    val nt = trm.evaluate(env)
+    val nt = pair.evaluate(env)
     nt match {
       case DPair(a, _, _) => a
       case _ => Proj1(nt)
@@ -29,4 +28,6 @@ case class Proj1(trm: Term) extends Term {
   }
 
   override def pretty(): String = toString
+
+  override def erase(): Option[ETerm] = pair.erase().map(EProj1)
 }

@@ -1,6 +1,7 @@
 package terms
 
 import terms.Variables.Variable
+import terms.erase.ETerm
 import typecheck.Environment.{EnvValue, Environment}
 import typecheck.inference.TypeInferenceException
 import util.Utils._
@@ -39,6 +40,8 @@ case class FElem(name: FElem.FElemType) extends Term {
   override def substHelper(env: Environment): State[Int, Term] = State.state(this)
 
   override def pretty(): String = s"@$name"
+
+  override def erase(): Option[ETerm] = ???
 }
 
 object FElem {
