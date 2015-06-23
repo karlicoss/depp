@@ -1,12 +1,12 @@
 package terms
 
-import terms.erase.{EProj1, EType, EProj2, ETerm}
+import terms.erase.{ETerm, EType}
 import typecheck.Environment.Environment
-
-import scala.util.Left
-import scalaz.State
 import util.Implicits._
 
+import scalaz.State
+
+@Deprecated
 case class Proj2(pair: Term) extends Term {
   /**
    * Infers the type of the expression under the given context
@@ -40,7 +40,5 @@ case class Proj2(pair: Term) extends Term {
 
   override def pretty(): String = toString
 
-  override def erase(): Option[Either[ETerm, EType]] = for {
-    pe <- pair.erase()
-  } yield Left(EProj2(pe.left.get))
+  override def erase(): Option[Either[ETerm, EType]] = ???
 }

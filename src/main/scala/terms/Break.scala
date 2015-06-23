@@ -1,7 +1,7 @@
 package terms
 
 import terms.Variables.Variable
-import terms.erase.{EType, ETerm}
+import terms.erase.{EBreak, EType, ETerm}
 import typecheck.Environment.{EnvValue, Environment}
 import typecheck.inference.TypeInferenceException
 
@@ -10,7 +10,10 @@ import util.Implicits.type2EnvElem
 import scalaz.State
 
 case class Break(what: Term, f: Variable, s: Variable, body: Term) extends Term {
-  override def erase(): Option[Either[ETerm, EType]] = ???
+  override def erase(): Option[Either[ETerm, EType]] = for {
+    ewh <- what.erase()
+    ebody <- body.erase()
+  } yield Left(EBreak(ewh.left.get, f, s, ebody.left.get))
 
   override def substHelper(env: Environment): State[Int, Term] = for { // TODO FIXME GENERATE NEW VARIABLES
     ws <- what.substHelper(env)

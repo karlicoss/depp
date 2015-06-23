@@ -1,11 +1,11 @@
 package terms
 
-import terms.erase.{EType, EProj1, ETerm}
+import terms.erase.{ETerm, EType}
 import typecheck.Environment.Environment
 
-import scala.util.Left
 import scalaz.State
 
+@Deprecated
 case class Proj1(pair: Term) extends Term {
 
   override def inferHelper(env: Environment): State[Int, Term] = State.state({
@@ -30,7 +30,5 @@ case class Proj1(pair: Term) extends Term {
 
   override def pretty(): String = toString
 
-  override def erase(): Option[Either[ETerm, EType]] = for {
-    pe <- pair.erase()
-  } yield Left(EProj1(pe.left.get))
+  override def erase(): Option[Either[ETerm, EType]] = ???
 }
