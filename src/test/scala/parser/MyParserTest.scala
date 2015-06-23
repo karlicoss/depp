@@ -141,11 +141,11 @@ class MyParserTest extends UnitSpec {
         | Bot = { };
         | Top = { top };
         | Bool = { tt, ff };
-        | not = \b. elim (b) {
+        | not = λ b. elim (b) {
         |   tt => ff ;
         |   ff => tt ;
         | };
-        | and = \a. \b. elim (a) {
+        | and = λ a. λ b. elim (a) {
         |   tt => elim (b) {
         |     tt => tt;
         |     ff => ff;
@@ -162,7 +162,7 @@ class MyParserTest extends UnitSpec {
         | Bot = { };
         | Top = { top };
         | Bool = { tt, ff };
-        | truth = \t. elim (t) {
+        | truth = λ t. elim (t) {
         |   tt => Top ;
         |   ff => Bot ;
         | };

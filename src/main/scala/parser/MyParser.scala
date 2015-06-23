@@ -19,26 +19,37 @@ class MyParser extends StdTokenParsers
   def identChar = lexical.letter
 
   lexical.delimiters ++= Seq(
-    "\\", "λ", // lambda
-    "->", "=>", // pi
+    "\\", // lambda
+    "->", // function
     ".", // abstraction separator
     ",", // dependent pair constructor, finite type
     "(", ")", // dependent pair constructor
     "{", "}", // finite
     "#", // level
     ":", // type annotation
+    "=>", // pattern separator
     ";", // cases separator, definitions separator
     "@", // finite element identifier
     "=" // definition
   )
 
   lexical.reserved ++= Seq(
-    "forall",
-    "exists",
+    "forall", "∀", // forall
+    "exists", "∃", // exists
+    "fun", "λ", // lambda
     "elim", "default",
     "Type",
     "fst", "snd" // dependend pairs elimination
   )
+
+  lazy val lambda: Parser[String] =
+    "fun" | "\\" | "λ"
+
+  lazy val forall: Parser[String] =
+    "forall" | "∀"
+
+  lazy val exists: Parser[String] =
+    "exists" | "∃"
 
   lazy val program: Parser[(Environment, Term)] =
     rep(dfn <~ ";") ~ expr ^^ flatten2((dfns, prog) => (dfns.toMap, prog))
@@ -72,7 +83,7 @@ class MyParser extends StdTokenParsers
       varname ~ (":" ~> term) ~ ("." ~> term) ^^ flatten3((v, tp, body) => (v, Some(tp), body)) |
       varname ~ ("." ~> term) ^^ flatten2((v, body) => (v, None, body))
 
-  def absParser(s: String): Parser[(Variable, Option[Term], Term)] = s ~> abs
+  def absParser(s: Parser[String]): Parser[(Variable, Option[Term], Term)] = s ~> abs
 
   lazy val pair: Parser[DPair] =
     ("(" ~> term <~ ",") ~ (term <~ ")") ^^ flatten2((fst, snd) => DPair(fst, snd))
@@ -84,19 +95,19 @@ class MyParser extends StdTokenParsers
     "snd" ~> term ^^ (Proj2(_))
 
   lazy val lam: Parser[Lam] =
-    absParser("\\") ^^ (x => x._2 match {
+    absParser(lambda) ^^ (x => x._2 match {
       case Some(tp) => x._1.lam(tp, x._3)
       case None => x._1.lam(x._3)
     })
 
   lazy val pi: Parser[Pi] =
-    absParser("forall") ^^ (x => x._2 match {
+    absParser(forall) ^^ (x => x._2 match {
       case Some(tp) => x._1.pi(tp, x._3)
       case None => throw ParserException("TODO")
     })
 
   lazy val sigma: Parser[Sigma] =
-    absParser("sigma") ^^ (x => x._2 match {
+    absParser(exists) ^^ (x => x._2 match {
       case Some(tp) => Sigma.create(x._1, tp, x._3)
       case None => throw ParserException("TODO")
     })
