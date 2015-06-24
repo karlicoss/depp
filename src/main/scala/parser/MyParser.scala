@@ -11,7 +11,7 @@ import scala.util.parsing.combinator.ImplicitConversions
 import scala.collection.Map
 import scala.collection.immutable.{Map => IMap}
 
-class MyParser extends StdTokenParsers
+class MyParser() extends StdTokenParsers
   with ImplicitConversions {
   override type Tokens = StdLexical
   override val lexical = new Tokens
@@ -145,8 +145,12 @@ class MyParser extends StdTokenParsers
       (varname <~ ")") ~
       ("in" ~> expr) ^^ flatten4((what, f, s, body) => Break(what, f, s, body))
 
-  def parse(source: String): ParseResult[Any] = {
+  def parse(source: String): ParseResult[(Environment, Term)] = {
     val tokens = new lexical.Scanner(source)
-    phrase(expr)(tokens)
+    phrase(program)(tokens)
   }
+}
+
+object MyParser {
+  def apply(): MyParser = new MyParser
 }
