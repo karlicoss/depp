@@ -2,13 +2,12 @@ package terms.erase
 
 import terms.FElem
 
-case class EFinite(elems: List[FElem.FElemType]) extends EType {
+case class EFinite(name: String, elems: List[FElem.FElemType]) extends EType {
   /**
    * Generates the code for the finite type definition
-   * @param name name of the type
    * @return
    */
-  def codegen(name: String): String = {
+  def codegen(): String = {
     val tp =
       s"""
         |%$name = type { i32 }

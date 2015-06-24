@@ -24,5 +24,5 @@ final case class Finite(elems: Set[FElem.FElemType]) extends Term {
 
   override def pretty(): String = elems.toString()
 
-  override def erase(): Option[Either[ETerm, EType]] = Some(Right(EFinite(elems.toList)))
+  override def erase(): Option[Either[ETerm, EType]] = Some(Right(EFinite(null, elems.toList))) // TODO finite type name
 }

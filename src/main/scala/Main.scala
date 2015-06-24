@@ -24,6 +24,13 @@ object Main {
       | id @uu
     """.stripMargin
 
+  val program2 =
+    """
+      | Unit = { uu };
+      | aaa = @uu;
+      | aaa
+    """.stripMargin
+
   def main(args: Array[String]): Unit = {
     println(eval.eval(program))
 //    val f = EFinite(List("tt", "ff"))
