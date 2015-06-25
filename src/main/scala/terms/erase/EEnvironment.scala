@@ -1,7 +1,7 @@
 package terms.erase
 
 package object EEnvironment {
-  type EEnvironment = Map[String, Decl]
+  type EEnvironment = Seq[(String, Decl)]
 
   abstract class Decl
 

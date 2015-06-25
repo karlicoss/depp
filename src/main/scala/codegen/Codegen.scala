@@ -1,6 +1,6 @@
 package codegen
 
-import terms.erase.EEnvironment.{EEnvironment, TermDecl, TypeDecl}
+import terms.erase.EEnvironment.{Decl, TermDecl, TypeDecl}
 import terms.erase._
 
 import scala.collection.mutable
@@ -21,8 +21,7 @@ class Codegen {
     res
   }
 
-  def generateEnv(env: EEnvironment): Unit = {
-
+  def generateEnv(env: Seq[(String, Decl)]): Unit = {
     for ((k, v) <- env) {
       v match {
         case TermDecl(t) => generateTerm(k, t)

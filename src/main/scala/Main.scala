@@ -1,7 +1,9 @@
 import codegen.Codegen
 import parser.MyParser
-import terms.erase.EEnvironment.{TypeDecl, TermDecl, EEnvironment}
-import terms.erase.{EFinite, EFElem}
+import terms.erase.EEnvironment.{TermDecl, EEnvironment, TypeDecl}
+import terms.erase.{EFElem, EFinite, ETerm}
+
+import scala.collection.mutable
 
 object Main {
 
@@ -22,6 +24,17 @@ object Main {
 
   object gen extends Codegen
 
+  def compile(env: EEnvironment, prog: ETerm): mutable.MutableList[String] = {
+    gen.generateEnv(env :+ ("res" -> TermDecl(prog)))
+    val code: mutable.MutableList[String] = mutable.MutableList()
+    code ++= gen.preamble
+    code += "define void @calc() {"
+    code ++= gen.code.map(s => s"  $s")
+    code += "ret void"
+    code += "}"
+    code
+  }
+
   def simple(): Unit = {
 //    val progs =
 //        """
@@ -29,16 +42,12 @@ object Main {
 //          | @uu
 //        """.stripMargin
 
-//    val (env, term) = eval.parse(progs).get
-    val ee: EEnvironment = Map(
-      "UU" -> TypeDecl(EFinite("Unit", List("uu"))),
-      "res" -> TermDecl(EFElem("uu", "Unit"))
+    val ee: EEnvironment = List(
+      "UU" -> TypeDecl(EFinite("Unit", List("uu")))
     )
-    gen.generateEnv(ee)
 
-    println(gen.preamble.mkString("\n"))
-
-    println(gen.code.mkString("\n"))
+    val code = compile(ee, EFElem("uu", "Unit"))
+    println(code.mkString("\n"))
   }
 
 
