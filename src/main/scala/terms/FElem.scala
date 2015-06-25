@@ -41,7 +41,7 @@ case class FElem(name: FElem.FElemType) extends Term {
 
   override def pretty(): String = s"@$name"
 
-  override def erase(): Option[Either[ETerm, EType]] = Some(Left(EFElem(name)))
+  override def erase(): Option[Either[ETerm, EType]] = Some(Left(EFElem(name, null))) // TODO
 }
 
 object FElem {

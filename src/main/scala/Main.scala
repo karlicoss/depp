@@ -1,4 +1,7 @@
+import codegen.Codegen
 import parser.MyParser
+import terms.erase.EEnvironment.{TypeDecl, TermDecl, EEnvironment}
+import terms.erase.{EFinite, EFElem}
 
 object Main {
 
@@ -17,6 +20,28 @@ object Main {
     }
   }
 
+  object gen extends Codegen
+
+  def simple(): Unit = {
+//    val progs =
+//        """
+//          | Unit = { uu };
+//          | @uu
+//        """.stripMargin
+
+//    val (env, term) = eval.parse(progs).get
+    val ee: EEnvironment = Map(
+      "UU" -> TypeDecl(EFinite("Unit", List("uu"))),
+      "res" -> TermDecl(EFElem("uu", "Unit"))
+    )
+    gen.generateEnv(ee)
+
+    println(gen.preamble.mkString("\n"))
+
+    println(gen.code.mkString("\n"))
+  }
+
+
   val program =
     """
       | Unit = { uu };
@@ -32,7 +57,9 @@ object Main {
     """.stripMargin
 
   def main(args: Array[String]): Unit = {
-    println(eval.eval(program))
+    simple()
+//    println(simple())
+//    println(eval.eval(program))
 //    val f = EFinite(List("tt", "ff"))
 //    println(f.codegen("Bool"))
 //    println(Codegen.genProgram(""))

@@ -1,19 +1,73 @@
 package codegen
 
-import terms.Variables.Variable
+import terms.erase.EEnvironment.{EEnvironment, TermDecl, TypeDecl}
 import terms.erase._
-import typecheck.Environment.EnvValue
+
+import scala.collection.mutable
 
 class Codegen {
   var cnt = 0
 
-  val lambdas: Map[String, List[String]]
-  val finites: Map[String, List[String]]
+  val lambdas: Map[String, List[String]] = null // TODO
+  val finites: Map[String, List[String]] = null // TODO
+
+  val preamble: mutable.MutableList[String] = mutable.MutableList()
+
+  val code: mutable.MutableList[String] = mutable.MutableList()
 
   def nextVar(): String = {
     val res = s"v$cnt"
     cnt += 1
     res
+  }
+
+  def generateEnv(env: EEnvironment): Unit = {
+
+    for ((k, v) <- env) {
+      v match {
+        case TermDecl(t) => generateTerm(k, t)
+        case TypeDecl(t) => generateType(k, t)
+        case _ => ???
+      }
+    }
+  }
+
+  def generateTerm(name: String, t: ETerm): Unit = {
+    t match {
+      case EApp(a, b) => ???
+      case EPair(a, b) => ???
+      case EVar(v) => ???
+      case EFElem(name, fname) => {
+        val st = generate(t)
+        code ++= st.code
+        // TODO store result in name
+      }
+      case ELam(x, tp, body) => ???
+      case EBreak(what, f, s, body) => ???
+      case ECase(cond, cases) => ???
+      case _ =>
+    }
+  }
+
+  def generateType(name: String, t: EType): Unit = {
+    t match {
+      case ESum(types) => ???
+      case ETuple(a, b) => ???
+      case EArrow(left, right) => ???
+      case EFinite(fname, elems) =>
+        val tp =
+          s"""
+              |%$fname = type { i32 }
+           """.stripMargin
+        val values: List[String] = for {
+          (elem, i) <- elems.zipWithIndex
+        } yield s"@$elem = internal global %$fname { i32 $i }"
+        preamble += s"; $fname declaration"
+        preamble += tp
+        preamble ++= values
+        preamble += s"; end of $fname declaration"
+      case _ => ???
+    }
   }
 
   def generate(term: ETerm): St = {
@@ -27,10 +81,13 @@ class Codegen {
         // TODO generate closure?
 
         // TODO
+        St(null, null, null, code) // TODO ??
       }
       case EFElem(name, fname) => {
+        val nvar = nextVar()
+        val ccode = List(s"%$nvar = load %$fname* @$name")
         // TODO extract EFElem from global scope?
-        St(null, s"@$name", s"%$fname", null)
+        St(nvar, null, s"%$fname", ccode)
       }
       case EBreak(what, f, s, body) => ???
       case EVar(v) => {
@@ -42,12 +99,14 @@ class Codegen {
         val clname = null
         s"$fresh = getelementptr %$cltype* %$clname, i32 0, i32 0"
         // TODO map variable in env to the index
+        ???
       }
       case ELam(x, tp, body) => {
         // TODO
+        ???
       }
       case ECase(cond, cases) => ???
-      case _ =>
+      case _ => ???
     }
   }
 
@@ -66,8 +125,6 @@ object Codegen {
     """.stripMargin
   }
 
-  def genType(tp: EType): String = ???
-
 //  val program =
 //    """
 //      | Unit = { uu };
@@ -75,15 +132,9 @@ object Codegen {
 //      | id @uu
 //    """.stripMargin
 
-  def genEnvValue(v: Variable, tp: EType, dfn: ETerm): String = {
-    val vname = v.pretty()
-    tp match {
-      case ESum(types) => ???
-      case ETuple(a, b) => ???
-      case EArrow(left, right) => ???
-      case EFinite(name, elems) =>
-      case _ => ???
-    }
-
-  }
+  //  val program =
+  //    """
+  //      | Unit = { uu };
+  //      | @uu
+  //    """.stripMargin
 }

@@ -49,7 +49,7 @@ final case class Var(name: Variable) extends Term {
       throw TypeInferenceException(s"Unbound variable ${name.pretty()}")
   }
 
-  override def erase(): Option[Either[ETerm, EType]] = Some(Left(EVar(name)))
+  override def erase(): Option[Either[ETerm, EType]] = Some(Left(EVar(name.toString))) // TODO TOSTRING
 }
 
 object Var {
