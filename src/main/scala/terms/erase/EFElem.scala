@@ -2,6 +2,10 @@ package terms.erase
 
 import terms.FElem
 
-case class EFElem(name: FElem.FElemType) extends ETerm {
+/**
+ * @param name name of the value
+ * @param fname name of the corresponding finite type
+ */
+case class EFElem(name: FElem.FElemType, fname: String) extends ETerm {
 
 }
