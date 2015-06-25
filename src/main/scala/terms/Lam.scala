@@ -1,8 +1,7 @@
 package terms
 
-import terms.Abs
-import terms.Variables.{Generated, Variable, Dummy, Simple}
-import terms.erase.{EType, ELam, ETerm}
+import terms.Variables.{Dummy, Generated, Simple}
+import terms.erase.{ELam, ETerm, EType}
 import typecheck.Environment._
 import util.Implicits.type2EnvElem
 
@@ -37,7 +36,7 @@ final case class Lam(abs: Abs) extends Term {
   override def erase(): Option[Either[ETerm, EType]] = for {
     tp <- abs.tp.erase()
     bd <- abs.body.erase()
-  } yield Left(ELam(abs.v, tp.right.get, bd.left.get))
+  } yield Left(ELam(abs.v.toString, tp.right.get, bd.left.get)) // TODO TOString
 }
 
 object Lam {

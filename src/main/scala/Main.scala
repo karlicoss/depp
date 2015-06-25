@@ -1,7 +1,7 @@
 import codegen.Codegen
 import parser.MyParser
 import terms.erase.EEnvironment.{TermDecl, EEnvironment, TypeDecl}
-import terms.erase.{EVar, EFElem, EFinite, ETerm}
+import terms.erase._
 
 import scala.collection.mutable
 
@@ -24,14 +24,16 @@ object Main {
 
   object gen extends Codegen
 
-  def indent = (lines: Seq[String]) => lines.map(l => s"  $l")
+  def debug(): Unit = {
+
+  }
 
   def compile(env: EEnvironment, prog: ETerm): mutable.MutableList[String] = {
     gen.generateEnv(env :+ ("res" -> TermDecl(prog)))
     val code: mutable.MutableList[String] = mutable.MutableList()
     code ++= gen.preamble
     code += "define void @calc() {"
-    code ++= indent(gen.code :+ "ret void")
+    code ++= gen.indent(gen.code :+ "ret void")
     code += "}"
     code
   }
@@ -52,6 +54,15 @@ object Main {
     println(code.mkString("\n"))
   }
 
+  def lambda(): Unit = {
+    val fin = EFinite("Unit", List())
+    val lam = ELam("x", fin, ELam("y", fin, EVar("x")))
+    val env = gen.Closure(Map())
+    val state = gen.GenState(env, Map(), null)
+    gen.generate(lam, state)
+    println(gen.preamble.mkString("\n"))
+    println(gen.code.mkString("\n"))
+  }
 
   val program =
     """
@@ -68,7 +79,8 @@ object Main {
     """.stripMargin
 
   def main(args: Array[String]): Unit = {
-    simple()
+//    simple()
+    lambda()
 //    println(simple())
 //    println(eval.eval(program))
 //    val f = EFinite(List("tt", "ff"))
