@@ -1,7 +1,7 @@
 import codegen.Codegen
 import parser.MyParser
 import terms.erase.EEnvironment.{TermDecl, EEnvironment, TypeDecl}
-import terms.erase.{EFElem, EFinite, ETerm}
+import terms.erase.{EVar, EFElem, EFinite, ETerm}
 
 import scala.collection.mutable
 
@@ -24,13 +24,14 @@ object Main {
 
   object gen extends Codegen
 
+  def indent = (lines: Seq[String]) => lines.map(l => s"  $l")
+
   def compile(env: EEnvironment, prog: ETerm): mutable.MutableList[String] = {
     gen.generateEnv(env :+ ("res" -> TermDecl(prog)))
     val code: mutable.MutableList[String] = mutable.MutableList()
     code ++= gen.preamble
     code += "define void @calc() {"
-    code ++= gen.code.map(s => s"  $s")
-    code += "ret void"
+    code ++= indent(gen.code :+ "ret void")
     code += "}"
     code
   }
@@ -43,10 +44,11 @@ object Main {
 //        """.stripMargin
 
     val ee: EEnvironment = List(
-      "UU" -> TypeDecl(EFinite("Unit", List("uu")))
+      "UU" -> TypeDecl(EFinite("Unit", List("uu"))),
+      "ww" -> TermDecl(EFElem("uu", "Unit"))
     )
 
-    val code = compile(ee, EFElem("uu", "Unit"))
+    val code = compile(ee, EVar("ww"))
     println(code.mkString("\n"))
   }
 
