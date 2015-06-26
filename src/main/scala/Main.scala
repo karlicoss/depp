@@ -56,11 +56,14 @@ object Main {
 
   def lambda(): Unit = {
     val fin = EFinite("Unit", List())
-    val lam = ELam("x", fin, ELam("y", fin, EVar("x")))
+    val lam = ELam("x", fin, ELam("y", fin, ELam("z", fin, EVar("x"))))
+//    val lam = ELam("x", fin, ELam("y", fin, EVar("x")))
+    gen.generateAll(Seq("Unit" -> TypeDecl(fin)), lam)
+
 //    val lam = ELam("x", fin, EVar("y"))
-    val env = gen.Closure(Map())
-    val state = gen.GenState(env, Map(), null)
-    gen.generate(lam, state)
+//    val env = gen.Closure(Map())
+//    val state = gen.GenState(env, Map(), null)
+//    gen.generate(lam, state)
     println(gen.datatypes.mkString("\n"))
     println(gen.lambdas.mkString("\n"))
     println(gen.code.mkString("\n"))

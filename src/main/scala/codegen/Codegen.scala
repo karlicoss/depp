@@ -11,6 +11,7 @@ class Codegen {
   var cnt = 0
   var tmpCnt = 0
   var closureCnt = 0
+  var localCnt = 0
 
   val datatypes: mutable.MutableList[String] = mutable.MutableList()
 
@@ -34,18 +35,29 @@ class Codegen {
     res
   }
 
+  def nextLocal(): String = {
+    val res = s"local$localCnt"
+    localCnt += 1
+    res
+  }
+
   def nextClosure(): String = {
     val res = s"Cl$closureCnt"
     closureCnt += 1
     res
   }
 
+  def generateAll(env: Seq[(String, Decl)], program: ETerm) = {
+    generateEnv(env)
+    val cl = Closure(Map()) // initial closure
+    val init = GenState(cl, Map(), null) // initial state // TODO environment
+    generate(program, init)
+  }
+
   def generateEnv(env: Seq[(String, Decl)]): Unit = {
     for ((k, v) <- env) {
       v match {
-        case TermDecl(t) => {
-          generateTerm(k, t)
-        }
+        case TermDecl(t) => ??? // TODO only type declarations at the moment generateTerm(k, t)
         case TypeDecl(t) => generateType(k, t)
         case _ => ???
       }
@@ -100,10 +112,10 @@ class Codegen {
         val values: List[String] = for {
           (elem, i) <- elems.zipWithIndex
         } yield s"@$elem = internal global %$fname { i32 $i }"
-        lambdas += s"; $fname declaration"
-        lambdas += tp
-        lambdas ++= values
-        lambdas += s"; end of $fname declaration"
+        datatypes += s"; $fname declaration"
+        datatypes += tp
+        datatypes ++= values
+        datatypes += s"; end of $fname declaration"
       case _ => ???
     }
   }
@@ -197,11 +209,28 @@ class Codegen {
     val res = nextVar()
     val tmp = nextTmp()
     val code: mutable.MutableList[String] = mutable.MutableList()
-    code += s"%$tmp = alloca %$cltype; allocating closure $cltype"
     if (state.curabs != null) {
-      code += s"TODO storing bound variable ${state.curabs.v} in the closure"
+      val argname = state.curabs.v
+      val argtp = makeIRType(state.curabs.tp)
+
+      val loadedEnv = nextLocal()
+      val loadedX = nextLocal()
+      code += "; loading local variables..."
+      code += s"%$loadedEnv = load %${state.closure.name}* %env"
+      code += s"%$loadedX = load %$argtp* %$argname"
+      code += s"; allocating closure $cltype and initializing with old closure"
+      code += s"%$tmp = alloca %$cltype"
+      val tmp3 = nextTmp()
+      code += s"%$tmp3 = bitcast %$cltype* %$tmp to %${state.closure.name}*"
+      code += s"store %${state.closure.name} %$loadedEnv, %${state.closure.name}* %$tmp3"
+      val bindex = state.closure.index(argname)
+      code += s"; storing bound variable $argname in the closure $cltype with index $bindex"
+      val xptr = nextVar()
+      code += s"%$xptr = getelementptr %$cltype* %$tmp, i32 $bindex, i32 0"
+      code += s"store %$argtp %$loadedX, %$argtp* %$xptr"
+      code += "; returning the closure"
+      code += s"%$res = load %$cltype* %$tmp"
     }
-    code += s"%$res = load %$cltype* %$tmp; returning the closure"
     St(res, null, cltype, code)
   }
 
