@@ -105,31 +105,6 @@ class Codegen {
     (code, cstate)
   }
 
-  def generateTerm(name: String, t: ETerm): Unit = {
-    t match {
-      case EApp(a, b) => {
-//        val st = generate(t, )
-        ???
-      }
-      case EPair(a, b) => ???
-      case EVar(_) => {
-        val st = generate(t, null)
-        code ++= st.code
-        curenv(name) = (st.res, st.tp)
-      }
-      case EFElem(_, _) => {
-        val st = generate(t, null) // TODO add to env
-        code ++= st.code
-        curenv(name) = (st.res, st.tp)
-        // TODO store result in name
-      }
-      case ELam(x, tp, body) => ???
-      case EBreak(what, f, s, body) => ???
-      case ECase(cond, cases, _) => ???
-      case _ =>
-    }
-  }
-
   /**
    * Converts the given type to the name of the corresponding structure in LL IR
    */
@@ -139,7 +114,6 @@ class Codegen {
       case EArrow(left, right) => ???
       case ETuple(a, b) => ???
       case EFinite(fname, elems) => fname
-      case _ => ???
     }
   }
 
@@ -158,7 +132,6 @@ class Codegen {
         datatypes ++= values
         datatypes += s"; end of $fname declaration"
         finiteTypes(fname) = e
-      case _ => ???
     }
   }
 
@@ -210,20 +183,6 @@ class Codegen {
   }
 
   case class Elem(v: String, tp: EType)
-
-  // priority: first closure, then environment?
-  def getType(v: String, state: GenState): EType = {
-    if (state.curabs != null && state.curabs.v == v) {
-      // TODO
-      state.curabs.tp
-    } else if (state.closure.hasVariable(v)) {
-      // TODO
-      ???
-    } else {
-//      state.varenv(v)._2
-      ???
-    }
-  }
 
   def compileLam(lam: ELam, state: GenState): St = {
     // 1. compile the body
