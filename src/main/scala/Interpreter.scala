@@ -18,7 +18,7 @@ object Interpreter {
   }
 
   def main(args: Array[String]): Unit = {
-    val res = eval.eval(Programs.maybe_boolean_functor)
+    val res = eval.eval(Programs.maybe_poly_functor)
 
     println(res.pretty())
   }

@@ -59,6 +59,34 @@ object Programs {
       | bfmap not (BJust @tt)
     """.stripMargin
 
+  val maybe_poly_functor =
+    """
+      | Unit = { uu };
+      |
+      | Bool = { tt, ff };
+      | if = fun cond: Bool.fun then: Bool. fun else: Bool. elim (cond) {
+      |   tt => then;
+      |   ff => else;
+      | };
+      | id = fun a: Bool.a;
+      | not = fun a: Bool. if a @ff @tt;
+      |
+      | MTag = { MEmpty, MJust };
+      | Maybe = forall T: Type. exists t: MTag. elim (t) {
+      |   MEmpty => Unit ;
+      |   MJust  => T ;
+      | };
+      | MEmpty = fun T: Type. (@MEmpty, @uu);  // kinda constructors
+      | MJust = fun T: Type. fun t: T. (@MJust, t);
+      | fmap = fun A: Type. fun B: Type. fun fn: (forall pi:A.B). fun m: Maybe A. break (m) with (f, s) in
+      |   elim(f) {
+      |     MEmpty => MEmpty B;
+      |     MJust => MJust B (fn s) ;
+      |  } ;
+      | val = MJust Bool @ff;
+      | fmap Bool Bool not val
+    """.stripMargin
+
 //  TODO wtf: should not typecheck (notice the name clash fun f/elim f)
 //  val maybe_boolean_functor =
 //    """
