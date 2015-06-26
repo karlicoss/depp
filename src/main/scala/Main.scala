@@ -59,6 +59,10 @@ object Main {
     val fin = EFinite("Unit", List("uu"))
 //    val lam = ELam("x", fin, ELam("y", fin, ELam("z", fin, EVar("x"))))
 //    val lam = ELam("x", fin, ELam("y", fin, EFElem("uu", "Unit")))
+
+//    val cnst = ELam("x", fin, ELam("y", fin, EVar("x")))
+//    val prog = EApp(EApp(cnst, EFElem("tt", "Bool")), EFElem("tt", "Bool"))
+
     val prog = EApp(ELam("x", fin, EVar("x")), EFElem("uu", "Unit"))
     gen.generateAll(Seq("Unit" -> TypeDecl(fin)), prog)
 

@@ -249,6 +249,10 @@ class Codegen {
       code += s"store %$argtp %$loadedX, %$argtp* %$xptr"
       code += "; returning the closure"
       code += s"%$res = load %$cltype* %$tmp"
+    } else {
+      // TODO does not look nice
+      code += s"%$tmp = alloca %$cltype"
+      code += s"%$res = load %$cltype* %$tmp"
     }
     St(res, null, cltype, code)
   }
