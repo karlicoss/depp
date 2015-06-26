@@ -31,7 +31,7 @@ object Main {
   def compile(env: EEnvironment, prog: ETerm): mutable.MutableList[String] = {
     gen.generateEnv(env :+ ("res" -> TermDecl(prog)))
     val code: mutable.MutableList[String] = mutable.MutableList()
-    code ++= gen.preamble
+    code ++= gen.lambdas
     code += "define void @calc() {"
     code ++= gen.indent(gen.code :+ "ret void")
     code += "}"
@@ -57,10 +57,12 @@ object Main {
   def lambda(): Unit = {
     val fin = EFinite("Unit", List())
     val lam = ELam("x", fin, ELam("y", fin, EVar("x")))
+//    val lam = ELam("x", fin, EVar("y"))
     val env = gen.Closure(Map())
     val state = gen.GenState(env, Map(), null)
     gen.generate(lam, state)
-    println(gen.preamble.mkString("\n"))
+    println(gen.datatypes.mkString("\n"))
+    println(gen.lambdas.mkString("\n"))
     println(gen.code.mkString("\n"))
   }
 

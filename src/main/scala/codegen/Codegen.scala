@@ -9,11 +9,12 @@ import scala.collection.{Map, mutable}
 
 class Codegen {
   var cnt = 0
+  var tmpCnt = 0
+  var closureCnt = 0
 
-  val lambdas: Map[String, List[String]] = null // TODO
-  val finites: Map[String, List[String]] = null // TODO
+  val datatypes: mutable.MutableList[String] = mutable.MutableList()
 
-  val preamble: mutable.MutableList[String] = mutable.MutableList()
+  val lambdas: mutable.MutableList[String] = mutable.MutableList()
 
   val code: mutable.MutableList[String] = mutable.MutableList()
 
@@ -28,14 +29,14 @@ class Codegen {
   }
   
   def nextTmp(): String = {
-    val res = s"tmp$cnt"
-    cnt += 1
+    val res = s"tmp$tmpCnt"
+    tmpCnt += 1
     res
   }
 
   def nextClosure(): String = {
-    val res = s"Cl$cnt"
-    cnt += 1
+    val res = s"Cl$closureCnt"
+    closureCnt += 1
     res
   }
 
@@ -99,10 +100,10 @@ class Codegen {
         val values: List[String] = for {
           (elem, i) <- elems.zipWithIndex
         } yield s"@$elem = internal global %$fname { i32 $i }"
-        preamble += s"; $fname declaration"
-        preamble += tp
-        preamble ++= values
-        preamble += s"; end of $fname declaration"
+        lambdas += s"; $fname declaration"
+        lambdas += tp
+        lambdas ++= values
+        lambdas += s"; end of $fname declaration"
       case _ => ???
     }
   }
@@ -115,8 +116,11 @@ class Codegen {
      * Map from variable to its index in LL IR closure
      */
     val index: Map[String, Int]  = elems.keys.zipWithIndex.toMap
+    val name = nextClosure()
 
-    def hasVariable(s: String): Boolean = elems.contains(s)
+    def hasVariable(s: String): Boolean = {
+      elems.contains(s)
+    }
 
     /**
      * Creates new closure
@@ -131,7 +135,7 @@ class Codegen {
     /**
      * Generates the definition of the LL IR closure
      */
-    def generateType(): String = IRtype(elems.values.map(makeIRType))
+    def generateType(): String = IRtype(elems.values.map(x => s"%${makeIRType(x)}"))
 
     /**
      * Generates the code to extract a variable in closure
@@ -145,9 +149,9 @@ class Codegen {
       val i = index(v)
       val irType = makeIRType(elems(v))
       val code: Seq[String] = Seq(
-        s"%$tmp = getelementptr %$irType*, i32 0, i32 $i",
+        s"%$tmp = getelementptr %$name* %env, i32 0, i32 $i",
         s"%$where = load %$irType* %$tmp")
-      St(where, null, null, code)
+      St(where, null, irType, code)
     }
   }
 
@@ -168,25 +172,37 @@ class Codegen {
 
   def compileLam(lam: ELam, state: GenState): St = {
     // 1. compile the body
-    val newState = GenState(state.closure.push(lam.x, lam.tp), state.varenv, Elem(lam.x, lam.tp))
-    val cbody = generate(lam.body, newState)
+    val nclosure = state.closure.push(lam.x, lam.tp)
+    val bodyState = GenState(nclosure, state.varenv, Elem(lam.x, lam.tp))
+    val cbody = generate(lam.body, bodyState)
     // TODO initialize the closure
     // TODO add to preamble
 
-    val cltype = nextClosure()
+//    val cltype = nextClosure()
+    val cltype = nclosure.name
+    datatypes += s"%$cltype = ${state.closure.generateType()}"
+
 
     // 2. create the function
-    val rettype = null // TODO
+    val rettype = cbody.tp
     val argtype = makeIRType(lam.tp)
     val clcode: mutable.MutableList[String] = mutable.MutableList()
-    clcode += s"define %$rettype @apply_$cltype(%$cltype* env, %$argtype* ${lam.x}) {"
-    clcode ++= indent(cbody.code)
-    // clcode += s"ret ????" // TODO
+    clcode += s"define %$rettype @apply_$cltype(%$cltype* %env, %$argtype* %${lam.x}) {"
+    clcode ++= indent(cbody.code :+ s"ret %${cbody.tp} %${cbody.res}")
     clcode += "}"
-    preamble += "\n"
-    preamble ++= clcode
-    preamble += "\n"
-    St(null, null, null, Seq())
+    lambdas += "\n"
+    lambdas ++= clcode
+    lambdas += "\n"
+
+    val res = nextVar()
+    val tmp = nextTmp()
+    val code: mutable.MutableList[String] = mutable.MutableList()
+    code += s"%$tmp = alloca %$cltype; allocating closure $cltype"
+    if (state.curabs != null) {
+      code += s"TODO storing bound variable ${state.curabs.v} in the closure"
+    }
+    code += s"%$res = load %$cltype* %$tmp; returning the closure"
+    St(res, null, cltype, code)
   }
 
   /**
@@ -202,11 +218,11 @@ class Codegen {
     /**
      * Just returns the function argument
      */
-    def returnBound(): St = {
+    def getBound(): St = {
       val tmp = nextTmp()
       val tp = makeIRType(curabs.tp)
-      val code = Seq(s"%$tmp = load $tp* ${curabs.v}")
-      St(tmp, null, ???, code)
+      val code = Seq(s"%$tmp = load %$tp* %${curabs.v}")
+      St(tmp, null, tp, code)
     }
   }
 
@@ -232,7 +248,7 @@ class Codegen {
       case EBreak(what, f, s, body) => ???
       case EVar(v) =>
         if (v == state.curabs.v) { // if the variable is the last bound, just return the argument
-          state.returnBound()
+          state.getBound()
         } else if (state.closure.hasVariable(v)) { // otherwise, search in closure
           state.closure.getClosureElement(v)
         } else { // otherwise, extract global variable TODO
