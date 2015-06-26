@@ -73,7 +73,7 @@ object Main {
     val not = ELam("x", tbool, ECase(EVar("x"), Map(
       "true" -> EFElem("false", "Bool"),
       "false" -> EFElem("true", "Bool")), None))
-    val prog = EApp(not, EFElem("true", "Bool"))
+    val prog = EApp(not, EFElem("false", "Bool"))
     gen.generateAll(Seq("Bool" -> TypeDecl(tbool)), prog)
   }
 

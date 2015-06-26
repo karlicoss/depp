@@ -63,6 +63,11 @@ class Codegen {
    */
   val retTypes: MMap[String, String] = MMap()
 
+  /**
+   * Map from finite type (Depp/IR) name to its representation
+   */
+  val finiteTypes: MMap[String, EFinite] = MMap()
+
   val curenv: MMap[String, (String, String)] = MMap()
 
 
@@ -133,7 +138,7 @@ class Codegen {
       case ESum(types) => ???
       case ETuple(a, b) => ???
       case EArrow(left, right) => ???
-      case EFinite(fname, elems) =>
+      case e@EFinite(fname, elems) =>
         val tp = s"%$fname = type { i32 }"
         val values: List[String] = for {
           (elem, i) <- elems.zipWithIndex
@@ -142,6 +147,7 @@ class Codegen {
         datatypes += tp
         datatypes ++= values
         datatypes += s"; end of $fname declaration"
+        finiteTypes(fname) = e
       case _ => ???
     }
   }
@@ -349,10 +355,11 @@ class Codegen {
         val clauses: mutable.MutableList[String] = mutable.MutableList[String]()
         val switches: mutable.MutableList[String] = mutable.MutableList[String]()
         for ((k, v) <- cases) {
-          val wrapped: Int = -1   // TODO find the wrapped int by k
           val lbl = generator.nextLabel()
           val g = generate(v, state)
           tp = g.tp
+          val wrapped = finiteTypes(tp).elems.indexOf(k)
+
           clauses += s"$lbl:"
           clauses ++= g.code
           clauses += s"store %$tp %${g.res}, %$tp* %$resp; set result"
