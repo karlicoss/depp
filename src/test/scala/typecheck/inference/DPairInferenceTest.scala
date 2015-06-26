@@ -1,15 +1,15 @@
 package typecheck.inference
 
+import terms.Variables.vv
 import terms._
 import typecheck.CustomMatchers
 import typecheck.Environment.EnvValue.auto
 import typecheck.Environment.{EnvValue, Environment}
 import typecheck.inference.BooleanContext._
 import typecheck.inference.MaybeBoolContext._
-import util.UnitSpec
+import typecheck.inference.UnitPairContext._
 import util.Implicits._
-import UnitPairContext._
-import terms.Variables.vv
+import util.UnitSpec
 
 class DPairInferenceTest extends UnitSpec with CustomMatchers {
 
@@ -59,12 +59,13 @@ class DPairInferenceTest extends UnitSpec with CustomMatchers {
     val eenv: Environment = Map(
       vv("UUU") -> auto(UUU),
       vv("uuu") -> auto(uuu),
-      vv("ex") -> auto(ex)
+      vv("ex") -> EnvValue(ex, exType)
     )
     val env: Environment = envWithUnit ++ envWithBBool ++ eenv
+    uuu should haveTypeInContext(env, UUU)
     ex should haveTypeInContext(env, exType)
     ex.app("uuu") should haveTypeInContext(env, "Unit")
-    "ex".app("uuu") should haveTypeInContext(env, "Unit")
+//    "ex".app("uuu") should haveTypeInContext(env, "Unit")
   }
 
   it should "break dependent pairs 3" in {

@@ -49,7 +49,7 @@ class BooleanEnvTest extends UnitSpec with CustomMatchers {
     /**
      * isTrue = \a.match (a) {tt -> tt, ff -> ff}
      */
-    val isTrueTerm = "a".lam("Bool", "a".ccaset(Map("tt" -> ftt, "ff" -> fff), "Bool"))
+    val isTrueTerm = "a".lam("Bool", "a".ccase(Map("tt" -> ftt, "ff" -> fff)))
     val env = extendedBoolEnv ++ Map(
       vv("isTrue") -> EnvValue(TVar.dummy, isTrueTerm)
     )

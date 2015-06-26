@@ -22,11 +22,10 @@ object MaybeBoolContext {
   val fBTJust = FElem("BTJust")
 
   // MaybeBool = Σ BTag (λ { BTEmpty → Unit ; BTJust → Bool })
-  val MaybeBool = Sigma(Abs("t", "BTag", Var("t").ccaset(
+  val MaybeBool = Sigma(Abs("t", "BTag", Var("t").ccase(
     IMap(
       "BTEmpty" -> "Unit",
-      "BTJust"  -> "Bool"),
-    Level(0))))
+      "BTJust"  -> "Bool"))))
 
   // BEmpty = (BTEmpty , unit)
   val BEmpty = DPair(fBTEmpty, fuu, "MaybeBool")

@@ -34,7 +34,7 @@ object BooleanContext {
       "tt" -> th,
       "ff" -> el
     )
-    Case(cond, cc, None, tp)
+    Case(cond, cc, None)
   }
 
   /**
@@ -84,16 +84,16 @@ object BooleanContext {
   val eqbTerm =
     "a".lam("Bool",
       "b".lam("Bool",
-        "a".ccaset(Map(
-          "ff" -> "b".ccaset(Map(
+        "a".ccase(Map(
+          "ff" -> "b".ccase(Map(
             "ff" -> "Top",
             "tt" -> "Bot"
-          ), Level(0)),
-          "tt" -> "b".ccaset(Map(
+          )),
+          "tt" -> "b".ccase(Map(
             "ff" -> "Bot",
             "tt" -> "Top"
-          ), Level(0))
-    ), Level(0))))
+          ))
+    ))))
 
   val topBotEnv = IMap(
     vv("Top") -> auto(topTerm),

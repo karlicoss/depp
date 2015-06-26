@@ -42,7 +42,7 @@ abstract class Term
 
   def ccase(cases: Map[FElem.FElemType, Term], dflt: Term): Case = Case(this, cases, dflt)
 
-  def ccaset(cases: Map[FElem.FElemType, Term], tp: Term): Case = Case(this, cases, None, tp)
+  def ccaset(cases: Map[FElem.FElemType, Term], tp: Term): Case = Case(this, cases, None)
 
   /**
    * TODO HOW TO MOVE THIS TO HasEvaluate?
@@ -61,4 +61,6 @@ abstract class Term
     }
     cur
   }
+
+  final def inferAll(env: Environment): Term = infer(env).evaluateAll(env)
 }

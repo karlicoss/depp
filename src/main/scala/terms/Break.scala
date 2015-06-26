@@ -1,11 +1,9 @@
 package terms
 
 import terms.Variables.Variable
-import terms.erase.{EBreak, EType, ETerm}
+import terms.erase.{EBreak, ETerm, EType}
 import typecheck.Environment.{EnvValue, Environment}
 import typecheck.inference.TypeInferenceException
-
-import util.Implicits.type2EnvElem
 
 import scalaz.State
 
@@ -46,8 +44,9 @@ case class Break(what: Term, f: Variable, s: Variable, body: Term) extends Term 
    * @return
    */
   override def inferHelper(env: Environment): State[Int, Term] = for {
-    wt <- what.inferHelper(env).map(_.evaluateAll(env))
-    Sigma(abs) = wt // what should be Sigma
+    wt <- what.inferHelper(env)
+    ewt = wt.evaluateAll(env)
+    Sigma(abs) = ewt // what should be Sigma
     // the type of Break is the type of body
     nenv: Environment = env + (f -> EnvValue(abs.tp)) + (s -> EnvValue(abs.body.subst(Map(abs.v -> EnvValue(Var(f))))))
     bt <- body.inferHelper(nenv)

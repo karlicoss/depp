@@ -28,14 +28,13 @@ class ImplicitTypeTest extends UnitSpec with CustomMatchers {
     case Sigma(abs) => hasDummy(abs)
     case TVar(v) => v.isInstanceOf[Dummy]
     case Lam(abs) => hasDummy(abs)
-    case Case(cond, cases, dflt, tp) =>
+    case Case(cond, cases, dflt) =>
       hasDummy(cond) ||
       cases.values.map(hasDummy).exists(_ == true) ||
       (dflt match {
         case Some(x) => hasDummy(x)
         case None => false
-      }) ||
-      hasDummy(tp)
+      })
 
     case DPair(a, b, tp) => hasDummy(a) || hasDummy(b) || hasDummy(tp)
     case App(a, b) => hasDummy(a) || hasDummy(b)

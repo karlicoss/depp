@@ -13,8 +13,7 @@ import scalaz.State
 case class Case(
                  cond: Term,
                  cases: Map[FElem.FElemType, Term],
-                 dflt: Option[Term],
-                 tp: Term) extends Term {
+                 dflt: Option[Term]) extends Term {
   /**
    * Evaluates the expression under the given context
    * @param env the context
@@ -34,7 +33,7 @@ case class Case(
         }
       }
       case other =>
-        new Case(other, cases, dflt, tp)
+        new Case(other, cases, dflt)
     }
   }
 
@@ -86,8 +85,7 @@ case class Case(
     scond <- cond.substHelper(env)
     scases <- promoteMap(cases.mapValues(_.substHelper(env))) // TODO Applicative.sequence
     sdflt <- liftOption(dflt.map(_.substHelper(env))) // TODO monadic lift?
-    stp <- tp.substHelper(env)
-  } yield new Case(scond, scases, sdflt, stp)
+  } yield new Case(scond, scases, sdflt)
 
   /**
    * Infers the type of the expression under the given context
@@ -100,7 +98,7 @@ case class Case(
     // 3. check that switch is exhaustive
     // 4. types of all the branches should be the same
 
-    val ctp = cond.infer(env) // tp should be the name of finite type
+    val ctp = cond.infer(env).evaluateAll(env) // tp should be the name of finite type
     val elems = ctp match {
       case Finite(ee) => ee
       case Var(name) => {
@@ -108,7 +106,7 @@ case class Case(
         ee
       }
       case _ => {
-        throw TypeInferenceException(s"Expected $tp to be Finite")
+        throw TypeInferenceException(s"Expected $ctp to be Finite")
       }
     }
     val ccases = cases.keySet
@@ -134,8 +132,9 @@ case class Case(
     if (ccases.size < elems.size) {
       clauses = clauses ++ Seq((dflt.get, env)) // TODO should provide default, throw exception
     }
-    for ((cl, ee) <- clauses) {
-      val cltp = cl.infer(ee)
+    val tp = clauses.head._1.inferAll(clauses.head._2)
+    for ((cl, ee) <- clauses.tail) {
+      val cltp = cl.inferAll(ee)
       if (!Beta.equivalent(ee, tp, cltp)) {
         throw TypeInferenceException(s"Expected types $tp and $cltp to be equal!")
       }
@@ -155,7 +154,6 @@ case class Case(
 }
 
 object Case {
-  def apply(cond: Term, cases: Map[FElem.FElemType, Term]): Case = new Case(cond, cases, None, null) // FIXME
-  def apply(cond: Term, cases: Map[FElem.FElemType, Term], dflt: Term): Case = new Case(cond, cases, Some(dflt), null) // FIXME
-  def apply(cond: Term, cases: Map[FElem.FElemType, Term], dflt: Term, tp: Term): Case = new Case(cond, cases, Some(dflt), tp)
+  def apply(cond: Term, cases: Map[FElem.FElemType, Term]): Case = new Case(cond, cases, None) // FIXME
+  def apply(cond: Term, cases: Map[FElem.FElemType, Term], dflt: Term): Case = new Case(cond, cases, Some(dflt)) // FIXME
 }
