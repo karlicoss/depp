@@ -234,21 +234,23 @@ class Codegen {
 
       val loadedEnv = generator.nextLocal()
       val loadedX = generator.nextLocal()
-      code += "; loading local variables..."
-      code += s"%$loadedEnv = load %${state.closure.name}* %env"
-      code += s"%$loadedX = load %$argtp* %$argname"
-      code += s"; allocating closure $cltype and initializing with old closure"
-      code += s"%$tmp = alloca %$cltype"
       val tmp3 = generator.nextTmp()
-      code += s"%$tmp3 = bitcast %$cltype* %$tmp to %${state.closure.name}*"
-      code += s"store %${state.closure.name} %$loadedEnv, %${state.closure.name}* %$tmp3"
       val bindex = state.closure.index(argname)
-      code += s"; storing bound variable $argname in the closure $cltype with index $bindex"
       val xptr = generator.nextVar()
-      code += s"%$xptr = getelementptr %$cltype* %$tmp, i32 $bindex, i32 0"
-      code += s"store %$argtp %$loadedX, %$argtp* %$xptr"
-      code += "; returning the closure"
-      code += s"%$res = load %$cltype* %$tmp"
+      code ++=
+        s"""; loading local variables...
+           |%$loadedEnv = load %${state.closure.name}* %env
+           |%$loadedX = load %$argtp* %$argname
+           |; allocating closure $cltype and initializing with old closure
+           |%$tmp = alloca %$cltype
+           |%$tmp3 = bitcast %$cltype* %$tmp to %${state.closure.name}*
+           |store %${state.closure.name} %$loadedEnv, %${state.closure.name}* %$tmp3
+           |; storing bound variable $argname in the closure $cltype with index $bindex
+           |%$xptr = getelementptr %$cltype* %$tmp, i32 $bindex, i32 0
+           |store %$argtp %$loadedX, %$argtp* %$xptr
+           |; returning the closure
+           |%$res = load %$cltype* %$tmp
+         """.stripMargin.split("\n")
     } else {
       // TODO does not look nice
       code += s"%$tmp = alloca %$cltype"
