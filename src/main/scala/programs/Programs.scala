@@ -1,26 +1,38 @@
 package programs
 
 object Programs {
+//  val should_be_false =
+//    """
+//      | Bot = { };
+//      | Top = { top };
+//      | Bool = { tt, ff };
+//      | not = λ z: Bool. elim (z) {
+//      |   tt => @ff ;
+//      |   ff => @tt ;
+//      | };
+//      | and = λ a: Bool. λ b: Bool. elim (a) {
+//      |   tt => elim (b) {
+//      |     tt => @tt;
+//      |     ff => @ff;
+//      |   };
+//      |   ff => elim (b) {
+//      |     tt => @ff;
+//      |     ff => @tt;
+//      |   };
+//      | };
+//      | and (not @tt) (and @ff (not @ff))
+//    """.stripMargin
+
   val should_be_false =
     """
       | Bot = { };
       | Top = { top };
       | Bool = { tt, ff };
-      | not = λ b. elim (b) {
-      |   tt => ff ;
-      |   ff => tt ;
+      | not = λ z: Bool. elim (z) {
+      |   tt => @ff ;
+      |   ff => @tt ;
       | };
-      | and = λ a. λ b. elim (a) {
-      |   tt => elim (b) {
-      |     tt => tt;
-      |     ff => ff;
-      |   };
-      |   ff => elim (b) {
-      |     tt => ff;
-      |     ff => tt;
-      |   };
-      | };
-      | and (not tt) (and ff (not ff))
+      | (not @tt)
     """.stripMargin
 
   val maybe_boolean_functor =

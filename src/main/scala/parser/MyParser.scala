@@ -2,14 +2,12 @@ package parser
 
 import terms.Variables.{Simple, Variable}
 import terms._
-import typecheck.Environment.{Environment, EnvValue}
+import typecheck.Environment.{EnvValue, Environment}
 
+import scala.collection.immutable.{Map => IMap}
+import scala.util.parsing.combinator.ImplicitConversions
 import scala.util.parsing.combinator.lexical.StdLexical
 import scala.util.parsing.combinator.syntactical.StdTokenParsers
-import scala.util.parsing.combinator.ImplicitConversions
-
-import scala.collection.Map
-import scala.collection.immutable.{Map => IMap}
 
 class MyParser() extends StdTokenParsers
   with ImplicitConversions {
@@ -63,7 +61,7 @@ class MyParser() extends StdTokenParsers
       varname ^^ (Var(_)) |
       felem |
       finite |
-      pair | fst | snd | brk |
+      pair | brk |
       level |
       ccase |
       lam | pi | sigma |
