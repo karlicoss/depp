@@ -57,8 +57,9 @@ object Main {
   def lambda(): Unit = {
     val fin = EFinite("Unit", List("uu"))
 //    val lam = ELam("x", fin, ELam("y", fin, ELam("z", fin, EVar("x"))))
-    val lam = ELam("x", fin, ELam("y", fin, EFElem("uu", "Unit")))
-    gen.generateAll(Seq("Unit" -> TypeDecl(fin)), lam)
+//    val lam = ELam("x", fin, ELam("y", fin, EFElem("uu", "Unit")))
+    val prog = EApp(ELam("x", fin, EVar("x")), EFElem("uu", "Unit"))
+    gen.generateAll(Seq("Unit" -> TypeDecl(fin)), prog)
 
 //    val lam = ELam("x", fin, EVar("y"))
 //    val env = gen.Closure(Map())
@@ -66,6 +67,7 @@ object Main {
 //    gen.generate(lam, state)
     println(gen.datatypes.mkString("\n"))
     println(gen.lambdas.mkString("\n"))
+    println("; Code:")
     println(gen.code.mkString("\n"))
   }
 

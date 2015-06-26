@@ -12,6 +12,7 @@ class Codegen {
   var tmpCnt = 0
   var closureCnt = 0
   var localCnt = 0
+  var argCnt = 0
 
   val datatypes: mutable.MutableList[String] = mutable.MutableList()
 
@@ -47,11 +48,18 @@ class Codegen {
     res
   }
 
+  def nextArg(): String = {
+    val res = s"arg$argCnt"
+    argCnt += 1
+    res
+  }
+
   def generateAll(env: Seq[(String, Decl)], program: ETerm) = {
     generateEnv(env)
     val cl = Closure(Map()) // initial closure
     val init = GenState(cl, Map(), null) // initial state // TODO environment
-    generate(program, init)
+    val res = generate(program, init)
+    code ++= res.code
   }
 
   def generateEnv(env: Seq[(String, Decl)]): Unit = {
@@ -259,18 +267,29 @@ class Codegen {
         val fcode = generate(a, state)
         val argcode = generate(b, state)
 
-        val code = fcode.code ++ argcode.code
-        // TODO generate closure?
+        val fn = nextArg()
+        val arg = nextArg()
+        val res = nextVar()
 
-        // TODO
-        St(null, null, null, code) // TODO ??
+        val restype = null // TODO???
+
+        val code: mutable.MutableList[String] = mutable.MutableList()
+        code ++= fcode.code // preparing the environment
+        code ++= argcode.code // preparing the argument
+        code += s"%$fn = alloca ${fcode.tp}"
+        code += s"%$arg = alloca ${argcode.tp}"
+        code += s"store %${fcode.tp} %${fcode.res}, %${fcode.tp}* %$fn"
+        code += s"store %${argcode.tp} %${argcode.res}, %${argcode.tp}* %$arg"
+        // and... the call!
+        // at this point, left hand side is the closure!
+        code += s"%$res = call %$restype @apply_${fcode.tp}(%${fcode.tp}* %$fn, %${argcode.tp}* %$arg)"
+        St(res, null, restype, code)
       }
-      case EFElem(name, fname) => {
+      case EFElem(name, fname) =>
         val tmp = nextTmp()
         val ccode = Seq(s"%$tmp = load %$fname* @$name")
         // TODO extract EFElem from global scope?
         St(tmp, null, s"$fname", ccode)
-      }
       case EBreak(what, f, s, body) => ???
       case EVar(v) =>
         if (v == state.curabs.v) { // if the variable is the last bound, just return the argument
