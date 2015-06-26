@@ -3,7 +3,7 @@ package terms
 import terms.Terms.Let
 import util.PrettyPrintable
 
-package object Variables {
+object Variables {
   sealed abstract class Variable extends PrettyPrintable {
     def lam(tp: Term, body: Term): Lam = Lam(Abs(this, tp, body))
 

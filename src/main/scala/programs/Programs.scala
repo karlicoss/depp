@@ -25,7 +25,7 @@ object Programs {
 
   val maybe_boolean_functor =
     """
-      | Top = { tt };
+      | Top = { top };
       | Bot = { };
       |
       | Unit = { uu };
@@ -61,9 +61,13 @@ object Programs {
 
   val maybe_poly_functor =
     """
-      | Unit = { uu };
+      | Top = { tt };
+      | Bot = { };
       |
       | Bool = { tt, ff };
+      |
+      | beq = fun a: Bool. fun b: Bool. forall a: Bool. forall b: Bool. Type
+      |
       | if = fun cond: Bool.fun then: Bool. fun else: Bool. elim (cond) {
       |   tt => then;
       |   ff => else;
@@ -85,6 +89,32 @@ object Programs {
       |  } ;
       | val = MJust Bool @ff;
       | fmap Bool Bool not val
+    """.stripMargin
+
+
+  val bool_equality =
+    """
+      | Top = { top };
+      | Bot = { };
+      |
+      | Unit = { uu };
+      |
+      | Bool = { tt, ff };
+      | eq = λ a: Bool. λ b: Bool. elim (a) {
+      |   tt => elim (b) {
+      |     tt => Top;
+      |     ff => Bot;
+      |   };
+      |   ff => elim (b) {
+      |     tt => Bot;
+      |     ff => Top;
+      |   };
+      | };
+      | reflType = forall a: Bool. eq a a;
+      | fun a: Bool. elim (a) {
+      |   tt => @top;
+      |   ff => @top;
+      | }
     """.stripMargin
 
 //  TODO wtf: should not typecheck (notice the name clash fun f/elim f)

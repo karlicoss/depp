@@ -3,7 +3,6 @@ package typecheck
 import terms.Variables.Variable
 import terms._
 import typecheck.Environment.Environment
-import typecheck.inference.TypeInferenceException
 
 /**
  * Alpha equivalence
@@ -82,9 +81,9 @@ object Alpha {
             case Finite(sb) => sa.sameElements(sb) // TODO not sure if a good idea
             case _ => false
           }
-        case Case(conda, casesa, dflta, _) =>
+        case Case(conda, casesa, dflta) =>
           b match {
-            case Case(condb, casesb, dfltb, _) => {
+            case Case(condb, casesb, dfltb) => {
               if (!helper(env, map, boundA, boundB, conda, condb)) {
                 return false
               }
