@@ -8,11 +8,43 @@ import scala.collection.mutable.{Map => MMap}
 import scala.collection.{Map, mutable}
 
 class Codegen {
-  var cnt = 0
-  var tmpCnt = 0
-  var closureCnt = 0
-  var localCnt = 0
-  var argCnt = 0
+  object generator {
+    var cnt = 0
+    var tmpCnt = 0
+    var closureCnt = 0
+    var localCnt = 0
+    var argCnt = 0
+
+    def nextVar(): String = {
+      val res = s"v$cnt"
+      cnt += 1
+      res
+    }
+
+    def nextTmp(): String = {
+      val res = s"tmp$tmpCnt"
+      tmpCnt += 1
+      res
+    }
+
+    def nextLocal(): String = {
+      val res = s"local$localCnt"
+      localCnt += 1
+      res
+    }
+
+    def nextClosure(): String = {
+      val res = s"Cl$closureCnt"
+      closureCnt += 1
+      res
+    }
+
+    def nextArg(): String = {
+      val res = s"arg$argCnt"
+      argCnt += 1
+      res
+    }
+  }
 
   val datatypes: mutable.MutableList[String] = mutable.MutableList()
 
@@ -24,35 +56,6 @@ class Codegen {
 
   def indent = (lines: Seq[String]) => lines.map(l => s"  $l")
 
-  def nextVar(): String = {
-    val res = s"v$cnt"
-    cnt += 1
-    res
-  }
-  
-  def nextTmp(): String = {
-    val res = s"tmp$tmpCnt"
-    tmpCnt += 1
-    res
-  }
-
-  def nextLocal(): String = {
-    val res = s"local$localCnt"
-    localCnt += 1
-    res
-  }
-
-  def nextClosure(): String = {
-    val res = s"Cl$closureCnt"
-    closureCnt += 1
-    res
-  }
-
-  def nextArg(): String = {
-    val res = s"arg$argCnt"
-    argCnt += 1
-    res
-  }
 
   def generateAll(env: Seq[(String, Decl)], program: ETerm) = {
     generateEnv(env)
@@ -133,7 +136,7 @@ class Codegen {
      * Map from variable to its index in LL IR closure
      */
     val index: Map[String, Int]  = elems.keys.zipWithIndex.toMap
-    val name = nextClosure()
+    val name = generator.nextClosure()
 
     def hasVariable(s: String): Boolean = {
       elems.contains(s)
@@ -160,8 +163,8 @@ class Codegen {
      * @param v name of the Depp variable
      */
     def getClosureElement(v: String): St = {
-      val tmp = nextTmp()
-      val where = nextVar()
+      val tmp = generator.nextTmp()
+      val where = generator.nextVar()
 
       val i = index(v)
       val irType = makeIRType(elems(v))
@@ -211,26 +214,26 @@ class Codegen {
     lambdas ++= clcode
     lambdas += "\n"
 
-    val res = nextVar()
-    val tmp = nextTmp()
+    val res = generator.nextVar()
+    val tmp = generator.nextTmp()
     val code: mutable.MutableList[String] = mutable.MutableList()
     if (state.curabs != null) {
       val argname = state.curabs.v
       val argtp = makeIRType(state.curabs.tp)
 
-      val loadedEnv = nextLocal()
-      val loadedX = nextLocal()
+      val loadedEnv = generator.nextLocal()
+      val loadedX = generator.nextLocal()
       code += "; loading local variables..."
       code += s"%$loadedEnv = load %${state.closure.name}* %env"
       code += s"%$loadedX = load %$argtp* %$argname"
       code += s"; allocating closure $cltype and initializing with old closure"
       code += s"%$tmp = alloca %$cltype"
-      val tmp3 = nextTmp()
+      val tmp3 = generator.nextTmp()
       code += s"%$tmp3 = bitcast %$cltype* %$tmp to %${state.closure.name}*"
       code += s"store %${state.closure.name} %$loadedEnv, %${state.closure.name}* %$tmp3"
       val bindex = state.closure.index(argname)
       code += s"; storing bound variable $argname in the closure $cltype with index $bindex"
-      val xptr = nextVar()
+      val xptr = generator.nextVar()
       code += s"%$xptr = getelementptr %$cltype* %$tmp, i32 $bindex, i32 0"
       code += s"store %$argtp %$loadedX, %$argtp* %$xptr"
       code += "; returning the closure"
@@ -253,7 +256,7 @@ class Codegen {
      * Just returns the function argument
      */
     def getBound(): St = {
-      val tmp = nextTmp()
+      val tmp = generator.nextTmp()
       val tp = makeIRType(curabs.tp)
       val code = Seq(s"%$tmp = load %$tp* %${curabs.v}")
       St(tmp, null, tp, code)
@@ -267,9 +270,9 @@ class Codegen {
         val fcode = generate(a, state)
         val argcode = generate(b, state)
 
-        val fn = nextArg()
-        val arg = nextArg()
-        val res = nextVar()
+        val fn = generator.nextArg()
+        val arg = generator.nextArg()
+        val res = generator.nextVar()
 
         val restype = null // TODO???
 
@@ -286,7 +289,7 @@ class Codegen {
         St(res, null, restype, code)
       }
       case EFElem(name, fname) =>
-        val tmp = nextTmp()
+        val tmp = generator.nextTmp()
         val ccode = Seq(s"%$tmp = load %$fname* @$name")
         // TODO extract EFElem from global scope?
         St(tmp, null, s"$fname", ccode)
