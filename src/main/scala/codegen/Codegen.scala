@@ -15,6 +15,7 @@ class Codegen {
     var closureCnt = 0
     var localCnt = 0
     var argCnt = 0
+    var labelCnt = 0
 
     def nextVar(): String = {
       val res = s"v$cnt"
@@ -43,6 +44,12 @@ class Codegen {
     def nextArg(): String = {
       val res = s"arg$argCnt"
       argCnt += 1
+      res
+    }
+
+    def nextLabel(): String = {
+      val res = s"lbl$labelCnt"
+      labelCnt += 1
       res
     }
   }
@@ -103,7 +110,7 @@ class Codegen {
       }
       case ELam(x, tp, body) => ???
       case EBreak(what, f, s, body) => ???
-      case ECase(cond, cases) => ???
+      case ECase(cond, cases, _) => ???
       case _ =>
     }
   }
@@ -280,6 +287,13 @@ class Codegen {
     }
   }
 
+  /**
+   * Unpacks int32 from a finite type element v
+   */
+  def unpack(v: String): St = {
+    ??? // TODO
+  }
+
   def generate(term: ETerm, state: GenState): St = {
     term match {
       case EPair(a, b) => ???
@@ -321,7 +335,52 @@ class Codegen {
         }
       case t@ELam(x, tp, body) =>
         compileLam(t, state)
-      case ECase(cond, cases) => ???
+      case ECase(cond, cases, dflt) => {
+        val cnd = generate(cond, state) // should be an element of finite type
+        val fvalue = generator.nextLocal()
+
+
+        var tp: String = null // type of the expression
+
+        val otw = generator.nextLabel() // otherwise label
+        val end = generator.nextLabel() // end label
+        val resp = generator.nextTmp() // pointer to the result
+
+        val clauses: mutable.MutableList[String] = mutable.MutableList[String]()
+        val switches: mutable.MutableList[String] = mutable.MutableList[String]()
+        for ((k, v) <- cases) {
+          val wrapped: Int = -1   // TODO find the wrapped int by k
+          val lbl = generator.nextLabel()
+          val g = generate(v, state)
+          tp = g.tp
+          clauses += s"$lbl:"
+          clauses ++= g.code
+          clauses += s"store %$tp %${g.res}, %$tp* %$resp; set result"
+          clauses += s"br label %$end"
+          clauses += "\n"
+          switches += s"i32 $wrapped, label %$lbl"
+        }
+        clauses += s"$otw:"
+        for (df <- dflt) {
+          val g = generate(df, state)
+          tp = g.tp
+          clauses ++= g.code
+          clauses += s"store %$tp %${g.res}, %$tp* %$resp; set case result"
+        }
+        clauses += s"br label %$end"
+        clauses += s"$end:"
+        val code = mutable.MutableList[String]()
+        code ++= cnd.code
+        code += s"%$fvalue = extractvalue %$tp %${cnd.res}, 0"
+        code += s"%$resp = alloca %$tp; case expression result"
+        code += s"switch i32 %$fvalue, label %$otw [ " + switches.mkString(" ") + " ] "
+        code ++= Codegen.indent(clauses)
+
+        val res = generator.nextVar()
+        code += s"%$res = load %$tp* %$resp"
+
+        St(res, tp, code)
+      }
       case _ => ???
     }
   }

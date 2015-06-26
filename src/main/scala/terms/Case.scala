@@ -1,11 +1,10 @@
 package terms
 
 import terms.FElem.FElemType
-import terms.Variables.Variable
-import terms.erase.{EType, ECase, ETerm}
+import terms.erase.{ECase, ETerm, EType}
 import typecheck.Beta
 import typecheck.Environment.EnvValue.auto
-import typecheck.Environment.{EnvValue, Environment}
+import typecheck.Environment.Environment
 import typecheck.inference.TypeInferenceException
 
 import scala.collection.Map
@@ -151,7 +150,8 @@ case class Case(
   override def erase(): Option[Either[ETerm, EType]] = for {
     econd <- cond.erase()
     emap: Map[FElemType, Either[ETerm, EType]] <- promoteMapOption(cases.mapValues(_.erase()))
-  } yield Left(ECase(econd.left.get, emap.mapValues(_.left.get)))
+//    edflt <- dflt.map(_.erase())
+  } yield Left(ECase(econd.left.get, emap.mapValues(_.left.get), null)) // TODO default
 }
 
 object Case {

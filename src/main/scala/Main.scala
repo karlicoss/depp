@@ -66,13 +66,24 @@ object Main {
     gen.generateAll(Seq("Bool" -> TypeDecl(tbool)), prog)
   }
 
+  def runNot(): Unit = {
+    val tbool = EFinite("Bool", List("false", "true"))
+    val env = Seq("Bool" -> TypeDecl(tbool))
+
+    val not = ELam("x", tbool, ECase(EVar("x"), Map(
+      "true" -> EFElem("false", "Bool"),
+      "false" -> EFElem("true", "Bool")), None))
+    val prog = EApp(not, EFElem("true", "Bool"))
+    gen.generateAll(Seq("Bool" -> TypeDecl(tbool)), prog)
+  }
+
   def lambda(): Unit = {
 //    val fin = EFinite("Unit", List("uu"))
 //    val lam = ELam("x", fin, ELam("y", fin, ELam("z", fin, EVar("x"))))
 //    val lam = ELam("x", fin, ELam("y", fin, EFElem("uu", "Unit")))
 
 
-    runConst()
+    runNot()
 
 //    val prog = EApp(ELam("x", fin, EVar("x")), EFElem("uu", "Unit"))
 
