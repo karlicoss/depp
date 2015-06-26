@@ -105,10 +105,7 @@ class Codegen {
       case ETuple(a, b) => ???
       case EArrow(left, right) => ???
       case EFinite(fname, elems) =>
-        val tp =
-          s"""
-              |%$fname = type { i32 }
-           """.stripMargin
+        val tp = s"%$fname = type { i32 }"
         val values: List[String] = for {
           (elem, i) <- elems.zipWithIndex
         } yield s"@$elem = internal global %$fname { i32 $i }"
@@ -272,7 +269,7 @@ class Codegen {
         val tmp = nextTmp()
         val ccode = Seq(s"%$tmp = load %$fname* @$name")
         // TODO extract EFElem from global scope?
-        St(tmp, null, s"%$fname", ccode)
+        St(tmp, null, s"$fname", ccode)
       }
       case EBreak(what, f, s, body) => ???
       case EVar(v) =>
@@ -283,35 +280,14 @@ class Codegen {
         } else { // otherwise, extract global variable TODO
           ???
         }
-      case t@ELam(x, tp, body) => {
+      case t@ELam(x, tp, body) =>
         compileLam(t, state)
-      }
       case ECase(cond, cases) => ???
       case _ => ???
     }
   }
 
-  def free(t: ETerm): Seq[String] = {
-    def helper(t: ETerm, bound: Set[String]): Set[String] = {
-      t match {
-        case EPair(a, b) => helper(a, bound) ++ helper(b, bound)
-        case EApp(a, b) => helper(a, bound) ++ helper(b, bound)
-        case EVar(v) => {
-          if (bound(v)) Set() else Set(v)
-        }
-        case EFElem(name, fname) => Set()
-        case ELam(x, tp, body) => helper(body, bound + x)
-        case EBreak(what, f, s, body) => ??? // TODO
-        case ECase(cond, cases) => helper(cond, bound) ++ cases.values.flatMap(x => helper(x, bound))
-        case _ => ???
-      }
-    }
-    helper(t, Set()).toSeq
-  }
-
-  case class St(res: String, ref: String, tp: String, code: Seq[String]) {
-
-  }
+  case class St(res: String, ref: String, tp: String, code: Seq[String])
 }
 
 object Codegen {

@@ -55,9 +55,9 @@ object Main {
   }
 
   def lambda(): Unit = {
-    val fin = EFinite("Unit", List())
-    val lam = ELam("x", fin, ELam("y", fin, ELam("z", fin, EVar("x"))))
-//    val lam = ELam("x", fin, ELam("y", fin, EVar("x")))
+    val fin = EFinite("Unit", List("uu"))
+//    val lam = ELam("x", fin, ELam("y", fin, ELam("z", fin, EVar("x"))))
+    val lam = ELam("x", fin, ELam("y", fin, EFElem("uu", "Unit")))
     gen.generateAll(Seq("Unit" -> TypeDecl(fin)), lam)
 
 //    val lam = ELam("x", fin, EVar("y"))
