@@ -1,5 +1,6 @@
 package codegen
 
+import codegen.Codegen.indent
 import terms.erase.EEnvironment.{Decl, TermDecl, TypeDecl}
 import terms.erase._
 
@@ -47,22 +48,32 @@ class Codegen {
   }
 
   val datatypes: mutable.MutableList[String] = mutable.MutableList()
-
   val lambdas: mutable.MutableList[String] = mutable.MutableList()
-
   val code: mutable.MutableList[String] = mutable.MutableList()
 
-  val curenv: MMap[String, (String, String)] = MMap()
+  /**
+   * Map from closure name to the return value
+   */
+  val retTypes: MMap[String, String] = MMap()
 
-  def indent = (lines: Seq[String]) => lines.map(l => s"  $l")
+  val curenv: MMap[String, (String, String)] = MMap()
 
 
   def generateAll(env: Seq[(String, Decl)], program: ETerm) = {
     generateEnv(env)
     val cl = Closure(Map()) // initial closure
     val init = GenState(cl, Map(), null) // initial state // TODO environment
-    val res = generate(program, init)
-    code ++= res.code
+    val pcode = generate(program, init)
+    val processRes: Seq[String] =
+      s"""
+         |; result output routines
+         |%res_ptr = alloca %${pcode.tp}
+         |store %${pcode.tp} %${pcode.res}, %${pcode.tp}* %res_ptr
+         |%inner = getelementptr %${pcode.tp}* %res_ptr, i32 0, i32 0
+         |%res = load i32* %inner
+       """.stripMargin.split("\n")
+    val rcode = pcode.code ++ processRes
+    code ++= Codegen.wrapInMain(rcode)
   }
 
   def generateEnv(env: Seq[(String, Decl)]): Unit = {
@@ -212,7 +223,7 @@ class Codegen {
     clcode += "}"
     lambdas += "\n"
     lambdas ++= clcode
-    lambdas += "\n"
+    retTypes(cltype) = rettype
 
     val res = generator.nextVar()
     val tmp = generator.nextTmp()
@@ -274,13 +285,13 @@ class Codegen {
         val arg = generator.nextArg()
         val res = generator.nextVar()
 
-        val restype = null // TODO???
+        val restype = retTypes(fcode.tp)
 
         val code: mutable.MutableList[String] = mutable.MutableList()
         code ++= fcode.code // preparing the environment
         code ++= argcode.code // preparing the argument
-        code += s"%$fn = alloca ${fcode.tp}"
-        code += s"%$arg = alloca ${argcode.tp}"
+        code += s"%$fn = alloca %${fcode.tp}"
+        code += s"%$arg = alloca %${argcode.tp}"
         code += s"store %${fcode.tp} %${fcode.res}, %${fcode.tp}* %$fn"
         code += s"store %${argcode.tp} %${argcode.res}, %${argcode.tp}* %$arg"
         // and... the call!
@@ -313,14 +324,29 @@ class Codegen {
 }
 
 object Codegen {
-  def genProgram(p: String): String = {
-    p +
-    """
-      | define i32 @main() {
-      |   ret i32 0
-      | }
-    """.stripMargin
+  /**
+   * Expects answer to be in int32 res
+   * @param prog
+   * @return
+   */
+  def wrapInMain(prog: Seq[String]): Seq[String] = {
+    val res = mutable.MutableList[String]()
+    res += "@buf = global [2 x i8] c\"H\\00\""
+    res += "declare i32 @puts(i8*)"
+    res += "define i32 @main() {"
+    res ++= indent(prog)
+    res +=
+      """  %tres = trunc i32 %res to i8
+        |  %chres = add i8 48, %tres
+        |  %str = getelementptr [2 x i8]* @buf, i32 0, i32 0
+        |  store i8 %chres, i8* %str
+        |  call i32 @puts(i8* getelementptr inbounds ([2 x i8]* @buf, i32 0, i32 0))
+        |  ret i32 0
+        |}
+      """.stripMargin
   }
+
+  def indent = (lines: Seq[String]) => lines.map(l => s"  $l")
 
 //  val program =
 //    """

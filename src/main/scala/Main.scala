@@ -1,4 +1,5 @@
 import codegen.Codegen
+import codegen.Codegen.indent
 import parser.MyParser
 import terms.erase.EEnvironment.{TermDecl, EEnvironment, TypeDecl}
 import terms.erase._
@@ -33,7 +34,7 @@ object Main {
     val code: mutable.MutableList[String] = mutable.MutableList()
     code ++= gen.lambdas
     code += "define void @calc() {"
-    code ++= gen.indent(gen.code :+ "ret void")
+    code ++= indent(gen.code :+ "ret void")
     code += "}"
     code
   }
