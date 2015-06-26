@@ -14,6 +14,8 @@ package object Variables {
     def let(tp: Term, what: Term): Let = Let(this, tp, what)
 
     def let(what: Term): Let = Let(this, what)
+
+    override def toString: String = this.pretty()
   }
 
   /**

@@ -55,6 +55,9 @@ abstract class Term
     var cur = this
     var done = false
     while (!done) {
+//      println("Current: " + cur.pretty())
+//      println("Environment: " + env.toList.mkString("\n"))
+//      println("-----------------------")
       val res = cur.evaluateAllHelper(env)
       done = res._1
       cur = res._2

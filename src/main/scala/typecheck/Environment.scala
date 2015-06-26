@@ -6,7 +6,9 @@ import terms.Variables.Variable
 import scala.collection.Map
 
 package object Environment {
-  case class EnvValue(tp: Term, dfn: Option[Term])
+  case class EnvValue(tp: Term, dfn: Option[Term]) {
+    override def toString: String = tp.pretty() + " : " + dfn.map(_.pretty())
+  }
 
   object EnvValue {
     def apply(tp: Term, dfn: Term): EnvValue = EnvValue(tp, Some(dfn))

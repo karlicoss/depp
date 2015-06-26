@@ -65,7 +65,7 @@ class DPairInferenceTest extends UnitSpec with CustomMatchers {
     uuu should haveTypeInContext(env, UUU)
     ex should haveTypeInContext(env, exType)
     ex.app("uuu") should haveTypeInContext(env, "Unit")
-//    "ex".app("uuu") should haveTypeInContext(env, "Unit")
+//    "ex".app("uuu") should haveTypeInContext(env, "Unit") // TODO weird, uncommenting results in a crash
   }
 
   it should "break dependent pairs 3" in {

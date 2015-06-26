@@ -29,7 +29,9 @@ final case class Abs(v: Variable, var tp: Term, body: Term, dummy: Unit)
     s <- State.get[Int]
     _ <- State.modify[Int](_ + 1)
     fv = v match {
-      case Simple(name) => Generated(name, s)
+      case Simple(name) => {
+        Generated(name, s)
+      }
       case Generated(name, id) => Generated(name, s)
       case Dummy() => null
     }

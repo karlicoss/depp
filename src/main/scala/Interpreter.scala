@@ -1,15 +1,15 @@
 import parser.MyParser
 import programs.Programs
+import terms.Term
 
 object Interpreter {
   object eval extends MyParser {
-    def eval(program: String): String = {
+    def eval(program: String): Term = {
       val res = parse(program)
       res match {
         case Success(result, next) => {
           val (env, term) = result
-          val res = term.evaluateAll(env)
-          res.pretty()
+          term.evaluateAll(env)
         }
         case _: NoSuccess =>
           throw new RuntimeException()
@@ -18,6 +18,8 @@ object Interpreter {
   }
 
   def main(args: Array[String]): Unit = {
-    eval.eval(Programs.should_be_false)
+    val res = eval.eval(Programs.maybe_boolean_functor)
+
+    println(res.pretty())
   }
 }

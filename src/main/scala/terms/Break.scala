@@ -16,7 +16,7 @@ case class Break(what: Term, f: Variable, s: Variable, body: Term) extends Term 
   override def substHelper(env: Environment): State[Int, Term] = for { // TODO FIXME GENERATE NEW VARIABLES
     ws <- what.substHelper(env)
     bs <- body.substHelper(env)
-  } yield Break(what, f, s, body)
+  } yield Break(ws, f, s, bs)
 
   /**
    * Evaluates the expression under the given context
