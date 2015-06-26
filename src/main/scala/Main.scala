@@ -30,7 +30,7 @@ object Main {
   }
 
   def compile(env: EEnvironment, prog: ETerm): mutable.MutableList[String] = {
-    gen.generateEnv(env :+ ("res" -> TermDecl(prog)))
+    gen.generateEnv(env :+ ("res" -> TermDecl(prog)), null)
     val code: mutable.MutableList[String] = mutable.MutableList()
     code ++= gen.lambdas
     code += "define void @calc() {"
@@ -63,18 +63,19 @@ object Main {
     val cnst = ELam("x", tbool, ELam("y", tbool, EVar("x")))
     val prog = EApp(EApp(cnst, EFElem("true", "Bool")), EFElem("false", "Bool"))
 
-    gen.generateAll(Seq("Bool" -> TypeDecl(tbool)), prog)
+    gen.generateAll(env, prog)
   }
 
   def runNot(): Unit = {
     val tbool = EFinite("Bool", List("false", "true"))
-    val env = Seq("Bool" -> TypeDecl(tbool))
-
     val not = ELam("x", tbool, ECase(EVar("x"), Map(
       "true" -> EFElem("false", "Bool"),
       "false" -> EFElem("true", "Bool")), None))
-    val prog = EApp(not, EFElem("false", "Bool"))
-    gen.generateAll(Seq("Bool" -> TypeDecl(tbool)), prog)
+    val env = Seq(
+      "Bool" -> TypeDecl(tbool),
+      "not"  -> TermDecl(not))
+    val prog = EApp(EVar("not"), EFElem("false", "Bool"))
+    gen.generateAll(env, prog)
   }
 
   def lambda(): Unit = {

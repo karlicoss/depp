@@ -72,10 +72,11 @@ class Codegen {
 
 
   def generateAll(env: Seq[(String, Decl)], program: ETerm) = {
-    generateEnv(env)
     val cl = Closure(Map()) // initial closure
     val init = GenState(cl, Map(), null) // initial state // TODO environment
-    val pcode = generate(program, init)
+    val (globalCode, state) = generateEnv(env, init)
+
+    val pcode = generate(program, state)
     val processRes: Seq[String] =
       s"""
          |; result output routines
@@ -84,23 +85,32 @@ class Codegen {
          |%inner = getelementptr %${pcode.tp}* %res_ptr, i32 0, i32 0
          |%res = load i32* %inner
        """.stripMargin.split("\n")
-    val rcode = pcode.code ++ processRes
+    val rcode = globalCode ++ pcode.code ++ processRes
     code ++= Codegen.wrapInMain(rcode)
   }
 
-  def generateEnv(env: Seq[(String, Decl)]): Unit = {
+  def generateEnv(env: Seq[(String, Decl)], state: GenState): (Seq[String], GenState) = {
+    val code = mutable.MutableList[String]()
+    var cstate = state
     for ((k, v) <- env) {
       v match {
-        case TermDecl(t) => ??? // TODO only type declarations at the moment generateTerm(k, t)
+        case TermDecl(t) => {
+          val tcode = generate(t, state)
+          code ++= tcode.code
+          cstate = GenState(cstate.closure, cstate.env + (k -> (tcode.res, tcode.tp)), state.curabs)
+        }
         case TypeDecl(t) => generateType(k, t)
-        case _ => ???
       }
     }
+    (code, cstate)
   }
 
   def generateTerm(name: String, t: ETerm): Unit = {
     t match {
-      case EApp(a, b) => ???
+      case EApp(a, b) => {
+//        val st = generate(t, )
+        ???
+      }
       case EPair(a, b) => ???
       case EVar(_) => {
         val st = generate(t, null)
@@ -210,14 +220,15 @@ class Codegen {
       // TODO
       ???
     } else {
-      state.varenv(v)._2
+//      state.varenv(v)._2
+      ???
     }
   }
 
   def compileLam(lam: ELam, state: GenState): St = {
     // 1. compile the body
     val nclosure = state.closure.push(lam.x, lam.tp)
-    val bodyState = GenState(nclosure, state.varenv, Elem(lam.x, lam.tp))
+    val bodyState = GenState(nclosure, state.env, Elem(lam.x, lam.tp))
     val cbody = generate(lam.body, bodyState)
     // TODO initialize the closure
     // TODO add to preamble
@@ -275,12 +286,12 @@ class Codegen {
   /**
    * Code generation state
    * @param closure lambda closure
-   * @param varenv TODO global variables?
+   * @param env TODO global variables?
    * @param curabs most recent abstraction
    */
   case class GenState(
                        closure: Closure,
-                       varenv: Map[String, (String, EType)],
+                       env: Map[String, (String, String)], // name -> (IR name, IR type)
                        curabs: Elem) {
     /**
      * Just returns the function argument
@@ -332,12 +343,13 @@ class Codegen {
         St(tmp, s"$fname", ccode)
       case EBreak(what, f, s, body) => ???
       case EVar(v) =>
-        if (v == state.curabs.v) { // if the variable is the last bound, just return the argument
+        if (state.curabs != null && v == state.curabs.v) { // if the variable is the last bound, just return the argument
           state.getBound()
         } else if (state.closure.hasVariable(v)) { // otherwise, search in closure
           state.closure.getClosureElement(v)
-        } else { // otherwise, extract global variable TODO
-          ???
+        } else { // otherwise, extract global variable
+          val s = state.env(v)
+          St(s._1, s._2, Seq())
         }
       case t@ELam(x, tp, body) =>
         compileLam(t, state)
