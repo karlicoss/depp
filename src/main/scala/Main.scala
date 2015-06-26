@@ -55,16 +55,27 @@ object Main {
     println(code.mkString("\n"))
   }
 
+  // (\x.\y.x) true false => true
+  def runConst(): Unit = {
+    val tbool = EFinite("Bool", List("false", "true"))
+    val env = Seq("Bool" -> TypeDecl(tbool))
+
+    val cnst = ELam("x", tbool, ELam("y", tbool, EVar("x")))
+    val prog = EApp(EApp(cnst, EFElem("true", "Bool")), EFElem("false", "Bool"))
+
+    gen.generateAll(Seq("Bool" -> TypeDecl(tbool)), prog)
+  }
+
   def lambda(): Unit = {
-    val fin = EFinite("Unit", List("uu"))
+//    val fin = EFinite("Unit", List("uu"))
 //    val lam = ELam("x", fin, ELam("y", fin, ELam("z", fin, EVar("x"))))
 //    val lam = ELam("x", fin, ELam("y", fin, EFElem("uu", "Unit")))
 
-//    val cnst = ELam("x", fin, ELam("y", fin, EVar("x")))
-//    val prog = EApp(EApp(cnst, EFElem("tt", "Bool")), EFElem("tt", "Bool"))
 
-    val prog = EApp(ELam("x", fin, EVar("x")), EFElem("uu", "Unit"))
-    gen.generateAll(Seq("Unit" -> TypeDecl(fin)), prog)
+    runConst()
+
+//    val prog = EApp(ELam("x", fin, EVar("x")), EFElem("uu", "Unit"))
+
 
 //    val lam = ELam("x", fin, EVar("y"))
 //    val env = gen.Closure(Map())

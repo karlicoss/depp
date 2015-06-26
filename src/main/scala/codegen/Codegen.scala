@@ -182,7 +182,7 @@ class Codegen {
       val code: Seq[String] = Seq(
         s"%$tmp = getelementptr %$name* %env, i32 0, i32 $i",
         s"%$where = load %$irType* %$tmp")
-      St(where, null, irType, code)
+      St(where, irType, code)
     }
   }
 
@@ -256,7 +256,7 @@ class Codegen {
       code += s"%$tmp = alloca %$cltype"
       code += s"%$res = load %$cltype* %$tmp"
     }
-    St(res, null, cltype, code)
+    St(res, cltype, code)
   }
 
   /**
@@ -276,7 +276,7 @@ class Codegen {
       val tmp = generator.nextTmp()
       val tp = makeIRType(curabs.tp)
       val code = Seq(s"%$tmp = load %$tp* %${curabs.v}")
-      St(tmp, null, tp, code)
+      St(tmp, tp, code)
     }
   }
 
@@ -303,13 +303,13 @@ class Codegen {
         // and... the call!
         // at this point, left hand side is the closure!
         code += s"%$res = call %$restype @apply_${fcode.tp}(%${fcode.tp}* %$fn, %${argcode.tp}* %$arg)"
-        St(res, null, restype, code)
+        St(res, restype, code)
       }
       case EFElem(name, fname) =>
         val tmp = generator.nextTmp()
         val ccode = Seq(s"%$tmp = load %$fname* @$name")
         // TODO extract EFElem from global scope?
-        St(tmp, null, s"$fname", ccode)
+        St(tmp, s"$fname", ccode)
       case EBreak(what, f, s, body) => ???
       case EVar(v) =>
         if (v == state.curabs.v) { // if the variable is the last bound, just return the argument
@@ -326,7 +326,7 @@ class Codegen {
     }
   }
 
-  case class St(res: String, ref: String, tp: String, code: Seq[String])
+  case class St(res: String, tp: String, code: Seq[String])
 }
 
 object Codegen {
