@@ -3,7 +3,7 @@ package codegen
 import java.io.{PrintWriter, File}
 
 import terms.erase.EEnvironment._
-import terms.erase.{ETerm, EFElem, EFinite}
+import terms.erase._
 import util.UnitSpec
 
 import scala.collection.mutable
@@ -33,15 +33,57 @@ class CodegenTest extends UnitSpec{
     file
   }
 
-  it should "compile" in {
-    val env: EEnvironment = List(
-      "UU" -> TypeDecl(EFinite("Unit", List("uu")))
-    )
-    val program = EFElem("uu", "Unit")
+  /**
+   * TODO Use matcher here
+   * @param env
+   * @param program
+   */
+  def shouldCompile(env: EEnvironment, program: ETerm): Unit = {
     val res = generate(env, program)
+    // TODO how to pipe in an ad-hoc manner instead of creating a temporary file?
     val tmpFile = writeToTmpfile(res.mkString("\n"))
     val lli = Process.apply("lli-3.4", Seq(tmpFile.getAbsolutePath))
     val exitValue = lli.!
     exitValue should be (0)
+  }
+
+  it should "compile simple program" in {
+    val env: EEnvironment = List(
+      "UU" -> TypeDecl(EFinite("Unit", List("uu")))
+    )
+    val program = EFElem("uu", "Unit")
+    shouldCompile(env, program)
+  }
+
+  it should "compile simple program[2]" in {
+    val env: EEnvironment = List(
+      "UU" -> TypeDecl(EFinite("Unit", List("uu"))),
+      "qq" -> TermDecl(EFElem("uu", "Unit"))
+    )
+    val program = EVar("qq")
+    shouldCompile(env, program)
+  }
+
+  it should "compile identity function" in {
+    val tunit = EFinite("Unit", List("uu"))
+    val env: EEnvironment = List(
+      "UU" -> TypeDecl(tunit),
+      "id" -> TermDecl(ELam("x", tunit, EVar("x")))
+    )
+    val program = EApp(EVar("id"), EFElem("uu", "Unit"))
+    shouldCompile(env, program)
+  }
+
+  it should "compile boolean not function" in {
+    val tbool = EFinite("Bool", List("false", "true"))
+    val not = ELam("x", tbool, ECase(EVar("x"), Map(
+      "true" -> EFElem("false", "Bool"),
+      "false" -> EFElem("true", "Bool")), None))
+    val env = Seq(
+      "Bool" -> TypeDecl(tbool),
+      "not"  -> TermDecl(not)
+    )
+    val program = EApp(EVar("not"), EFElem("false", "Bool"))
+    shouldCompile(env, program)
   }
 }
