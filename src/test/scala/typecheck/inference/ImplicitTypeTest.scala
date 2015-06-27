@@ -21,8 +21,6 @@ class ImplicitTypeTest extends UnitSpec with CustomMatchers {
 
   def hasDummy(t: Term): Boolean = t match {
     case Level(kind) => false
-    case Proj1(trm) => hasDummy(trm)
-    case Proj2(trm) => hasDummy(trm)
     case Finite(elems) => false
     case Pi(abs) => hasDummy(abs)
     case Sigma(abs) => hasDummy(abs)

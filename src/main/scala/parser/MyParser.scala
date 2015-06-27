@@ -37,7 +37,6 @@ class MyParser() extends StdTokenParsers
     "fun", "λ", // lambda
     "elim", "default",
     "Type",
-    "fst", "snd", // dependend pairs elimination
     "break", "with", "in" // break (pair) with (f, s) in { }
   )
 
@@ -86,12 +85,6 @@ class MyParser() extends StdTokenParsers
 
   lazy val pair: Parser[DPair] =
     ("(" ~> term <~ ",") ~ (term <~ ")") ^^ flatten2((fst, snd) => DPair(fst, snd))
-
-  lazy val fst: Parser[Proj1] =
-     "fst" ~> term ^^ (Proj1(_))
-
-  lazy val snd: Parser[Proj2] =
-    "snd" ~> term ^^ (Proj2(_))
 
   lazy val lam: Parser[Lam] =
     absParser(lambda) ^^ (x => x._2 match {

@@ -75,16 +75,6 @@ class MyParserTest extends UnitSpec {
     p.parsing("Type#32") shouldEqual Level(32)
   }
 
-  it should "parse proj1" in {
-    implicit val ptest = p.fst
-    p.parsing("fst pair") shouldBe an[Proj1]
-  }
-
-  it should "parse proj2" in {
-    implicit val ptest = p.snd
-    p.parsing("snd pair") shouldBe an[Proj2]
-  }
-
   it should "parse dflt" in {
     implicit val ptest = p.dflt
     p.parsing("default => alala ;")
