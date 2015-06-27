@@ -86,4 +86,15 @@ class CodegenTest extends UnitSpec{
     val program = EApp(EVar("not"), EFElem("false", "Bool"))
     shouldCompile(env, program)
   }
+
+  it should "compile const function" in {
+    val tbool = EFinite("Bool", List("false", "true"))
+    val const = ELam("x", tbool, ELam("y", tbool, EVar("x")))
+    val env = Seq(
+      "Bool" -> TypeDecl(tbool),
+      "const"  -> TermDecl(const)
+    )
+    val program = EApp(EApp(EVar("const"), EFElem("true", "Bool")), EFElem("false", "Bool"))
+    shouldCompile(env, program)
+  }
 }
