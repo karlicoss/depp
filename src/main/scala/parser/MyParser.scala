@@ -1,6 +1,6 @@
 package parser
 
-import terms.Variables.{Simple, Variable}
+import terms.Variables.{Dummy, Simple, Variable}
 import terms._
 import typecheck.Environment.{EnvValue, Environment}
 
@@ -32,9 +32,9 @@ class MyParser() extends StdTokenParsers
   )
 
   lexical.reserved ++= Seq(
+    "fun", "λ", // lambda
     "forall", "∀", // forall
     "exists", "∃", // exists
-    "fun", "λ", // lambda
     "elim", "default",
     "Type",
     "break", "with", "in" // break (pair) with (f, s) in { }
@@ -52,8 +52,10 @@ class MyParser() extends StdTokenParsers
   lazy val program: Parser[(Environment, Term)] =
     rep(dfn <~ ";") ~ expr ^^ flatten2((dfns, prog) => (dfns.toMap, prog))
 
+  // TODO what is the point of expr if it is the same as term?
   lazy val expr: Parser[Term] = term
 
+  // TODO what is the point of having both aterm and appterm
   lazy val term: Parser[Term] = appterm
 
   lazy val aterm: Parser[Term] =
@@ -92,11 +94,16 @@ class MyParser() extends StdTokenParsers
       case None => x._1.lam(x._3)
     })
 
-  lazy val pi: Parser[Pi] =
+  lazy val pi: Parser[Pi] = simplePi | dependentPi
+
+  lazy val dependentPi: Parser[Pi] =
     absParser(forall) ^^ (x => x._2 match {
       case Some(tp) => x._1.pi(tp, x._3)
       case None => throw ParserException("TODO")
     })
+
+  lazy val simplePi: Parser[Pi] =
+    (term <~ "->") ~ term ^^ (p => Dummy().pi(p._1, p._2))
 
   lazy val sigma: Parser[Sigma] =
     absParser(exists) ^^ (x => x._2 match {

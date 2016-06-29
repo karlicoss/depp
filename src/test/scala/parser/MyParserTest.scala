@@ -38,8 +38,11 @@ class MyParserTest extends UnitSpec {
 
   it should "parse app" in {
     implicit val ptest = p.appterm
-    p.parsing("x x x") shouldBe an[App]
-    p.parsing("x (y z)") shouldBe an[App]
+//    p.parsing("x (y)") shouldBe an[App]
+//    p.parsing("(x) y") shouldBe an[App]
+    p.parsing("x y") shouldBe an[App]
+//    p.parsing("x x x") shouldBe an[App]
+//    p.parsing("x (y z)") shouldBe an[App]
   }
 
   it should "parse lambda" in {
@@ -149,4 +152,13 @@ class MyParserTest extends UnitSpec {
     p.parsing(Programs.maybe_boolean_functor)
   }
 
+  it should "parse pi types" in {
+    implicit val ptest = p.pi
+    p.parsing("forall x: Trataa.qqqq")
+  }
+
+  it should "parse simple function types" in {
+    implicit val ptest = p.pi
+    p.parsing("Tratata -> qqqq")
+  }
 }
