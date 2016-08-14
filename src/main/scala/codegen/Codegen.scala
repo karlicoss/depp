@@ -82,8 +82,8 @@ class Codegen {
          |; result output routines
          |%res_ptr = alloca %${pcode.tp}
          |store %${pcode.tp} %${pcode.res}, %${pcode.tp}* %res_ptr
-         |%inner = getelementptr %${pcode.tp}* %res_ptr, i32 0, i32 0
-         |%res = load i32* %inner
+         |%inner = getelementptr %${pcode.tp}, %${pcode.tp}* %res_ptr, i32 0, i32 0
+         |%res = load i32, i32* %inner
        """.stripMargin.split("\n")
     val rcode = globalCode ++ pcode.code ++ processRes
     code ++= Codegen.wrapInMain(rcode)
@@ -176,8 +176,8 @@ class Codegen {
       val i = index(v)
       val irType = makeIRType(elems(v))
       val code: Seq[String] = Seq(
-        s"%$tmp = getelementptr %$name* %env, i32 0, i32 $i",
-        s"%$where = load %$irType* %$tmp")
+        s"%$tmp = getelementptr %$name, %$name* %env, i32 0, i32 $i",
+        s"%$where = load %$irType, %$irType* %$tmp")
       St(where, irType, code)
     }
   }
@@ -222,22 +222,22 @@ class Codegen {
       val xptr = generator.nextVar()
       code ++=
         s"""; loading local variables...
-           |%$loadedEnv = load %${state.closure.name}* %env
-           |%$loadedX = load %$argtp* %$argname
+           |%$loadedEnv = load %${state.closure.name}, %${state.closure.name}* %env
+           |%$loadedX = load %$argtp, %$argtp* %$argname
            |; allocating closure $cltype and initializing with old closure
            |%$tmp = alloca %$cltype
            |%$tmp3 = bitcast %$cltype* %$tmp to %${state.closure.name}*
            |store %${state.closure.name} %$loadedEnv, %${state.closure.name}* %$tmp3
            |; storing bound variable $argname in the closure $cltype with index $bindex
-           |%$xptr = getelementptr %$cltype* %$tmp, i32 $bindex, i32 0
+           |%$xptr = getelementptr %$cltype, %$cltype* %$tmp, i32 $bindex, i32 0
            |store %$argtp %$loadedX, %$argtp* %$xptr
            |; returning the closure
-           |%$res = load %$cltype* %$tmp
+           |%$res = load %$cltype, %$cltype* %$tmp
          """.stripMargin.split("\n")
     } else {
       // TODO does not look nice
       code += s"%$tmp = alloca %$cltype"
-      code += s"%$res = load %$cltype* %$tmp"
+      code += s"%$res = load %$cltype, %$cltype* %$tmp"
     }
     St(res, cltype, code)
   }
@@ -258,7 +258,7 @@ class Codegen {
     def getBound(): St = {
       val tmp = generator.nextTmp()
       val tp = makeIRType(curabs.tp)
-      val code = Seq(s"%$tmp = load %$tp* %${curabs.v}")
+      val code = Seq(s"%$tmp = load %$tp, %$tp* %${curabs.v}")
       St(tmp, tp, code)
     }
   }
@@ -297,7 +297,7 @@ class Codegen {
       }
       case EFElem(name, fname) =>
         val tmp = generator.nextTmp()
-        val ccode = Seq(s"%$tmp = load %$fname* @$name")
+        val ccode = Seq(s"%$tmp = load %$fname, %$fname* @$name")
         // TODO extract EFElem from global scope?
         St(tmp, s"$fname", ccode)
       case EBreak(what, f, s, body) => ???
@@ -355,7 +355,7 @@ class Codegen {
         code ++= Codegen.indent(clauses)
 
         val res = generator.nextVar()
-        code += s"%$res = load %$tp* %$resp"
+        code += s"%$res = load %$tp, %$tp* %$resp"
 
         St(res, tp, code)
       }
@@ -381,9 +381,9 @@ object Codegen {
     res +=
       """  %tres = trunc i32 %res to i8
         |  %chres = add i8 48, %tres
-        |  %str = getelementptr [2 x i8]* @buf, i32 0, i32 0
+        |  %str = getelementptr [2 x i8], [2 x i8]* @buf, i32 0, i32 0
         |  store i8 %chres, i8* %str
-        |  call i32 @puts(i8* getelementptr inbounds ([2 x i8]* @buf, i32 0, i32 0))
+        |  call i32 @puts(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @buf, i32 0, i32 0))
         |  ret i32 0
         |}
       """.stripMargin

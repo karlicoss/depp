@@ -42,7 +42,7 @@ class CodegenTest extends UnitSpec{
     val res = generate(env, program)
     // TODO how to pipe in an ad-hoc manner instead of creating a temporary file?
     val tmpFile = writeToTmpfile(res.mkString("\n"))
-    val lli = Process.apply("lli-3.4", Seq(tmpFile.getAbsolutePath))
+    val lli = Process.apply("lli", Seq(tmpFile.getAbsolutePath))
     val exitValue = lli.!
     exitValue should be (0)
   }
