@@ -120,19 +120,4 @@ class BooleanEnvTest extends UnitSpec with CustomMatchers {
   it should "infer eqb type" in {
     Var("eqb") should haveTypeInContext(extendedBoolEnv, "x".pi("Bool", "y".pi("Bool", Level(0))))
   }
-
-  it should "rwerewr" in {
-    /**
-     * th1 : (a : Bool) → (qq : (ww : a eqb ff) → ⊥) → a eqb tt
-     */
-    val statement = "a".pi("Bool", "qq".pi("ww".pi("eqb".app("a", fff), "Bot"), "eqb".app("a", ftt)))
-    /**
-     * th1 = λ { tt → λ _ → top ; ff → λ z → z top }
-     */
-    val proof = "a".lam("Bool", "a".ccaset(IMap(
-      "ff" -> "z".lam(".".pi("Top", "Bot"), "z".app(ftop)),
-      "tt" -> "z".lam(".".pi("Bot", "Bot"), ftop)
-    ), "qq".pi("ww".pi("eqb".app("a", fff), "Bot"), "eqb".app("a", ftt))))
-    proof should haveTypeInContext(extendedBoolEnv, statement)
-  }
 }
